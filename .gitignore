@@ -78,5 +78,6 @@ Assets/CRIMW.meta
 .idea/
 
 # DOTween Ignore
-Assets/ThirdParty/Plugins/
-Assets/ThirdParty/Resources/
+Assets/ThirdParty/DOTween
+
+Assets/Packages/
