@@ -1,4 +1,4 @@
-
+﻿
 public enum ViewID
 {
     Invalid = 0,

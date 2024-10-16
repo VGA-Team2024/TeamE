@@ -1,19 +1,18 @@
-using Cysharp.Threading.Tasks;
+ï»¿using Cysharp.Threading.Tasks;
 using DataManagement.SpreadSheet;
 using SerializableCollections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// ƒQ[ƒ€“à‚Åg—p‚·‚éƒf[ƒ^‚½‚¿
+/// ã‚²ãƒ¼ãƒ å†…ã§ä½¿ç”¨ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ãŸã¡
 /// </summary>
 namespace DataManagement
 {
     /// <summary>
-    /// ƒVƒXƒeƒ€—p
+    /// ã‚·ã‚¹ãƒ†ãƒ ç”¨
     /// </summary>
     public interface IMasterData
     {
@@ -33,9 +32,9 @@ namespace DataManagement
         public abstract UniTask Marshal();
 
         /// <summary>
-        /// ƒtƒ@ƒCƒ‹‚©‚ç‚Ì“Ç‚İ‚İ
+        /// ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã®èª­ã¿è¾¼ã¿
         /// </summary>
-        /// <param name="masterName">ƒ}ƒXƒ^–¼(È—ª‰Â)</param>
+        /// <param name="masterName">ãƒã‚¹ã‚¿å(çœç•¥å¯)</param>
         /// <returns></returns>
         protected async UniTask<SerializableDictionary<K, V>> LoadFromFile(string masterName = "default")
         {
@@ -47,7 +46,7 @@ namespace DataManagement
         }
 
         /// <summary>
-        /// ƒf[ƒ^‚ÌƒVƒ“ƒvƒ‹‚È®Œ`
+        /// ãƒ‡ãƒ¼ã‚¿ã®ã‚·ãƒ³ãƒ—ãƒ«ãªæ•´å½¢
         /// </summary>
         protected void pretty<T>(T[] data, Func<T, (K, V)> mapper)
         {
@@ -74,7 +73,7 @@ namespace DataManagement
 
 
     /// <summary>
-    /// ƒeƒLƒXƒgƒ}ƒXƒ^
+    /// ãƒ†ã‚­ã‚¹ãƒˆãƒã‚¹ã‚¿
     /// </summary>
     [Serializable]
     public class TextMaster : MasterDataBase<string, string>
@@ -85,20 +84,20 @@ namespace DataManagement
 
         public override async UniTask Marshal()
         {
-            //ƒeƒLƒXƒgƒ}ƒXƒ^‚ğİ’è‚·‚é
-            //“ú–{Œê‚ğg‚¤
-            //TODO: Œ¾Œêİ’è‚ğŒ©‚é
+            //ãƒ†ã‚­ã‚¹ãƒˆãƒã‚¹ã‚¿ã‚’è¨­å®šã™ã‚‹
+            //æ—¥æœ¬èªã‚’ä½¿ã†
+            //TODO: è¨€èªè¨­å®šã‚’è¦‹ã‚‹
 
-            // ƒ}ƒXƒ^“Ç‚İ‚İˆ—
+            // ãƒã‚¹ã‚¿èª­ã¿è¾¼ã¿å‡¦ç†
             var text = await MasterData.LoadMasterData<SpreadSheet.TextMaster>("JP_Text");
 
-            // ®Œ`ˆ—
+            // æ•´å½¢å‡¦ç†
             pretty(text.Data, (SpreadSheet.TextData data) => { return (data.Key, data.Text); });
         }
     }
 
     /// <summary>
-    /// “Gƒ}ƒXƒ^
+    /// æ•µãƒã‚¹ã‚¿
     /// </summary>
     [Serializable]
     public class EnemyMaster : MasterDataBase<int, EnemyMaster.EnemyData>
@@ -106,7 +105,7 @@ namespace DataManagement
         public override string MasterName => "EnemyMaster";
 
         /// <summary>
-        /// ƒXƒLƒ‹‚Ìƒf[ƒ^
+        /// ã‚¹ã‚­ãƒ«ã®ãƒ‡ãƒ¼ã‚¿
         /// </summary>
         [Serializable]
         public class EnemyData
@@ -125,7 +124,7 @@ namespace DataManagement
         }
 
         /// <summary>
-        /// ƒXƒLƒ‹‚Ìƒf[ƒ^
+        /// ã‚¹ã‚­ãƒ«ã®ãƒ‡ãƒ¼ã‚¿
         /// </summary>
         [Serializable]
         public class SkillData
@@ -145,7 +144,7 @@ namespace DataManagement
             };
             await masterDataDownloads;
 
-            // ®Œ`ˆ—
+            // æ•´å½¢å‡¦ç†
             pretty(enemy.Data, (SpreadSheet.EnemyData data) => { return (data.Id, new EnemyData(data)); });
         }
     }

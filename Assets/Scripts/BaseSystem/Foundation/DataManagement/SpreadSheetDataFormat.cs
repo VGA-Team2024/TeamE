@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 /// <summary>
 /// スプレッドシートからダウンロードしてくるデータたち
 /// </summary>

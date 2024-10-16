@@ -1,53 +1,59 @@
-
+Ôªø
+using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 
 public class GameSettings
 {
     public class SceneSetting
     {
-        public string BaseSceneName;
+        public string BaseSceneName = "";
+        public Action StartDriver = null;
         public List<string> AdditiveSceneName = new List<string>();
     }
 
     static public string MasterDataAPIURI => "https://script.google.com/macros/s/AKfycbw6J_mqIsEjQUq1iThp7mnul7UiWhZYDyil3jIr75WR0QK1h2DKgsmnPva9aXDYqvYX/exec";
 
+
     /// <summary>
-    /// É`Å[ÉÄÇ≈å¬ï Ç…ê›íËÇµÇƒÇ≠ÇæÇ≥Ç¢
+    /// „ÉÅ„Éº„É†„ÅßÂÄãÂà•„Å´Ë®≠ÂÆö„Åó„Å¶„Åè„Å†„Åï„ÅÑ
+    /// NOTE: @PlayScene„ÅØÁèæÂú®Ë®≠ÂÆö‰∏≠„ÅÆ„Ç∑„Éº„É≥„Åå
     /// </summary>
-    static Dictionary<string, SceneSetting> _sceneDic = new Dictionary<string, SceneSetting>()
+    static Dictionary<string, SceneSetting> _sceneTypeDic = new Dictionary<string, SceneSetting>()
     {
         {
-            "Title" ,
+            "Ingame" ,
             new SceneSetting(){
-                BaseSceneName = "Title"
-            }
-        },
-        {
-            "Stage1" ,
-            new SceneSetting(){
-                BaseSceneName = "Stage1",
+                BaseSceneName = "@PlayScene",
                 AdditiveSceneName = new List<string>(){
                     "IngameSystem"
                 }
             }
         },
         {
-            "Stage2" ,
+            "Ingame_Debug" ,
             new SceneSetting(){
-                BaseSceneName = "Stage2",
+                BaseSceneName = "@PlayScene",
                 AdditiveSceneName = new List<string>(){
-                    "IngameSystem"
+                    "IngameSystem",
+                    "IngameDebug"
                 }
             }
         },
         {
-            "Result" ,
+            "ProgramTest" ,
             new SceneSetting(){
-                BaseSceneName = "Result"
+                BaseSceneName = "Night",
+                AdditiveSceneName = new List<string>(){
+                    "IngameSystem",
+                    ""
+                }
             }
         }
     };
 
-    public static SceneSetting GetSetting(string key) => _sceneDic.ContainsKey(key) ? _sceneDic[key] : throw new KeyNotFoundException("SceneSettingÇÃÉLÅ[Ç™Ç†ÇËÇ‹ÇπÇÒ");
+    public static SceneSetting GetSetting(string key) => _sceneTypeDic.ContainsKey(key) ? _sceneTypeDic[key] : throw new KeyNotFoundException("SceneSetting„ÅÆ„Ç≠„Éº„Åå„ÅÇ„Çä„Åæ„Åõ„Çì");
+
+#if UNITY_EDITOR
+    public static Dictionary<string, SceneSetting> SceneTypeDic => _sceneTypeDic;
+#endif
 }
