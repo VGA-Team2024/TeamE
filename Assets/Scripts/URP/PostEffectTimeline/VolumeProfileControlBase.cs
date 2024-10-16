@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace HikanyanLaboratory.URP
+namespace TeamE.URP
 {
     [ExecuteAlways, RequireComponent(typeof(Volume))]
     public abstract class VolumeProfileControlBase<T> : MonoBehaviour where T : VolumeComponent
