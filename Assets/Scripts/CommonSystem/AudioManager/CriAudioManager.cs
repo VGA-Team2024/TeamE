@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CriWare;
+using Cysharp.Threading.Tasks;
 using HikanyanLaboratory.CommonSystem;
 using UnityEngine;
 using R3;
@@ -20,49 +22,50 @@ namespace HikanyanLaboratory.Audio
         public ReactiveProperty<float> VoiceVolume { get; private set; } = new ReactiveProperty<float>(1f);
 
 
-        // private void Awake()
-        // {
-        //     // ACF設定
-        //     string path = Application.streamingAssetsPath + $"/{_audioSetting.StreamingAssetsPathAcf}.acf";
-        //     CriAtomEx.RegisterAcf(null, path);
-        //
-        //     // CriAtom作成
-        //     gameObject.AddComponent<CriAtom>();
-        //
-        //     _listener = FindObjectOfType<CriAtomListener>();
-        //     if (_listener == null)
-        //     {
-        //         _listener = gameObject.AddComponent<CriAtomListener>();
-        //     }
-        //
-        //     _audioPlayers = new Dictionary<CriAudioType, ICriAudioPlayerService>();
-        //
-        //     foreach (var cueSheet in _audioSetting.AudioCueSheet)
-        //     {
-        //         CriAtom.AddCueSheet(cueSheet.CueSheetName, $"{cueSheet.AcbPath}.acb",
-        //             !string.IsNullOrEmpty(cueSheet.AwbPath) ? $"{cueSheet.AwbPath}.awb" : null, null);
-        //         if (cueSheet.CueSheetName == CriAudioType.CueSheet_BGM.ToString())
-        //         {
-        //             _audioPlayers.Add(CriAudioType.CueSheet_BGM, new BGMPlayer(cueSheet.CueSheetName, _listener));
-        //         }
-        //         else if (cueSheet.CueSheetName == CriAudioType.CueSheet_SE.ToString())
-        //         {
-        //             _audioPlayers.Add(CriAudioType.CueSheet_SE, new SEPlayer(cueSheet.CueSheetName, _listener));
-        //         }
-        //         else if (cueSheet.CueSheetName == CriAudioType.CueSheet_Voice.ToString())
-        //         {
-        //             _audioPlayers.Add(CriAudioType.CueSheet_Voice, new VoicePlayer(cueSheet.CueSheetName, _listener));
-        //         }
-        //
-        //         // 他のCriAudioTypeも同様に追加可能
-        //     }
-        //
-        //     // MasterVolumeの変更を監視して、各Playerに反映
-        //     MasterVolume.Subscribe(OnMasterVolumeChanged).AddTo(this);
-        //     BgmVolume.Subscribe(volume => OnVolumeChanged(CriAudioType.CueSheet_BGM, volume)).AddTo(this);
-        //     SeVolume.Subscribe(volume => OnVolumeChanged(CriAudioType.CueSheet_SE, volume)).AddTo(this);
-        //     VoiceVolume.Subscribe(volume => OnVolumeChanged(CriAudioType.CueSheet_Voice, volume)).AddTo(this);
-        // }
+        protected override async void OnAwake()
+        {
+            // ACF設定
+            string path = Application.streamingAssetsPath + $"/{_audioSetting.StreamingAssetsPathAcf}.acf";
+            CriAtomEx.RegisterAcf(null, path);
+
+            // CriAtom作成
+            var criAtom = gameObject.AddComponent<CriAtom>();
+            await UniTask.WaitUntil(() => criAtom.cueSheets.All(cs => cs.IsLoading == false));
+
+            _listener = FindObjectOfType<CriAtomListener>();
+            if (_listener == null)
+            {
+                _listener = gameObject.AddComponent<CriAtomListener>();
+            }
+
+            _audioPlayers = new Dictionary<CriAudioType, ICriAudioPlayerService>();
+
+            foreach (var cueSheet in _audioSetting.AudioCueSheet)
+            {
+                CriAtom.AddCueSheet(cueSheet.CueSheetName, $"{cueSheet.AcbPath}.acb",
+                    !string.IsNullOrEmpty(cueSheet.AwbPath) ? $"{cueSheet.AwbPath}.awb" : null, null);
+                if (cueSheet.CueSheetName == CriAudioType.CueSheet_BGM.ToString())
+                {
+                    _audioPlayers.Add(CriAudioType.CueSheet_BGM, new BGMPlayer(cueSheet.CueSheetName, _listener));
+                }
+                else if (cueSheet.CueSheetName == CriAudioType.CueSheet_SE.ToString())
+                {
+                    _audioPlayers.Add(CriAudioType.CueSheet_SE, new SEPlayer(cueSheet.CueSheetName, _listener));
+                }
+                else if (cueSheet.CueSheetName == CriAudioType.CueSheet_Voice.ToString())
+                {
+                    _audioPlayers.Add(CriAudioType.CueSheet_Voice, new VoicePlayer(cueSheet.CueSheetName, _listener));
+                }
+
+                // 他のCriAudioTypeも同様に追加可能
+            }
+
+            // MasterVolumeの変更を監視して、各Playerに反映
+            MasterVolume.Subscribe(OnMasterVolumeChanged).AddTo(this);
+            BgmVolume.Subscribe(volume => OnVolumeChanged(CriAudioType.CueSheet_BGM, volume)).AddTo(this);
+            SeVolume.Subscribe(volume => OnVolumeChanged(CriAudioType.CueSheet_SE, volume)).AddTo(this);
+            VoiceVolume.Subscribe(volume => OnVolumeChanged(CriAudioType.CueSheet_Voice, volume)).AddTo(this);
+        }
 
         private void OnMasterVolumeChanged(float volume)
         {
