@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace HikanyanLaboratory.URP
+namespace TeamE.URP
 {
     public class BloomControl : VolumeProfileControlBase<Bloom>
     {
