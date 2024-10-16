@@ -75,3 +75,7 @@ crashlytics-build.properties
 Assets/ThirdParty/CRI/CRIMW/
 Assets/CRIMW/
 Assets/CRIMW.meta
+
+# DOTween Ignore
+Assets/ThirdParty/Plugins/
+Assets/ThirdParty/Resources/
