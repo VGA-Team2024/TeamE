@@ -27,6 +27,9 @@ public static class ScenePlayer
     {
         _currentSceneName = nextScene.name;
 
+        //シーンデータベースから現在のシーンが登録されているか確認してもらい、登録されていたらそのシーンから再生する
+        SceneLoader.ChangeEditorScene(_currentSceneName);
+
         //UnityEngine.Debug.Log("Active Scene Changed:" + _currentSceneName);
     }
 
@@ -35,7 +38,6 @@ public static class ScenePlayer
         switch(state)
         {
             case PlayModeStateChange.EnteredEditMode:
-                EditorSceneManager.playModeStartScene = null;
                 break;
 
             case PlayModeStateChange.EnteredPlayMode:
@@ -53,7 +55,8 @@ public static class ScenePlayer
     public static async void Play()
     {
         //シーンデータベースから現在のシーンが登録されているか確認してもらい、登録されていたらそのシーンで再生する
-        await SceneLoader.ChangeEditorScene(_currentSceneName);
+        //await SceneLoader.ChangeEditorScene(_currentSceneName);
+        await SceneLoader.LoadAdditionalSceneEditorPlaying(_currentSceneName);
 
         EditorApplication.isPlaying = true;
     }

@@ -44,8 +44,7 @@ public class GameSettings
             new SceneSetting(){
                 BaseSceneName = "Night",
                 AdditiveSceneName = new List<string>(){
-                    "IngameSystem",
-                    ""
+                    "IngameSystem"
                 }
             }
         }

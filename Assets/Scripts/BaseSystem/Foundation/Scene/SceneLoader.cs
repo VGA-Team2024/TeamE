@@ -133,7 +133,7 @@ public class SceneLoader
         _sceneDBCache = null;
     }
 
-    public static async UniTask<bool> ChangeEditorScene(string currentSceneName)
+    public static bool ChangeEditorScene(string currentSceneName)
     {
         SceneDependencies sceneDB = GetSceneDB();
         var current = sceneDB.Get(currentSceneName);
@@ -171,6 +171,21 @@ public class SceneLoader
         }
 
         EditorSceneManager.playModeStartScene = sceneAsset;
+
+        return true;
+    }
+
+    public static async UniTask<bool> LoadAdditionalSceneEditorPlaying(string currentSceneName)
+    {
+        SceneDependencies sceneDB = GetSceneDB();
+        var current = sceneDB.Get(currentSceneName);
+
+        //依存シーンがある場合はベースシーンを拾ってきて再生する
+        GameSettings.SceneSetting setting = null;
+        if (current.SceneType != SceneType.Normal && current.SceneType != SceneType.Ignore)
+        {
+            setting = GameSettings.GetSetting(current.SceneType.ToString());
+        }
 
         if (setting != null)
         {
