@@ -1848,8 +1848,8 @@ ModelImporter:
       name: JumpStart
       takeName: Take 001
       internalID: 0
-      firstFrame: 9
-      lastFrame: 11
+      firstFrame: 10
+      lastFrame: 29
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -2296,10 +2296,10 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Fall
+      name: Landing
       takeName: Take 001
       internalID: -998496362607748373
-      firstFrame: 35.3
+      firstFrame: 31
       lastFrame: 56
       wrapMode: 0
       orientationOffsetY: 0
@@ -2625,25 +2625,25 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: JumpUp
+      name: Fall
       takeName: Take 001
-      internalID: 3060872287085348379
-      firstFrame: 16.9
-      lastFrame: 26.8
+      internalID: 6641085478485924818
+      firstFrame: 29
+      lastFrame: 31
       wrapMode: 0
       orientationOffsetY: 0
-      level: 0.6
+      level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 0
       loopBlend: 0
-      loopBlendOrientation: 1
-      loopBlendPositionY: 1
-      loopBlendPositionXZ: 1
-      keepOriginalOrientation: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 1
+      keepOriginalPositionXZ: 0
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
@@ -4095,7 +4095,8 @@ ModelImporter:
     - name: J_L_Sode_C01
       parentName: 
       position: {x: -0.16287853, y: 0.00000022381876, z: 0.00000093108343}
-      rotation: {x: -0.000000076300694, y: -0.000000010357524, z: 0.000000033980374, w: 1}
+      rotation: {x: -0.000000076300694, y: -0.000000010357524, z: 0.000000033980374,
+        w: 1}
       scale: {x: 0.9999999, y: 1.0000005, z: 0.99999994}
     - name: J_L_Sode_D00
       parentName: 
@@ -4215,7 +4216,8 @@ ModelImporter:
     - name: J_L_HairTail_06
       parentName: 
       position: {x: -0.15478086, y: -0.00000052757593, z: -0.00000040117513}
-      rotation: {x: 0.0000000141623655, y: -0.000000015605016, z: -0.000000014990063, w: 1}
+      rotation: {x: 0.0000000141623655, y: -0.000000015605016, z: -0.000000014990063,
+        w: 1}
       scale: {x: 0.9999964, y: 0.99999654, z: 0.9999954}
     - name: J_L_HeadRibbon_00
       parentName: 
@@ -4450,7 +4452,8 @@ ModelImporter:
     - name: J_R_Sode_B01
       parentName: 
       position: {x: -0.1506708, y: -0.0078119077, z: 0.0000000030447638}
-      rotation: {x: 0.000000011892411, y: -0.000000004487513, z: -0.00000002829866, w: 1}
+      rotation: {x: 0.000000011892411, y: -0.000000004487513, z: -0.00000002829866,
+        w: 1}
       scale: {x: 1.0000006, y: 0.9999992, z: 0.99999964}
     - name: J_R_Sode_C00
       parentName: 
@@ -4460,7 +4463,8 @@ ModelImporter:
     - name: J_R_Sode_C01
       parentName: 
       position: {x: -0.1628789, y: 0.00000016852847, z: -0.0000005949301}
-      rotation: {x: 0.000000010720873, y: -0.000000047106106, z: -0.000000012448184, w: 1}
+      rotation: {x: 0.000000010720873, y: -0.000000047106106, z: -0.000000012448184,
+        w: 1}
       scale: {x: 1.0000002, y: 1.0000019, z: 1.0000001}
     - name: J_R_Sode_D00
       parentName: 
@@ -4530,7 +4534,8 @@ ModelImporter:
     - name: J_R_SusoSide_01
       parentName: 
       position: {x: 0.09931385, y: -0.009804875, z: -0.0015692549}
-      rotation: {x: -0.000000005500674, y: 0.000000004336203, z: 0.00000008390894, w: 1}
+      rotation: {x: -0.000000005500674, y: 0.000000004336203, z: 0.00000008390894,
+        w: 1}
       scale: {x: 0.9999993, y: 1.0000006, z: 0.9999989}
     - name: J_L_Skirt_00
       parentName: 

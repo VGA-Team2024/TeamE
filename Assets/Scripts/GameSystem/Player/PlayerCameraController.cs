@@ -1,8 +1,7 @@
-using System;
 using UnityEngine;
 public class PlayerCameraController : MonoBehaviour
 {
-    [SerializeField] private GameObject _reticleImage;
+    [SerializeField] private GameObject _reticuleImage;
     [SerializeField] private Transform _playerTransform;
     [SerializeField] private Transform _cameraLookAtTarget;
     [SerializeField] private Transform _cameraFollow;
@@ -13,7 +12,6 @@ public class PlayerCameraController : MonoBehaviour
     [Header("Y感度")] public float YSensibility = 1f;
     [SerializeField] [Header("YAxis上限角度")] private float _maxUpAngle = 40f;
     [SerializeField] [Header("YAxis下限角度")] private float _minDownAngle = -30f;
-    [SerializeField] [Header("ターゲットに与える初期回転")] private float _playerRotationY;
 
     private Vector3 _defaultTargetPosition;
     private Vector2 _currentInput;
@@ -22,7 +20,7 @@ public class PlayerCameraController : MonoBehaviour
 
     private void Start()
     {
-        _defaultTargetPosition = _cameraLookAtTarget.position;
+        _defaultTargetPosition = _cameraLookAtTarget.localPosition;
     }
     private void Update()
     {
@@ -34,7 +32,7 @@ public class PlayerCameraController : MonoBehaviour
         _rotationY += _inverseY ? -1 : 1 * -_currentInput.y * YSensibility;
         _rotationY = Mathf.Clamp(_rotationY, -_maxUpAngle, -_minDownAngle);
         var playerPosition = _playerTransform.position;
-        _cameraLookAtTarget.position = new Vector3(playerPosition.x, _defaultTargetPosition.y, playerPosition.z);
+        _cameraLookAtTarget.position = playerPosition + _defaultTargetPosition;
         _cameraLookAtTarget.rotation = Quaternion.Euler(-_rotationY, _rotationX, 0f);
     }
 
@@ -44,11 +42,11 @@ public class PlayerCameraController : MonoBehaviour
         {
             case CameraMode.Normal:
                 _cameraFollow.localPosition = Vector3.zero;
-                _reticleImage.SetActive(false);
+                _reticuleImage.SetActive(false);
                 break;
             case CameraMode.Aim:
                 _cameraFollow.localPosition = Vector3.right * _arrowTargetOffsetX;
-                _reticleImage.SetActive(true);
+                _reticuleImage.SetActive(true);
                 break;
         }
     }
