@@ -16,12 +16,7 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: 0ab45ebe8a771a84e89f81d5c48a4d6c
-  m_SerializeEntries:
-  - m_GUID: c60c2ca92c2d30244a57d8d3d38604a1
-    m_Address: Assets/Prefabs/CRI.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: f7954a5e551c001488d9ecd8e2f3601d, type: 2}
   m_SchemaSet:

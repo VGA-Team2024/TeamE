@@ -4,7 +4,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.AddressableAssets;
-using System;
 
 
 #if UNITY_EDITOR
@@ -24,13 +23,6 @@ public class SceneLoader
     //シーン依存系
     static SceneDependencies _sceneDependencies;
 
-
-    static public void Load()
-    {
-        //
-
-        //
-    }
 
     static public void CheckScene()
     {
@@ -83,30 +75,44 @@ public class SceneLoader
     {
         if (_sceneDependencies == null)
         {
-            var handle = Addressables.LoadAssetAsync<SceneDependencies>(SceneDependencies.SOAssetPath);
+            var handle = Addressables.LoadAssetAsync<SceneDependencies>(SceneDependencies.AssetPath);
             await UniTask.WaitUntil(() => handle.IsDone);
             _sceneDependencies = handle.Result;
         }
 
-        var sceneType = _sceneDependencies.Get(sceneName);
-        var setting = GameSettings.GetSetting(sceneType.SceneType.ToString());
+        var nextScene = _sceneDependencies.Get(sceneName);
+        //依存シーンがある場合はベースシーンを拾ってきて再生する
+        GameSettings.SceneSetting setting = null;
+        if (nextScene.SceneType != SceneType.Normal && nextScene.SceneType != SceneType.Ignore)
+        {
+            setting = GameSettings.GetSetting(nextScene.SceneType.ToString());
+        }
 
         SceneTerm();
+
+        //シーン名
+        if (!(setting == null || (setting != null && setting.BaseSceneName == "@PlayScene")))
+        {
+            sceneName = setting.BaseSceneName;
+        }
 
 #if USE_ADDRESSABLES
         //TBD
 #else
         //ベースシーンの読み込みをする＆待つ
-        var baseSceneHandle = SceneManager.LoadSceneAsync(setting.BaseSceneName, LoadSceneMode.Single);
+        var baseSceneHandle = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
         await UniTask.WaitUntil(() => baseSceneHandle.isDone);
 
-        //追加シーンの読み込みをする＆待つ
-        List<AsyncOperation> handles = new List<AsyncOperation>();
-        foreach(var addScene in setting.AdditiveSceneName)
+        if (setting != null)
         {
-            handles.Add(SceneManager.LoadSceneAsync(addScene, LoadSceneMode.Additive));
+            //追加シーンの読み込みをする＆待つ
+            List<AsyncOperation> handles = new List<AsyncOperation>();
+            foreach (var addScene in setting.AdditiveSceneName)
+            {
+                handles.Add(SceneManager.LoadSceneAsync(addScene, LoadSceneMode.Additive));
+            }
+            await UniTask.WaitUntil(() => handles.All(h => h.isDone));
         }
-        await UniTask.WaitUntil(() => handles.All(h => h.isDone));
 #endif
 
         SceneInit();
@@ -123,7 +129,7 @@ public class SceneLoader
     {
         if (_sceneDBCache == null)
         {
-            _sceneDBCache = AssetDatabase.LoadAssetAtPath<SceneDependencies>("Assets/" + SceneDependencies.SOAssetPath);
+            _sceneDBCache = AssetDatabase.LoadAssetAtPath<SceneDependencies>(SceneDependencies.AssetPath);
         }
         return _sceneDBCache;
     }
