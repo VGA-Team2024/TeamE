@@ -7,6 +7,7 @@ public class PlayerBowController : MonoBehaviour
     [SerializeField] private float _arrowChargeTime;
     [SerializeField , Range(0f , 1f)] private float _lookAtWeight;
     [SerializeField] float _arrowTargetDistance = 100f;
+    [SerializeField] private float _arrowInterpolationTime = 0.1f;
     [SerializeField] ParentConstraint _bowStringConstraint;
     [SerializeField] PositionConstraint _resetBowStringConstraint;
     [SerializeField] private Transform _cameraTransform;
@@ -14,18 +15,14 @@ public class PlayerBowController : MonoBehaviour
     [SerializeField] GameObject _arrowParticle;
     [SerializeField] GameObject _arrowStart;
     [SerializeField] private Animator _animator;
-    bool _isArrowCharging;
-    bool _isArrowTaking;
-    float _arrowInterpolationTimer;
-    [SerializeField] private float _arrowInterpolationTime = 0.1f;
-    float _arrowChargeTimer ;
-    int _arrowMotionLayerIndex;
+    private bool _isArrowCharging;
+    private bool _isArrowTaking;
+    private float _arrowInterpolationTimer;
+    private float _arrowChargeTimer ;
+    private int _arrowMotionLayerIndex;
     private ObservableStateMachineTrigger _stateMachineTrigger;
     private static readonly int Charge = Animator.StringToHash("ArrowCharge");
     private static readonly int Release = Animator.StringToHash("ArrowRelease");
-    static readonly int Speed = Animator.StringToHash("Speed");
-    
-    
     private void Start()
     {
         _arrowMotionLayerIndex = _animator.GetLayerIndex("ArrowMotionLayer");
@@ -35,7 +32,6 @@ public class PlayerBowController : MonoBehaviour
     {
         if (layerIndex == _arrowMotionLayerIndex)
         {
- 
             if (_isArrowTaking)
             {
                 _arrowInterpolationTimer += Time.deltaTime;
@@ -61,11 +57,7 @@ public class PlayerBowController : MonoBehaviour
             _animator.SetIKPosition(AvatarIKGoal.LeftHand, arrowDestination);   
         }
     }
-
-    public void SetLocomotionSpeed(float normalizedSpeed)
-    {
-        _animator.SetFloat(Speed , normalizedSpeed);
-    }
+    
     public void ArrowCharge()
     {
         if (!_isArrowCharging)
