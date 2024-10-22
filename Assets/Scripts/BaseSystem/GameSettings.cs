@@ -50,7 +50,7 @@ public class GameSettings
         }
     };
 
-    public static SceneSetting GetSetting(string key) => _sceneTypeDic.ContainsKey(key) ? _sceneTypeDic[key] : throw new KeyNotFoundException("SceneSettingのキーがありません");
+    public static SceneSetting GetSetting(string key) => _sceneTypeDic.ContainsKey(key) ? _sceneTypeDic[key] : throw new KeyNotFoundException("SceneSettingのキーがありません:" + key);
 
 #if UNITY_EDITOR
     public static Dictionary<string, SceneSetting> SceneTypeDic => _sceneTypeDic;
