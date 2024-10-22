@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using HikanyanLaboratory.CommonSystem;
 using UnityEngine;
 using R3;
+using UnityEngine.AddressableAssets;
 
 namespace HikanyanLaboratory.Audio
 {
@@ -15,7 +16,8 @@ namespace HikanyanLaboratory.Audio
 
         private CriAtomListener _listener; // リスナー
         protected override bool UseDontDestroyOnLoad => true;
-
+        bool _isReady = false;
+        public bool IsReady => _isReady;
         public ReactiveProperty<float> MasterVolume { get; private set; } = new ReactiveProperty<float>(1f);
         public ReactiveProperty<float> BgmVolume { get; private set; } = new ReactiveProperty<float>(1f);
         public ReactiveProperty<float> SeVolume { get; private set; } = new ReactiveProperty<float>(1f);
@@ -24,47 +26,58 @@ namespace HikanyanLaboratory.Audio
 
         protected override async void OnAwake()
         {
-            // ACF設定
-            string path = Application.streamingAssetsPath + $"/{_audioSetting.StreamingAssetsPathAcf}.acf";
-            CriAtomEx.RegisterAcf(null, path);
+            var criAtom = FindObjectOfType<CriAtom>();
+            if (criAtom == null)
+            {
+                _isReady = false;
 
-            // CriAtom作成
-            var criAtom = gameObject.AddComponent<CriAtom>();
+                var obj = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/CRI.prefab").WaitForCompletion();
+                Utility.Instantiate(obj);
+                Addressables.Release(obj);
+
+                criAtom = FindObjectOfType<CriAtom>();
+            }
+
+            if (_isReady) return;
+
+            // キューシートファイルのロード待ち
             await UniTask.WaitUntil(() => criAtom.cueSheets.All(cs => cs.IsLoading == false));
+            _isReady = true;
 
+            // CriAtomListenerの設定
             _listener = FindObjectOfType<CriAtomListener>();
             if (_listener == null)
             {
                 _listener = gameObject.AddComponent<CriAtomListener>();
             }
 
+            // プレイヤーの初期化
             _audioPlayers = new Dictionary<CriAudioType, ICriAudioPlayerService>();
 
-            foreach (var cueSheet in _audioSetting.AudioCueSheet)
+            foreach (var cueSheet in criAtom.cueSheets)
             {
-                CriAtom.AddCueSheet(cueSheet.CueSheetName, $"{cueSheet.AcbPath}.acb",
-                    !string.IsNullOrEmpty(cueSheet.AwbPath) ? $"{cueSheet.AwbPath}.awb" : null, null);
-                if (cueSheet.CueSheetName == CriAudioType.CueSheet_BGM.ToString())
+                switch (cueSheet.name)
                 {
-                    _audioPlayers.Add(CriAudioType.CueSheet_BGM, new BGMPlayer(cueSheet.CueSheetName, _listener));
+                    case nameof(CriAudioType.Cuesheet_BGM):
+                        _audioPlayers.Add(CriAudioType.Cuesheet_BGM, new BGMPlayer(cueSheet.name, _listener));
+                        break;
+                    case nameof(CriAudioType.Cuesheet_SE):
+                        _audioPlayers.Add(CriAudioType.Cuesheet_SE, new SEPlayer(cueSheet.name, _listener));
+                        break;
+                    case nameof(CriAudioType.Cuesheet_VOICE):
+                        _audioPlayers.Add(CriAudioType.Cuesheet_VOICE, new VoicePlayer(cueSheet.name, _listener));
+                        break;
+                    default:
+                        Debug.LogWarning($"Unknown CueSheet: {cueSheet.name}");
+                        break;
                 }
-                else if (cueSheet.CueSheetName == CriAudioType.CueSheet_SE.ToString())
-                {
-                    _audioPlayers.Add(CriAudioType.CueSheet_SE, new SEPlayer(cueSheet.CueSheetName, _listener));
-                }
-                else if (cueSheet.CueSheetName == CriAudioType.CueSheet_Voice.ToString())
-                {
-                    _audioPlayers.Add(CriAudioType.CueSheet_Voice, new VoicePlayer(cueSheet.CueSheetName, _listener));
-                }
-
-                // 他のCriAudioTypeも同様に追加可能
             }
 
-            // MasterVolumeの変更を監視して、各Playerに反映
+            // 音量監視の設定
             MasterVolume.Subscribe(OnMasterVolumeChanged).AddTo(this);
-            BgmVolume.Subscribe(volume => OnVolumeChanged(CriAudioType.CueSheet_BGM, volume)).AddTo(this);
-            SeVolume.Subscribe(volume => OnVolumeChanged(CriAudioType.CueSheet_SE, volume)).AddTo(this);
-            VoiceVolume.Subscribe(volume => OnVolumeChanged(CriAudioType.CueSheet_Voice, volume)).AddTo(this);
+            BgmVolume.Subscribe(volume => OnVolumeChanged(CriAudioType.Cuesheet_BGM, volume)).AddTo(this);
+            SeVolume.Subscribe(volume => OnVolumeChanged(CriAudioType.Cuesheet_SE, volume)).AddTo(this);
+            VoiceVolume.Subscribe(volume => OnVolumeChanged(CriAudioType.Cuesheet_VOICE, volume)).AddTo(this);
         }
 
         private void OnMasterVolumeChanged(float volume)
@@ -110,7 +123,7 @@ namespace HikanyanLaboratory.Audio
             if (_audioPlayers.TryGetValue(audioType, out var player))
             {
                 float adjustedVolume = Math.Min(volume, MasterVolume.Value * volume);
-                Debug.Log($"Playing AudioType: {audioType}, CueName: {cueName}, Volume: {adjustedVolume}");
+                //Debug.Log($"Playing AudioType: {audioType}, CueName: {cueName}, Volume: {adjustedVolume}");
                 return player.Play(cueName, adjustedVolume, isLoop);
             }
             else
@@ -228,22 +241,12 @@ namespace HikanyanLaboratory.Audio
 
         public ICriAudioPlayerService GetPlayer(CriAudioType type)
         {
-            if (_audioPlayers.TryGetValue(type, out var player))
-            {
-                return player;
-            }
-
-            return null;
+            return _audioPlayers.GetValueOrDefault(type);
         }
 
         public float GetPlayerVolume(CriAudioType type)
         {
-            if (_audioPlayers.TryGetValue(type, out var player))
-            {
-                return player.Volume.Value;
-            }
-
-            return 1f;
+            return _audioPlayers.TryGetValue(type, out var player) ? player.Volume.Value : 1f;
         }
 
         /// <summary>
@@ -251,26 +254,58 @@ namespace HikanyanLaboratory.Audio
         /// </summary>
         private CriAudioType DetermineAudioType(string namespaceName)
         {
-            if (namespaceName.Contains("CueSheet_BGM"))
+            if (namespaceName.Contains(CriAudioType.Cuesheet_BGM.ToString()))
             {
-                return CriAudioType.CueSheet_BGM;
+                return CriAudioType.Cuesheet_BGM;
             }
-            else if (namespaceName.Contains("CueSheet_SE"))
+            else if (namespaceName.Contains(CriAudioType.Cuesheet_SE.ToString()))
             {
-                return CriAudioType.CueSheet_SE;
+                return CriAudioType.Cuesheet_SE;
             }
-            else if (namespaceName.Contains("CueSheet_Voice"))
+            else if (namespaceName.Contains(CriAudioType.Cuesheet_VOICE.ToString()))
             {
-                return CriAudioType.CueSheet_Voice;
+                return CriAudioType.Cuesheet_VOICE;
             }
-            else if (namespaceName.Contains("CueSheet_ME"))
+            else if (namespaceName.Contains(CriAudioType.Cuesheet_ME.ToString()))
             {
-                return CriAudioType.CueSheet_ME;
+                return CriAudioType.Cuesheet_ME;
             }
             else
             {
                 return CriAudioType.Other; // その他のタイプとして処理
             }
+        }
+
+        protected override void OnDestroy()
+        {
+            // 音声プレイヤーを全て停止してリソースを解放
+            if (_audioPlayers != null)
+            {
+                foreach (var player in _audioPlayers.Values)
+                {
+                    player.StopAll(); // すべての音声再生を停止
+                    player.Dispose(); // リソース解放
+                }
+
+                _audioPlayers.Clear();
+            }
+
+            // CRI関連のリスナーやキューシートのリソースも解放
+            if (_listener != null)
+            {
+                Destroy(_listener.gameObject); // リスナーを明示的に破棄
+                _listener = null;
+            }
+
+            // CriAtomの解放 (必要に応じて)
+            var criAtom = FindObjectOfType<CriAtom>();
+            if (criAtom != null)
+            {
+                Destroy(criAtom.gameObject);
+            }
+
+            Debug.Log("CRI Audio Manager and resources have been destroyed.");
+            base.OnDestroy();
         }
     }
 
@@ -321,6 +356,24 @@ namespace HikanyanLaboratory.Audio
         }
 
         ~SEPlayer()
+        {
+            _disposables.Dispose();
+        }
+    }
+
+    public class VoicePlayer : CriAudioPlayerService
+    {
+        private readonly CompositeDisposable _disposables = new CompositeDisposable();
+
+        public VoicePlayer(string cueSheetName, CriAtomListener listener)
+            : base(cueSheetName, listener)
+        {
+            Observable.EveryUpdate()
+                .Subscribe(_ => CheckPlayerStatus())
+                .AddTo(_disposables);
+        }
+
+        ~VoicePlayer()
         {
             _disposables.Dispose();
         }

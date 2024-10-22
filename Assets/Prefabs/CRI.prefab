@@ -44,18 +44,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91f529aa944b914449d62b8c40f188fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acfFile: TGS2023.acf
+  acfFile: VGA2024TeamE.acf
   cueSheets:
-  - name: BGM
-    acbFile: BGM.acb
-    awbFile: BGM.awb
-    loaderStatus: 0
-  - name: SE
-    acbFile: SE.acb
+  - name: Cuesheet_BGM
+    acbFile: Cuesheet_BGM.acb
     awbFile: 
     loaderStatus: 0
-  - name: ME
-    acbFile: ME.acb
+  - name: Cuesheet_SE
+    acbFile: Cuesheet_SE.acb
+    awbFile: 
+    loaderStatus: 0
+  - name: Cuesheet_VOICE
+    acbFile: Cuesheet_VOICE.acb
     awbFile: 
     loaderStatus: 0
   dspBusSetting: 

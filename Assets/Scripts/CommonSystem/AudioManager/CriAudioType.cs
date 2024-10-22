@@ -3,10 +3,10 @@
     public enum CriAudioType
     {
         Master,
-        CueSheet_BGM,
-        CueSheet_ME,
-        CueSheet_SE,
-        CueSheet_Voice,
+        Cuesheet_BGM,
+        Cuesheet_ME,
+        Cuesheet_SE,
+        Cuesheet_VOICE,
         Other
     }
 }
