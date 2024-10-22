@@ -1,8 +1,6 @@
-using Cysharp.Threading.Tasks;
 using R3;
 using R3.Triggers;
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class PlayerMoveController : MonoBehaviour
@@ -11,20 +9,26 @@ public class PlayerMoveController : MonoBehaviour
     [SerializeField , Range(0f , 1f)] private float _moveInputThreshold;
     [SerializeField , Range(0f , 1f)] private float _aimSpeedDecrease;
     [SerializeField , Range(0f , 50f)] private float _stoppingRate;
+    
+    [SerializeField] private float _rotateLerpRateIsNormal;
+    [SerializeField] private float _rotateLerpRateIsAiming;
+    [SerializeField] private float _rotateThreshold;
+    
     [SerializeField] private float _jumpPower = 3.0f;
 
     [SerializeField] private Animator _animator;
     [SerializeField] private Rigidbody _rigidBody;
     [SerializeField] private Transform _playerTransform;
 
-    private static readonly int Speed = Animator.StringToHash("Speed");
     
-    public bool PreviousIsGround = true;
     public bool IsLanding;
     
     int _baseLayerIndex;
     private ObservableStateMachineTrigger _stateMachineTrigger;
-    
+    private static readonly int Speed = Animator.StringToHash("Speed");
+    private static readonly int Jump = Animator.StringToHash("Jump");
+    private static readonly int IsGround = Animator.StringToHash("IsGround");
+
     private void Start()
     {
         _baseLayerIndex = _animator.GetLayerIndex("BaseLayer");
@@ -41,21 +45,26 @@ public class PlayerMoveController : MonoBehaviour
     public void JumpStart()
     {
         _rigidBody.AddForce(Vector3.up * _jumpPower, ForceMode.Impulse);
-        _animator.SetBool("Jump", true);
+        _animator.SetBool(Jump, true);
     }
 
     public void SetIsGround(bool isGround)
     {
-        _animator.SetBool("IsGround", isGround);
+        _animator.SetBool(IsGround, isGround);
     }
 
     public void Landing()
     {
         IsLanding = true;
+        
         _stateMachineTrigger
             .OnStateExitAsObservable()
             .Where(x => x.LayerIndex == _baseLayerIndex && x.StateInfo.IsName("Landing"))
-            .Subscribe( _ => IsLanding = false)
+            .Select(_ => Unit.Default)
+            .Merge(Observable.Timer(TimeSpan.FromSeconds(1)))
+            .Subscribe(
+                _ => IsLanding = false
+            )
             .AddTo(this);
     }
 
@@ -68,7 +77,17 @@ public class PlayerMoveController : MonoBehaviour
         if (IsAiming)
         {
             //弓を引いている間は、プレイヤーが動いてなくともカメラ向きを計算する。
-            _playerTransform.forward = new Vector3(forward.x, 0f , forward.z);
+            //プレイヤーとカメラのなす角が大きい場合、補完を行う
+            var angle = Vector3.Angle(_playerTransform.forward, new Vector3(forward.x, 0f, forward.z));
+            if (angle > _rotateThreshold)
+            {
+                var target = Quaternion.LookRotation(new Vector3(forward.x, 0f, forward.z));
+                _playerTransform.rotation = Quaternion.Slerp(_playerTransform.rotation, target, Time.fixedDeltaTime * _rotateLerpRateIsAiming);
+            }
+            else
+            {
+                _playerTransform.forward = new Vector3(forward.x, 0f, forward.z);
+            }
         }
         
         if (!IsLanding && Mathf.Abs(input.magnitude) > _moveInputThreshold)
@@ -85,7 +104,15 @@ public class PlayerMoveController : MonoBehaviour
             else
             {
                 //通常時はカメラの回転をプレイヤー移動に混ぜる。
-                _playerTransform.forward = dir;
+                var angle = Vector3.Angle(_playerTransform.forward, dir);
+                if (angle > _rotateThreshold)
+                {
+                    var target = Quaternion.LookRotation(dir);
+                    _playerTransform.rotation = Quaternion.Slerp(_playerTransform.rotation, target, Time.fixedDeltaTime * _rotateLerpRateIsNormal);
+                }else
+                {
+                    _playerTransform.forward = dir;
+                }
                 var velocity = _playerTransform.forward * (dir.magnitude * _forwardSpeed);
                 _rigidBody.velocity = new Vector3(velocity.x, _rigidBody.velocity.y, velocity.z);
             }

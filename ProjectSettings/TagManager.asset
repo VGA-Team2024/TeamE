@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Field
   - Bullet
+  - ClimbableWall
+  - ClimbableWallTop
   layers:
   - Default
   - TransparentFX
