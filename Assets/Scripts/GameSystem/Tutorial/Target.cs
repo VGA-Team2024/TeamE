@@ -1,10 +1,8 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Target : MonoBehaviour
 {
+    [SerializeField] float _destroyTime = 3f;
     Rigidbody rb;
     void Start()
     {
@@ -15,6 +13,6 @@ public class Target : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         rb.useGravity = true;
-        Destroy(gameObject, 3f);
+        Destroy(gameObject, _destroyTime);
     }
 }
