@@ -5,11 +5,11 @@ namespace HikanyanLaboratory.Audio
 {
     public interface ICriAudioPlayerService : ICriVolume, IDisposable
     {
-        Guid Play(string cueName, float volume = 1f, bool isLoop = false);
-        Guid Play3D(Transform transform, string cueName, float volume = 1f, bool isLoop = false);
-        void Stop(Guid id);
-        void Pause(Guid id);
-        void Resume(Guid id);
+        int Play(string cueName, float volume = 1f, bool isLoop = false);
+        int Play3D(Transform transform, string cueName, float volume = 1f, bool isLoop = false);
+        void Stop(int id);
+        void Pause(int id);
+        void Resume(int id);
         void StopAll();
         void PauseAll();
         void ResumeAll();

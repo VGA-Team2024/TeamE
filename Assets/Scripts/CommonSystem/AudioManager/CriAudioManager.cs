@@ -7,12 +7,13 @@ using HikanyanLaboratory.CommonSystem;
 using UnityEngine;
 using R3;
 using UnityEngine.AddressableAssets;
+using VGA2024TeamE.Cuesheet_BGM;
 
 namespace HikanyanLaboratory.Audio
 {
     public class CriAudioManager : SingletonMonoBehaviour<CriAudioManager>
     {
-        private Dictionary<CriAudioType, ICriAudioPlayerService> _audioPlayers; // 各音声の再生を管理するクラス
+        private Dictionary<CriAudioType, ICriAudioPlayerService> _audioPlayers; // 各音声の再生を管理する
 
         private CriAtomListener _listener; // リスナー
         protected override bool UseDontDestroyOnLoad => true;
@@ -22,7 +23,6 @@ namespace HikanyanLaboratory.Audio
         public ReactiveProperty<float> BgmVolume { get; private set; } = new ReactiveProperty<float>(1f);
         public ReactiveProperty<float> SeVolume { get; private set; } = new ReactiveProperty<float>(1f);
         public ReactiveProperty<float> VoiceVolume { get; private set; } = new ReactiveProperty<float>(1f);
-
 
         protected override async void OnAwake()
         {
@@ -102,7 +102,7 @@ namespace HikanyanLaboratory.Audio
         /// <summary>
         /// Enumで指定されたキュー名を使用して音声を再生するメソッド
         /// </summary>
-        public Guid Play<TEnum>(TEnum cue, float volume = 1f, bool isLoop = false) where TEnum : Enum
+        public int Play<TEnum>(TEnum cue, float volume = 1f, bool isLoop = false) where TEnum : Enum
         {
             // Enumの型から名前空間を取得し、自動でCriAudioTypeを判別する
             var enumType = typeof(TEnum);
@@ -113,7 +113,7 @@ namespace HikanyanLaboratory.Audio
             if (audioType == CriAudioType.Other)
             {
                 Debug.LogWarning($"Unable to determine CriAudioType for namespace {namespaceName}");
-                return Guid.Empty;
+                return -1;
             }
 
             // CueのEnum名を文字列として取得
@@ -123,17 +123,16 @@ namespace HikanyanLaboratory.Audio
             if (_audioPlayers.TryGetValue(audioType, out var player))
             {
                 float adjustedVolume = Math.Min(volume, MasterVolume.Value * volume);
-                //Debug.Log($"Playing AudioType: {audioType}, CueName: {cueName}, Volume: {adjustedVolume}");
                 return player.Play(cueName, adjustedVolume, isLoop);
             }
             else
             {
                 Debug.LogWarning($"Audio player for {audioType} not available.");
-                return Guid.Empty;
+                return -1;
             }
         }
 
-        public Guid Play3D<TEnum>(Transform transform, TEnum cue, float volume = 1f,
+        public int Play3D<TEnum>(Transform transform, TEnum cue, float volume = 1f,
             bool isLoop = false) where TEnum : Enum
         {
             // Enumの型から名前空間を取得し、自動でCriAudioTypeを判別する
@@ -145,7 +144,7 @@ namespace HikanyanLaboratory.Audio
             if (audioType == CriAudioType.Other)
             {
                 Debug.LogWarning($"Unable to determine CriAudioType for namespace {namespaceName}");
-                return Guid.Empty;
+                return -1;
             }
 
             // CueのEnum名を文字列として取得
@@ -155,69 +154,41 @@ namespace HikanyanLaboratory.Audio
             if (_audioPlayers.TryGetValue(audioType, out var player))
             {
                 float adjustedVolume = Math.Min(volume, MasterVolume.Value * volume);
-                Debug.Log($"Playing AudioType: {audioType}, CueName: {cueName}, Volume: {adjustedVolume}");
+                // プレイヤーで再生し、再生された音声に対応するGuidを取得
                 return player.Play3D(transform, cueName, adjustedVolume, isLoop);
             }
             else
             {
                 Debug.LogWarning($"Audio player for {audioType} not available.");
-                return Guid.Empty;
+                return -1;
             }
         }
 
-        public void Stop(Guid id)
+        public void Stop(int id)
         {
-            // プレイヤーを決定するための CriAudioType を特定
-            CriAudioType audioType = DetermineAudioType(typeof(CriAudioType).Namespace);
-            // 該当するプレイヤーが存在するか確認
-            if (_audioPlayers.TryGetValue(audioType, out var player))
+            // 全てのCriAudioTypeのプレイヤーを確認
+            foreach (var playerEntry in _audioPlayers)
             {
-                // プレイヤーが該当するIDの音声を再生中かどうかを確認して停止
-                player.Stop(id);
-            }
-            else
-            {
-                Debug.LogWarning($"Audio player for type {audioType} not supported.");
+                playerEntry.Value.Stop(id);
             }
         }
 
-        public void Pause(CriAudioType type, Guid id)
+
+        public void Pause(int id)
         {
-            if (_audioPlayers.TryGetValue(type, out var player))
+            foreach (var playerEntry in _audioPlayers)
             {
-                player.Pause(id);
-            }
-            else
-            {
-                Debug.LogWarning($"Audio type {type} not supported.");
+                playerEntry.Value.Pause(id);
             }
         }
 
-        public void Resume(CriAudioType type, Guid id)
+        public void Resume(int id)
         {
-            if (_audioPlayers.TryGetValue(type, out var player))
+            foreach (var playerEntry in _audioPlayers)
             {
-                player.Resume(id);
-            }
-            else
-            {
-                Debug.LogWarning($"Audio type {type} not supported.");
+                playerEntry.Value.Resume(id);
             }
         }
-
-        public void SetVolume(CriAudioType type, float volume)
-        {
-            if (_audioPlayers.TryGetValue(type, out var player))
-            {
-                float adjustedVolume = Math.Min(volume, MasterVolume.Value * volume);
-                player.SetVolume(adjustedVolume);
-            }
-            else
-            {
-                Debug.LogWarning($"Audio type {type} not supported.");
-            }
-        }
-
 
         public void StopAll()
         {
@@ -242,7 +213,18 @@ namespace HikanyanLaboratory.Audio
                 player.ResumeAll();
             }
         }
-
+        // public void SetVolume(CriAudioType type, float volume)
+        // {
+        //     if (_audioPlayers.TryGetValue(type, out var player))
+        //     {
+        //         float adjustedVolume = Math.Min(volume, MasterVolume.Value * volume);
+        //         player.SetVolume(adjustedVolume);
+        //     }
+        //     else
+        //     {
+        //         Debug.LogWarning($"Audio type {type} not supported.");
+        //     }
+        // }
         public ICriAudioPlayerService GetPlayer(CriAudioType type)
         {
             return _audioPlayers.GetValueOrDefault(type);
@@ -334,8 +316,8 @@ namespace HikanyanLaboratory.Audio
 
         private void StopAllBGM()
         {
-            var idsToStop = new List<Guid>(_playbacks.Keys);
-            foreach (var id in idsToStop)
+            var idsToStop = new List<int>(_playbacks.Keys);
+            foreach (int id in idsToStop)
             {
                 Stop(id);
             }

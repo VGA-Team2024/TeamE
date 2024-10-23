@@ -10,7 +10,7 @@ namespace HikanyanLaboratory.Audio
     {
         private readonly CriAtomExPlayer _criAtomExPlayer; // 複数の音声を再生するためのプレイヤー
         private readonly CriAtomEx3dSource _criAtomEx3dSource; // 3D音源
-        protected readonly Dictionary<Guid, CriAtomExPlayback> _playbacks; // 再生中の音声を管理
+        protected readonly Dictionary<int, CriAtomExPlayback> _playbacks; // 再生中の音声を管理
         private readonly CriAtomListener _criAtomListener; // リスナー
         private readonly string _cueSheetName; // ACBファイルの名前
         private const float MasterVolume = 1f; // マスターボリューム
@@ -22,7 +22,7 @@ namespace HikanyanLaboratory.Audio
             _criAtomListener = criAtomListener;
             _criAtomExPlayer = new CriAtomExPlayer();
             _criAtomEx3dSource = new CriAtomEx3dSource();
-            _playbacks = new Dictionary<Guid, CriAtomExPlayback>();
+            _playbacks = new Dictionary<int, CriAtomExPlayback>();
 
             Volume.Subscribe(SetVolume);
         }
@@ -37,12 +37,12 @@ namespace HikanyanLaboratory.Audio
             _criAtomExPlayer.SetVolume(volume * MasterVolume);
         }
 
-        public virtual Guid Play(string cueName, float volume = 1f, bool isLoop = false)
+        public virtual int Play(string cueName, float volume = 1f, bool isLoop = false)
         {
             if (!CheckCueSheet())
             {
                 Debug.LogWarning($"ACBがNullです。CueSheet: {_cueSheetName}");
-                return Guid.Empty;
+                return -1;
             }
 
             var tempAcb = CriAtom.GetCueSheet(_cueSheetName).acb;
@@ -54,17 +54,17 @@ namespace HikanyanLaboratory.Audio
             _criAtomExPlayer.Loop(isLoop);
 
             var playback = _criAtomExPlayer.Start();
-            var id = Guid.NewGuid();
+            int id = (int)playback.id;
             _playbacks[id] = playback;
             return id;
         }
 
-        public virtual Guid Play3D(Transform transform, string cueName, float volume = 1f, bool isLoop = false)
+        public virtual int Play3D(Transform transform, string cueName, float volume = 1f, bool isLoop = false)
         {
             if (!CheckCueSheet())
             {
                 Debug.LogWarning($"ACBがNullです。CueSheet: {_cueSheetName}");
-                return Guid.Empty;
+                return -1;
             }
 
             var tempAcb = CriAtom.GetCueSheet(_cueSheetName).acb;
@@ -82,12 +82,13 @@ namespace HikanyanLaboratory.Audio
             _criAtomExPlayer.Loop(isLoop);
 
             var playback = _criAtomExPlayer.Start();
-            var id = Guid.NewGuid();
+            int id = (int)playback.id;
             _playbacks[id] = playback;
+
             return id;
         }
 
-        public void Stop(Guid id)
+        public void Stop(int id)
         {
             if (_playbacks.ContainsKey(id))
             {
@@ -96,7 +97,7 @@ namespace HikanyanLaboratory.Audio
             }
         }
 
-        public void Pause(Guid id)
+        public void Pause(int id)
         {
             if (_playbacks.ContainsKey(id))
             {
@@ -104,7 +105,7 @@ namespace HikanyanLaboratory.Audio
             }
         }
 
-        public void Resume(Guid id)
+        public void Resume(int id)
         {
             if (_playbacks.ContainsKey(id))
             {
@@ -169,7 +170,7 @@ namespace HikanyanLaboratory.Audio
 
         public void CheckPlayerStatus()
         {
-            var idsToRemove = new List<Guid>();
+            var idsToRemove = new List<int>();
 
             foreach (var kvp in _playbacks)
             {
