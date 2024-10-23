@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public enum CameraMode
 {
@@ -24,13 +23,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerBowController _playerBowController;
     [SerializeField] private PlayerCameraController _playerCameraController;
     [SerializeField] private PlayerClimbController _playerClimbController;
-    public bool IsArrowCharging;
     public bool IsAiming;
+    public bool IsArrowReleasing;
+    public bool IsArrowCharging;
     public bool IsJumping;
     public bool PreviousIsGround = true;
     public bool IsGround = true;
     public bool IsClimbable;
     public bool IsClimbing;
+    public bool IsClimbPullUp;
     public bool IsLanding;
     private RaycastHit _climeTargetHit;
     private Vector2 _currentMoveInput;
@@ -39,10 +40,12 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         _currentMoveInput = new Vector2(Input.GetAxis("L_XAxis"), Input.GetAxis("L_YAxis"));
-        if(IsLanding && _playerMoveController.IsLanding)
-        {
-            IsLanding = false;
-        }
+
+        IsLanding = _playerMoveController.IsLanding;
+        IsClimbing = _playerClimbController.IsClimbing;
+        IsClimbPullUp = _playerClimbController.IsPullUp;
+        IsArrowReleasing = _playerBowController.IsArrowReleasing;
+        IsArrowCharging = _playerBowController.IsArrowCharging;
         
         if (_ignoreGroundTimer < Mathf.Epsilon)
         {
@@ -50,9 +53,8 @@ public class PlayerController : MonoBehaviour
             _playerMoveController.SetIsGround(IsGround);
             if (IsGround)
             {
-                if (!IsLanding && !PreviousIsGround && IsGround)
+                if (!IsClimbPullUp && !IsLanding && !PreviousIsGround && IsGround)
                 {
-                    IsLanding = true;
                     _playerMoveController.Landing();
                 }
                 if (!IsLanding)
@@ -61,9 +63,8 @@ public class PlayerController : MonoBehaviour
                     {
                         IsJumping = false;
                     }
-                    if (IsClimbing)
+                    if (IsClimbing && !IsClimbPullUp)
                     {
-                        IsClimbing = false;
                         _playerClimbController.ClimbEnd();
                     }
                 }
@@ -80,29 +81,26 @@ public class PlayerController : MonoBehaviour
         //壁の判定
         IsClimbable = Physics.Raycast(_playerClimbRayPoint.position , _playerClimbRayPoint.forward , out _climeTargetHit , _playerClimbRayLength , _climbLayerMask);
         
-        if(IsClimbing && !IsClimbable)
+        if(IsClimbing && !IsClimbable && !IsClimbPullUp)
         {
-            IsClimbing = false;
             _playerClimbController.ClimbEnd();
         }
         
         if(IsGround && !_playerMoveController.IsLanding && !IsAiming && IsClimbable && Vector3.Dot(-_climeTargetHit.normal , new Vector3(_currentMoveInput.x , 0f , _currentMoveInput.y)) > _playerClimbThreshold)
         {
-            IsClimbing = true;
             _ignoreGroundTimer = _ignoreGroundTime;
-            _playerClimbController.ClimbStart();
+            _playerClimbController.ClimbStart(hitWall: _climeTargetHit);
             //ClimbStart
         }
         
         if (Input.GetButtonDown("X"))
         {
-            if ( IsClimbing || !IsClimbable)
+            if ( IsClimbing || !IsClimbable && !IsClimbPullUp)
             {
-                IsClimbing = false;
                 _playerClimbController.ClimbEnd();
                 //climb Cancel
             }
-            if (IsGround && !IsJumping)
+            if (IsGround && !IsLanding && !IsJumping)
             {
                 IsJumping = true;
                 _ignoreGroundTimer = _ignoreGroundTime;
@@ -129,13 +127,11 @@ public class PlayerController : MonoBehaviour
             if ( (int)Input.GetAxisRaw("RT") == 1)
             {
                 _playerBowController.ArrowCharge();
-                IsArrowCharging = true;
             }
         
             if(IsArrowCharging && (int)Input.GetAxisRaw("RT") == 0)
             {
                 _playerBowController.ArrowRelease(canceled:false);
-                IsArrowCharging = false;
             } 
         }
         else
@@ -143,14 +139,13 @@ public class PlayerController : MonoBehaviour
             if (IsArrowCharging)
             {
                 _playerBowController.ArrowRelease(canceled:true);
-                IsArrowCharging = false;
             }
         }
     }
 
     private void FixedUpdate()
     {
-        if(IsClimbable && IsClimbing)
+        if(IsClimbable && IsClimbing || IsClimbPullUp)
         {
             _playerClimbController.ClimbMove(_currentMoveInput , _climeTargetHit);
         }
