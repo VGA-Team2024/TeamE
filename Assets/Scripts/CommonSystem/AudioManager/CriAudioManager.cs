@@ -165,15 +165,19 @@ namespace HikanyanLaboratory.Audio
             }
         }
 
-        public void Stop(CriAudioType type, Guid id)
+        public void Stop(Guid id)
         {
-            if (_audioPlayers.TryGetValue(type, out var player))
+            // プレイヤーを決定するための CriAudioType を特定
+            CriAudioType audioType = DetermineAudioType(typeof(CriAudioType).Namespace);
+            // 該当するプレイヤーが存在するか確認
+            if (_audioPlayers.TryGetValue(audioType, out var player))
             {
+                // プレイヤーが該当するIDの音声を再生中かどうかを確認して停止
                 player.Stop(id);
             }
             else
             {
-                Debug.LogWarning($"Audio type {type} not supported.");
+                Debug.LogWarning($"Audio player for type {audioType} not supported.");
             }
         }
 
@@ -304,7 +308,7 @@ namespace HikanyanLaboratory.Audio
                 Destroy(criAtom.gameObject);
             }
 
-            Debug.Log("CRI Audio Manager and resources have been destroyed.");
+            //Debug.Log("CRI Audio Manager and resources have been destroyed.");
             base.OnDestroy();
         }
     }
