@@ -144,6 +144,12 @@ public class SceneLoader
         SceneDependencies sceneDB = GetSceneDB();
         var current = sceneDB.Get(currentSceneName);
 
+        if(current == null)
+        {
+            Debug.LogError(currentSceneName + "のシーンはありません");
+            return false;
+        }
+
         //依存シーンがある場合はベースシーンを拾ってきて再生する
         GameSettings.SceneSetting setting = null;
         if (current.SceneType != SceneType.Normal && current.SceneType != SceneType.Ignore)
