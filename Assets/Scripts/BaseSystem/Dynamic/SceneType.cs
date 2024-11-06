@@ -4,5 +4,6 @@ public enum SceneType
 	Ignore,
 	Ingame,
 	Ingame_Debug,
-	ProgramTest
+	ProgramTest,
+	Main
 };

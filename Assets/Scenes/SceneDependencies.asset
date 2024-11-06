@@ -13,15 +13,63 @@ MonoBehaviour:
   m_Name: SceneDependencies
   m_EditorClassIdentifier: 
   _dependencies:
-  - Name: SampleScene
-    AssetPath: Assets/Scenes/SampleScene.unity
+  - CanIDebugSelect: 1
+    Name: PostProcessingScene
+    AssetPath: Assets/Scenes/Debug/PostProcessingScene.unity
     SceneType: 0
-  - Name: Morning
+  - CanIDebugSelect: 1
+    Name: Morning
     AssetPath: Assets/Scenes/Design/Morning.unity
     SceneType: 2
-  - Name: Night
+  - CanIDebugSelect: 1
+    Name: Night
     AssetPath: Assets/Scenes/Design/Night.unity
     SceneType: 2
-  - Name: IngameSystem
+  - CanIDebugSelect: 1
+    Name: TomizawaTaiju
+    AssetPath: Assets/Scenes/Design/TomizawaTaiju.unity
+    SceneType: 0
+  - CanIDebugSelect: 1
+    Name: YamamotoKanta
+    AssetPath: Assets/Scenes/Design/YamamotoKanta.unity
+    SceneType: 0
+  - CanIDebugSelect: 1
+    Name: InGame
+    AssetPath: Assets/Scenes/Mockup/InGame.unity
+    SceneType: 5
+  - CanIDebugSelect: 1
+    Name: Result
+    AssetPath: Assets/Scenes/Mockup/Result.unity
+    SceneType: 5
+  - CanIDebugSelect: 1
+    Name: Title
+    AssetPath: Assets/Scenes/Mockup/Title.unity
+    SceneType: 5
+  - CanIDebugSelect: 1
+    Name: 3DSoundSample
+    AssetPath: Assets/Scenes/Sample/3DSoundSample.unity
+    SceneType: 0
+  - CanIDebugSelect: 1
+    Name: EnemyTest
+    AssetPath: Assets/Scenes/Sample/EnemyTest.unity
+    SceneType: 0
+  - CanIDebugSelect: 1
+    Name: PlayerTest
+    AssetPath: Assets/Scenes/Sample/PlayerTest.unity
+    SceneType: 0
+  - CanIDebugSelect: 1
+    Name: Tutorial
+    AssetPath: Assets/Scenes/Sample/Tutorial.unity
+    SceneType: 0
+  - CanIDebugSelect: 1
+    Name: GameLauncher
+    AssetPath: Assets/Scenes/System/GameLauncher.unity
+    SceneType: 0
+  - CanIDebugSelect: 1
+    Name: IngameDebug
+    AssetPath: Assets/Scenes/System/IngameDebug.unity
+    SceneType: 0
+  - CanIDebugSelect: 1
+    Name: IngameSystem
     AssetPath: Assets/Scenes/System/IngameSystem.unity
     SceneType: 0

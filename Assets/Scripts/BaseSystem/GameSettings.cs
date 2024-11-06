@@ -47,6 +47,18 @@ public class GameSettings
                     "IngameSystem"
                 }
             }
+        },
+        {
+            "Main" ,
+            new SceneSetting()
+            {
+                BaseSceneName = "Title",
+                AdditiveSceneName= new List<string>()
+                {
+                    "InGame",
+                    "Result"
+                }
+            }
         }
     };
 
