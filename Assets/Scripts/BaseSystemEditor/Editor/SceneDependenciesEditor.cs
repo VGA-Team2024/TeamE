@@ -14,12 +14,12 @@ using UnityEditor.Build.Content;
 [CustomEditor(typeof(SceneDependencies), true, isFallback = true)]
 public class SceneDependenciesEditor : Editor
 {
-    public const string TypeScriptPath = "/Scripts/BaseSystem/Dynamic/SceneType.cs";
+    public const string TypeScriptPath = "Scripts/BaseSystem/Dynamic/SceneType.cs";
 
     //動的生成
-    public static void CreateSceneDependencies()
+    public static void CreateSceneDependencies(bool isForceRecreate = false)
     {
-        string assetRoot = "Assets"; //Application.dataPath;
+        string assetRoot = "Assets/"; //Application.dataPath;
         //既にアセットあるか
         var db = AssetDatabase.LoadAssetAtPath<SceneDependencies>(AssetPath);
         if(db == null)
@@ -46,7 +46,7 @@ public class SceneDependenciesEditor : Editor
         {
             string name = f.Name.Replace(".unity", "");
             var d = db.Get(name);
-            if (d != null)
+            if (d != null && !isForceRecreate)
             {
                 dList.Add(d);
                 continue;
@@ -91,5 +91,14 @@ public class SceneDependenciesEditor : Editor
     public static void Create()
     {
         CreateSceneDependencies();
+    }
+
+    /// <summary>
+    /// メニューから生成する
+    /// </summary>
+    [MenuItem("VTNTools/SceneManagement/RecreateSceneDependencies")]
+    public static void Recreate()
+    {
+        CreateSceneDependencies(true);
     }
 }
