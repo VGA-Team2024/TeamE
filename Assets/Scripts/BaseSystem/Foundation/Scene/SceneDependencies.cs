@@ -8,7 +8,7 @@ using UnityEngine;
 /// </summary>
 public class SceneDependencies : ScriptableObject
 {
-    public const string ScenePath = "/Scenes";                                  //シーンのパス(このフォルダ以下にあるシーンを全検索する)
+    public const string ScenePath = "Scenes";                                  //シーンのパス(このフォルダ以下にあるシーンを全検索する)
     public const string AssetPath = "Assets/Scenes/SceneDependencies.asset";    //このファイルが置かれている場所
 
     [System.Serializable]
