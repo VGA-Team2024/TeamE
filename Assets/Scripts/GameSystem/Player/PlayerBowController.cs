@@ -15,8 +15,8 @@ public class PlayerBowController : MonoBehaviour
     [SerializeField] GameObject _arrowParticle;
     [SerializeField] GameObject _arrowStart;
     [SerializeField] private Animator _animator;
-    private bool _isArrowCharging;
-    private bool _isArrowTaking;
+    public bool IsArrowCharging;
+    public bool IsArrowReleasing;
     private float _arrowInterpolationTimer;
     private float _arrowChargeTimer ;
     private int _arrowMotionLayerIndex;
@@ -32,7 +32,7 @@ public class PlayerBowController : MonoBehaviour
     {
         if (layerIndex == _arrowMotionLayerIndex)
         {
-            if (_isArrowTaking)
+            if (IsArrowCharging)
             {
                 _arrowInterpolationTimer += Time.deltaTime;
                 if (_arrowInterpolationTimer > _arrowInterpolationTime)
@@ -42,28 +42,35 @@ public class PlayerBowController : MonoBehaviour
             }
             else
             {
-                _arrowInterpolationTimer -= Time.deltaTime;
-                if (_arrowInterpolationTimer < 0f)
+                if(_arrowInterpolationTimer > 0f)
                 {
-                    _arrowInterpolationTimer = 0f;
+                    _arrowInterpolationTimer -= Time.deltaTime; 
                 }
             }
-            float chargeRate = (_arrowInterpolationTimer / _arrowInterpolationTime);
-            _animator.bodyRotation *= Quaternion.Euler(0, 90 * chargeRate, 0);
-            var arrowDestination = _cameraTransform.position + _cameraTransform.forward * _arrowTargetDistance;
-            _animator.SetLookAtWeight(_lookAtWeight);
-            _animator.SetLookAtPosition(arrowDestination); 
-            _animator.SetIKPositionWeight(AvatarIKGoal.LeftHand , chargeRate); 
-            _animator.SetIKPosition(AvatarIKGoal.LeftHand, arrowDestination);   
+
+            if (_arrowInterpolationTimer > 0f)
+            {
+                float chargeRate = (_arrowInterpolationTimer / _arrowInterpolationTime);
+                _animator.bodyRotation *= Quaternion.Euler(0, 90 * chargeRate, 0);
+                if (IsArrowCharging || IsArrowReleasing)
+                {
+                    var arrowDestination = _cameraTransform.position + _cameraTransform.forward * _arrowTargetDistance;
+                    _animator.SetLookAtWeight(_lookAtWeight);
+                    _animator.SetLookAtPosition(arrowDestination); 
+                    _animator.SetIKPositionWeight(AvatarIKGoal.LeftHand , chargeRate); 
+                    _animator.SetIKPosition(AvatarIKGoal.LeftHand, arrowDestination);   
+                }
+            }
+            
+
         }
     }
     
     public void ArrowCharge()
     {
-        if (!_isArrowCharging)
+        if (!IsArrowCharging)
         {
-            _isArrowCharging = true;
-            _isArrowTaking = true;
+            IsArrowCharging = true;
             _arrowObject.SetActive(true);
             _resetBowStringConstraint.constraintActive = false;
             _bowStringConstraint.constraintActive = true;
@@ -74,35 +81,39 @@ public class PlayerBowController : MonoBehaviour
     }
     public void ArrowRelease(bool canceled)
     {
-        if (!canceled && _arrowChargeTimer > _arrowChargeTime)
+        if (!canceled &&  _arrowChargeTimer > _arrowChargeTime)
         {
-            _animator.SetTrigger(Release);
-            _animator.SetBool(Charge, false);
-            _isArrowTaking = false;
-            _stateMachineTrigger
-                .OnStateExitAsObservable()
-                .Where(x => x.LayerIndex == _arrowMotionLayerIndex && x.StateInfo.IsName("ArrowRelease"))
-                .Subscribe( _ => ResetCharge())
-                .AddTo(this);
-            var arrowStart = _arrowStart.transform.position;
-            var arrowDestination = _cameraTransform.position + _cameraTransform.forward * _arrowTargetDistance;
-            var arrowDirection = arrowDestination - arrowStart;
-            Instantiate(_arrowParticle, arrowStart, Quaternion.LookRotation(arrowDirection), null);
+            if (!IsArrowReleasing)
+            {
+                _animator.SetTrigger(Release);
+                _animator.SetBool(Charge, false);
+                IsArrowReleasing = true;
+                var arrowStart = _arrowStart.transform.position;
+                var arrowDestination = _cameraTransform.position + _cameraTransform.forward * _arrowTargetDistance;
+                var arrowDirection = arrowDestination - arrowStart;
+                Instantiate(_arrowParticle, arrowStart, Quaternion.LookRotation(arrowDirection), null);
+                _stateMachineTrigger
+                    .OnStateExitAsObservable()
+                    .Where(x => x.LayerIndex == _arrowMotionLayerIndex && x.StateInfo.IsName("ArrowRelease"))
+                    .Subscribe( _ => ResetBow())
+                    .AddTo(this);
+            }
         }
         else
         {
             _animator.SetBool(Charge, false);
-            _isArrowTaking = false;
-            ResetCharge();
+            IsArrowCharging = false;
+            ResetBow();
         }
     }
-    private void ResetCharge()
+    private void ResetBow()
     {
+        IsArrowCharging = false;
+        IsArrowReleasing = false;
         _arrowChargeTimer = 0f;
         _arrowObject.SetActive(false);
         _bowStringConstraint.constraintActive = false;
         _resetBowStringConstraint.constraintActive = true;
-        _isArrowCharging = false;
         _animator.SetLayerWeight(_arrowMotionLayerIndex, 0f);
     }
 }
