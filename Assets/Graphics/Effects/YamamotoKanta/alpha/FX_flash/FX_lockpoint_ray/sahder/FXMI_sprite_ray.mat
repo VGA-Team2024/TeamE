@@ -79,13 +79,15 @@ Material:
     - _alphacliping: 0
     - _alphaintensity: 1
     - _color_intensity: 1
+    - _depthedege1: 1
+    - _depthedge: 2
     - _edge_wdth: 1
-    - _emi: 11
+    - _emi: 0
     - _subuv_x: 1
     - _subuv_y: 1
     - _warp_intesity: 0
     m_Colors:
-    - _Color: {r: 0.8867924, g: 0.8825537, b: 0.53123885, a: 1}
+    - _Color: {r: 0.8415094, g: 0.8362925, b: 0.36677104, a: 1}
     - _emi_1: {r: 0, g: 0, b: 0, a: 0}
     - _emisive: {r: 6.6252537, g: 8, b: 0, a: 0}
   m_BuildTextureStacks: []
