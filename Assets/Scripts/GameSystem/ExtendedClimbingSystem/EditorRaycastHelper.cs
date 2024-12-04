@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -67,3 +68,4 @@ public static class EditorRaycastHelper
         return false;
     }
 }
+#endif
