@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -48,16 +46,16 @@ public class FadeSceneLoader : MonoBehaviour
         Color startColor = fadePanelImage.color;       
         Color endColor = new Color(startColor.r, startColor.g, startColor.b, 1.0f); 
 
-        // ƒtƒF[ƒhƒAƒEƒgƒAƒjƒ[ƒVƒ‡ƒ“‚ğÀs
+        // ï¿½tï¿½Fï¿½[ï¿½hï¿½Aï¿½Eï¿½gï¿½Aï¿½jï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½s
         while (elapsedTime < _fadeDuration)
         {
             elapsedTime += Time.deltaTime;                       
-            float t = Mathf.Clamp01(elapsedTime / _fadeDuration);  // ƒtƒF[ƒh‚Ìis“x‚ğŒvZ
+            float t = Mathf.Clamp01(elapsedTime / _fadeDuration);  // ï¿½tï¿½Fï¿½[ï¿½hï¿½Ìiï¿½sï¿½xï¿½ï¿½ï¿½vï¿½Z
             fadePanelImage.color = Color.Lerp(startColor, endColor, t); 
             yield return null;                                     
         }
 
-        fadePanelImage.color = endColor;  // ƒtƒF[ƒh‚ªŠ®—¹‚µ‚½‚çÅIF‚Éİ’è
+        fadePanelImage.color = endColor;  // ï¿½tï¿½Fï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÅIï¿½Fï¿½Éİ’ï¿½
         FadePanel.SetActive(false);
         Panel_SetActive = false;
     }
