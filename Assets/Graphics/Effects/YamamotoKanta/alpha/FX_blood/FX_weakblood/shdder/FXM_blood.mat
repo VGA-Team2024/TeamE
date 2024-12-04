@@ -77,8 +77,11 @@ Material:
     - _ZTest: 4
     - _ZWrite: 0
     - _ZWriteControl: 0
+    - _alphacliping: 0.1
     - _alphaintensity: 11
-    - _color_intensity: 33
+    - _color_intensity: 22
+    - _depthedege1: 0
+    - _depthedge: 0
     - _edge_wdth: 0.14
     - _emi: 0
     - _subuv_x: 4
