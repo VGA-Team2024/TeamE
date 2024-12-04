@@ -12,14 +12,17 @@ Material:
     type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _SURFACE_TYPE_TRANSPARENT
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Transparent
+  disabledShaderPasses:
+  - DepthOnly
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -58,12 +61,24 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AlphaClip: 0
+    - _AlphaToMask: 0
+    - _Blend: 0
+    - _CastShadows: 1
+    - _Cull: 0
+    - _DstBlend: 10
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _SrcBlend: 5
+    - _Surface: 1
+    - _ZTest: 4
+    - _ZWrite: 0
+    - _ZWriteControl: 0
     - _aurax: 0
     - _auray: 0
-    - _edge_1: 25.55
-    - _edge_2: 18.16
+    - _dotpower: 0
+    - _edge_1: 1
+    - _edge_2: 2
     - _tilingx: 1
     - _tilingy: 1
     - _uvrotation: 0
@@ -73,8 +88,8 @@ Material:
     - _warpx: 0
     - _warpy: 0
     m_Colors:
-    - _BaseColor: {r: 0.9660369, g: 1, b: 0.94905657, a: 0.039215688}
-    - _black: {r: 1, g: 1, b: 1, a: 0}
+    - _BaseColor: {r: 2.8943224, g: 2.9960785, b: 2.843448, a: 0.011764706}
+    - _black: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &8409080309036723694
 MonoBehaviour:
