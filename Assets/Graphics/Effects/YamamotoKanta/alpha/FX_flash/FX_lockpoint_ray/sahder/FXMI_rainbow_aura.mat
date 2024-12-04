@@ -71,6 +71,7 @@ Material:
     - _QueueOffset: 0
     - _alpha_intesity: 4
     - _color_intesity: 3
+    - _dotpower: 2
     - _subx: 1
     - _suby: 1
     - _warp_intensity: 0.1

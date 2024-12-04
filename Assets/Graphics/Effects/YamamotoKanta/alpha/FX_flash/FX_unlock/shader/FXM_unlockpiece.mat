@@ -65,12 +65,16 @@ Material:
     m_Floats:
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _alphacliping: 0.1
     - _alphaintensity: 1
     - _color_intensity: 1
     - _edge_wdth: 0.2
+    - _emi: 0
     - _subuv_x: 1
     - _subuv_y: 1
     - _warp_intesity: 0
     m_Colors:
     - _Color: {r: 1.4980395, g: 1.2078433, b: 0, a: 0}
+    - _emi_1: {r: 0, g: 0, b: 0, a: 0}
+    - _emisive: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
