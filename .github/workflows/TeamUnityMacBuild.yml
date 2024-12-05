@@ -1,0 +1,25 @@
+name: TeamUnityMacBuild
+
+on:
+  workflow_dispatch: {}
+  schedule:
+      # UTCなので9時間引いた値 JST換算だと午前3時
+      - cron: '0 20 * * *'
+
+jobs:
+  build:
+    runs-on: [self-hosted, macOS]
+    steps:
+      - name: Build
+        # 指定したcmdファイルを実行する
+        run: |
+          sh -x ${{ secrets.MAC_UNITY_BUILD_PATH }}/team-e-build.sh
+        continue-on-error: false
+      - name: Discord Failure Post
+        if: failure()
+        env:
+          DISCORD_MESSAGE: "Curl Test \\n https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        run: >
+          curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }}
+          -H "Content-Type: application/json"
+          -d "{\"content\":\"${{ env.DISCORD_MESSAGE }}\"}"
