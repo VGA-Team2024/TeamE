@@ -57,6 +57,12 @@ public class BuildCommand
                             platform = BuildTarget.Switch;
                             ext = "";
                             break;
+                        case "Mac":
+                            platform = BuildTarget.StandaloneOSX;
+                            ext = ".app";
+                            // Macの場合は対象CPUアーキテクチャを設定する
+                            PlayerSettings.SetArchitecture(BuildTargetGroup.Standalone, 2);
+                            break;
                     }
                     break;
                 default:
