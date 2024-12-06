@@ -1,0 +1,20 @@
+name: TeamUnityBuild
+
+on:
+  workflow_dispatch: {}
+  schedule:
+      # UTCなので9時間引いた値 JST換算だと午前5時
+      - cron: '0 20 * * *'
+
+jobs:
+  build:
+    runs-on: [self-hosted, Windows]
+    steps:
+      - name: Build
+        # 指定したcmdファイルを実行する
+        run: cmd /c ${{ secrets.UNITY_BUILD_PATH }}\team-e-build.cmd
+        continue-on-error: false
+      - name: Discord Failure Post
+        if: failure()
+        run:
+          Invoke-WebRequest -Headers @{"Content-Type"="application/json"} -Method Post -Body "{`"content`":`"${{ secrets.DISCORD_MESSAGE }} \n <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>`"}" ${{ secrets.DISCORD_WEBHOOK_URL }}
