@@ -1,6 +1,7 @@
 using System;
 using R3;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ECPlayerController : MonoBehaviour
 {
@@ -24,6 +25,7 @@ public class ECPlayerController : MonoBehaviour
 
     [SerializeField] private float _overlapSphereOffset = 0.8f;
     [SerializeField] private float _overlapSphereRadius = 0.8f;
+    [SerializeField] private CapsuleCollider _capsuleCollider;
     private Vector3 _overlapSphereOrigin;
     
     public bool IsAiming;
@@ -43,20 +45,87 @@ public class ECPlayerController : MonoBehaviour
     private Vector3 _currentNormal;
     private Vector3 _currentClosestPoint;
 
+    private void Start()
+    {
+        PlayerInputProvider.Instance.JumpSubject.Subscribe(_ => Jump()).AddTo(this);
+        PlayerInputProvider.Instance.AimSubject.Subscribe(Aim).AddTo(this);
+        PlayerInputProvider.Instance.AttackSubject.Subscribe(_ => Attack()).AddTo(this);
+    }
+
+    void Jump()
+    {
+        if (IsClimbing || !IsClimbable.Value && !IsClimbPullUp)
+        {
+            _playerClimbController.ClimbEnd();
+            //climb Cancel
+        }
+        if (IsGround && !IsLanding && !IsJumping)
+        {
+            IsJumping = true;
+            _ignoreGroundTimer = _ignoreGroundTime;
+            _playerMoveController.JumpStart();
+        }
+    }
+
+    void Aim(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            IsAiming = true;
+            _bowObject.SetActive(true);
+            _playerCameraController.ChangeMode(CameraMode.Aim);
+        }
+
+        if (context.canceled)
+        {
+            AimStop();
+            if(IsArrowCharging)
+            {
+                _playerBowController.ArrowRelease(canceled:false);
+            } 
+        }
+    }
+
+    void AimStop()
+    {
+        IsAiming = false;
+        _bowObject.SetActive(false);
+        _playerCameraController.ChangeMode(CameraMode.Normal);
+    }
+    void Attack()
+    {
+        AimStop();
+        if (IsArrowCharging)
+        {
+            _playerBowController.ArrowRelease(canceled:true);
+        }
+    }
     private void Update()
     {
+        if (IsAiming)
+        {
+            _playerBowController.ArrowCharge();
+        }
         _boneContainer = FindObjectOfType<BoneContainer>();
-        _currentMoveInput = new Vector2(Input.GetAxis("L_XAxis"), Input.GetAxis("L_YAxis"));
+        _currentMoveInput = PlayerInputProvider.Instance.MoveValue;
 
         IsLanding = _playerMoveController.IsLanding;
         IsClimbing = _playerClimbController.IsClimbing;
         IsClimbPullUp = _playerClimbController.IsPullUp;
         IsArrowReleasing = _playerBowController.IsArrowReleasing;
         IsArrowCharging = _playerBowController.IsArrowCharging;
-        
+
         if (_ignoreGroundTimer < Mathf.Epsilon)
         {
-            IsGround = Physics.Raycast(_rigidBody.position + new Vector3(0f, _groundCheckRayCastOffsetY, 0f), Vector3.down, out var hit, _groundCheckRayCastLength, _groundCheckRayCastLayerMask);
+            IsGround = Physics.SphereCast(_rigidBody.position + new Vector3(0f, _groundCheckRayCastOffsetY, 0f),_capsuleCollider.radius , Vector3.down, out var hit, _groundCheckRayCastLength - _capsuleCollider.radius, _groundCheckRayCastLayerMask);
+            if (IsGround)
+            {
+                _playerMoveController.GroundNormal = hit.normal;
+            }
+            else
+            {
+                _playerMoveController.GroundNormal = Vector3.up;
+            }
             _playerMoveController.IsGrounded = IsGround;
             _playerMoveController.SetIsGround(IsGround);
             if (IsGround)
@@ -153,7 +222,6 @@ public class ECPlayerController : MonoBehaviour
                 if (IsClimbing && !IsClimbPullUp)
                 {
                     _playerClimbController.ClimbEnd();
-                    Debug.Log("climb end");
                 }
             })
             .AddTo(this);
@@ -163,55 +231,6 @@ public class ECPlayerController : MonoBehaviour
             _ignoreGroundTimer = _ignoreGroundTime;
             _playerClimbController.ClimbStart(hitWall: _climeTargetHit, _currentNormal, _currentClosestPoint);
             //ClimbStart
-        }
-        
-        if (Input.GetButtonDown("X"))
-        {
-            if ( IsClimbing || !IsClimbable.Value && !IsClimbPullUp)
-            {
-                _playerClimbController.ClimbEnd();
-                //climb Cancel
-            }
-            if (IsGround && !IsLanding && !IsJumping)
-            {
-                IsJumping = true;
-                _ignoreGroundTimer = _ignoreGroundTime;
-                _playerMoveController.JumpStart();
-            }
-        }
-        
-        if ((int)Input.GetAxisRaw("LT") == 1)
-        {
-            IsAiming = true;
-            _bowObject.SetActive(true);
-            _playerCameraController.ChangeMode(CameraMode.Aim);
-        }
-        
-        if(IsAiming && (int)Input.GetAxisRaw("LT") == 0)
-        {
-            IsAiming = false;
-            _bowObject.SetActive(false);
-            _playerCameraController.ChangeMode(CameraMode.Normal);
-        }
-        
-        if (IsAiming)
-        {
-            if ( (int)Input.GetAxisRaw("RT") == 1)
-            {
-                _playerBowController.ArrowCharge();
-            }
-        
-            if(IsArrowCharging && (int)Input.GetAxisRaw("RT") == 0)
-            {
-                _playerBowController.ArrowRelease(canceled:false);
-            } 
-        }
-        else
-        {
-            if (IsArrowCharging)
-            {
-                _playerBowController.ArrowRelease(canceled:true);
-            }
         }
     }
 

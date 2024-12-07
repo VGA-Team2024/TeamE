@@ -1,6 +1,7 @@
 using R3;
 using R3.Triggers;
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class ECMoveController : MonoBehaviour
@@ -31,7 +32,7 @@ public class ECMoveController : MonoBehaviour
     
     [HideInInspector] public bool IsLanding;
     [HideInInspector] public bool IsGrounded;
-    
+    [HideInInspector] public Vector3 GroundNormal = Vector3.up;
     int _baseLayerIndex;
     private ObservableStateMachineTrigger _stateMachineTrigger;
     private static readonly int Speed = Animator.StringToHash("Speed");
@@ -46,16 +47,27 @@ public class ECMoveController : MonoBehaviour
     private void Update()
     {
         var magnitude = new Vector3(_rigidBody.velocity.x , 0f , _rigidBody.velocity.z).magnitude;
-
-        
         _animator.SetFloat(Speed , magnitude / _forwardSpeed);
     }
     
     public void JumpStart()
     {
-        _rigidBody.AddForce(Vector3.up * _jumpPower, ForceMode.Impulse);
-        _animator.SetBool(Jump, true);
+        StartCoroutine(JumpCoroutine());
     }
+
+    IEnumerator JumpCoroutine()
+    {
+        _jumpTrigger = true;
+        yield return new WaitForFixedUpdate();
+        var copy = _rigidBody.velocity;
+        copy.y = _jumpPower;
+        _rigidBody.velocity = copy;
+        _animator.SetBool(Jump, true);
+        yield return new WaitForSeconds(0.3f);
+        _jumpTrigger = false;
+    }
+
+    private bool _jumpTrigger;
 
     public void SetIsGround(bool isGround)
     {
@@ -135,7 +147,14 @@ public class ECMoveController : MonoBehaviour
                 }
                 else
                 {
-                    _rigidBody.velocity = new Vector3(velocity.x, _rigidBody.velocity.y, velocity.z);
+                    if (!_jumpTrigger && IsGrounded)
+                    {
+                        _rigidBody.velocity = Vector3.ProjectOnPlane(new Vector3(velocity.x, 0, velocity.z), GroundNormal).normalized * _forwardSpeed;
+                    }
+                    else
+                    {
+                        _rigidBody.velocity = new Vector3(velocity.x, _rigidBody.velocity.y, velocity.z);
+                    }
                 }
             }
         }
