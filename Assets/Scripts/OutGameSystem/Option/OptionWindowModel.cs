@@ -1,6 +1,6 @@
 ﻿namespace CommonSystem.Option
 {
-    public class OptionModel
+    public class OptionWindowModel
     {
         
     }

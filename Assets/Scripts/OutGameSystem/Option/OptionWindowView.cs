@@ -3,14 +3,13 @@ using UnityEngine.UI;
 
 namespace CommonSystem.Option
 {
-    public class OptionView : MonoBehaviour
+    public class OptionWindowView : MonoBehaviour
     {
         [SerializeField] private GameObject _audioPanel;
         [SerializeField] private Button _button;
 
-        void Start()
+        public void Initialize()
         {
-            
         }
     }
 }
