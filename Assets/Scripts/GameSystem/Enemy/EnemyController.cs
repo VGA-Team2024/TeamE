@@ -26,57 +26,16 @@ public class EnemyController : MonoBehaviour
 
     private void Start()
     {
-        // プレイヤーの初期設定を行う
-        Initialize();
-        
-        var rotateAction = new EnemyNodes.ActionNode(Rotate);
-        var rotateCondition = new EnemyNodes.ConditionNode(IsPlayerNotInFront);
-        var rotateSeq = new EnemyNodes.SequenceNode();
-        rotateSeq.Add(rotateCondition);
-        rotateSeq.Add(rotateAction);
-        
-        var chaseAction = new EnemyNodes.ActionNode(Chase);
-        var chaseCondition = new EnemyNodes.ConditionNode(IsPlayerAway);
-        var chaseSeq = new EnemyNodes.SequenceNode();
-        chaseSeq.Add(chaseCondition);
-        chaseSeq.Add(chaseAction);
-
-        var frontAttackAciton = new EnemyNodes.ActionNode(FrontAttack);
-        var frontAttackCondition = new EnemyNodes.ConditionNode(CanFrontAttack);
-        var frontAttackSeq = new EnemyNodes.SequenceNode();
-        frontAttackSeq.Add(frontAttackCondition);
-        frontAttackSeq.Add(frontAttackAciton);
-
-        var centerAttackAction = new EnemyNodes.ActionNode(CenterAttack);
-        var centerAttackCondition = new EnemyNodes.ConditionNode(CanCenterAttack);
-        var centerAttackSeq = new EnemyNodes.SequenceNode();
-        centerAttackSeq.Add(centerAttackCondition);
-        centerAttackSeq.Add(centerAttackAction);
-
-        var backAttackAction = new EnemyNodes.ActionNode(BackAttack);
-        var backAttackCondition = new EnemyNodes.ConditionNode(CanBackAttack);
-        var backAttackSeq = new EnemyNodes.SequenceNode();
-        backAttackSeq.Add(backAttackCondition);
-        backAttackSeq.Add(backAttackAction);
-        
-        _rootNode.Add(rotateSeq);
-        _rootNode.Add(chaseSeq);
-        _rootNode.Add(frontAttackSeq);
-        _rootNode.Add(centerAttackSeq);
-        _rootNode.Add(backAttackSeq);
-    }
-
-    /// <summary>
-    /// 敵の初期化処理を行うメソッド
-    /// </summary>
-    private void Initialize()
-    {
         // コンポーネントを取得する
         GetAllNecessaryComponents();
         
         // BehaviourTreeを構築する
         SetUpBehaviourTree();
     }
+    
+    //-------------------------------------------------------------------------------
+    // 初期化に関連する処理
+    //-------------------------------------------------------------------------------
 
     /// <summary>
     /// 必要なコンポーネントを全て取得するメソッド
@@ -91,7 +50,118 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private void SetUpBehaviourTree()
     {
-        
+        SetUpRotateSequence();
+    }
+    
+    //-------------------------------------------------------------------------------
+    // 回転シーケンス
+    //-------------------------------------------------------------------------------
+
+    /// <summary>
+    /// 回転シーケンスを構築するメソッド
+    /// </summary>
+    private EnemyNodes.BaseNode SetUpRotateSequence()
+    {
+        var rotateSeq = new EnemyNodes.SequenceNode();
+        rotateSeq.Add(new EnemyNodes.ConditionNode(IsPlayerNotInFront));
+        rotateSeq.Add(new EnemyNodes.ActionNode(Rotate));
+        return rotateSeq;
+    }
+    
+    //-------------------------------------------------------------------------------
+    // 回転シーケンスに関連する処理
+    //-------------------------------------------------------------------------------
+    
+    //-------------------------------------------------------------------------------
+    // 追跡シーケンス
+    //-------------------------------------------------------------------------------
+
+    /// <summary>
+    /// 追跡シーケンスを構築するメソッド
+    /// </summary>
+    private EnemyNodes.BaseNode SetUpChaseSequence()
+    {
+        var chaseSeq = new EnemyNodes.SequenceNode();
+        chaseSeq.Add(new EnemyNodes.ConditionNode(IsPlayerAway));
+        chaseSeq.Add(new EnemyNodes.ActionNode(Chase));
+        return chaseSeq;
+    }
+    
+    //-------------------------------------------------------------------------------
+    // 追跡シーケンスに関連する処理
+    //-------------------------------------------------------------------------------
+    
+    //-------------------------------------------------------------------------------
+    // 前足の攻撃シーケンス
+    //-------------------------------------------------------------------------------
+
+    /// <summary>
+    /// 前足の攻撃シーケンスを構築するメソッド
+    /// </summary>
+    private EnemyNodes.BaseNode SetUpFrontAttackSequence()
+    {
+        var frontAttackSeq = new EnemyNodes.SequenceNode();
+        frontAttackSeq.Add(new EnemyNodes.ConditionNode(CanFrontAttack));
+        frontAttackSeq.Add(new EnemyNodes.ActionNode(FrontAttack));
+        return frontAttackSeq;
+    }
+    
+    //-------------------------------------------------------------------------------
+    // 前足の攻撃シーケンスに関連する処理
+    //-------------------------------------------------------------------------------
+    
+    //-------------------------------------------------------------------------------
+    // 胴体の攻撃シーケンス
+    //-------------------------------------------------------------------------------
+
+    /// <summary>
+    /// 胴体の攻撃シーケンスを構築するメソッド
+    /// </summary>
+    private EnemyNodes.BaseNode SetUpCenterAttackSequence()
+    {
+        var centerAttackSeq = new EnemyNodes.SequenceNode();
+        centerAttackSeq.Add(new EnemyNodes.ConditionNode(CanCenterAttack));
+        centerAttackSeq.Add(new EnemyNodes.ActionNode(CenterAttack));
+        return centerAttackSeq;
+    }
+    
+    //-------------------------------------------------------------------------------
+    // 胴体の攻撃シーケンスに関連する処理
+    //-------------------------------------------------------------------------------
+    
+    //-------------------------------------------------------------------------------
+    // 後足の攻撃シーケンス
+    //-------------------------------------------------------------------------------
+
+    /// <summary>
+    /// 後足の攻撃シーケンスを構築するメソッド
+    /// </summary>
+    private EnemyNodes.BaseNode SetUpBackAttackSequence()
+    {
+        var backAttackSeq = new EnemyNodes.SequenceNode();
+        backAttackSeq.Add(new EnemyNodes.ConditionNode(CanBackAttack));
+        backAttackSeq.Add(new EnemyNodes.ActionNode(BackAttack));
+        return backAttackSeq;
+    }
+    
+    //-------------------------------------------------------------------------------
+    // 後足の攻撃シーケンスに関連する処理
+    //-------------------------------------------------------------------------------
+    
+    //-------------------------------------------------------------------------------
+    // ルートノード
+    //-------------------------------------------------------------------------------
+
+    /// <summary>
+    /// ルートノードを構築するメソッド
+    /// </summary>
+    private void SetUpRootNode()
+    {
+        _rootNode.Add(SetUpRotateSequence());
+        _rootNode.Add(SetUpChaseSequence());
+        _rootNode.Add(SetUpFrontAttackSequence());
+        _rootNode.Add(SetUpCenterAttackSequence());
+        _rootNode.Add(SetUpBackAttackSequence());
     }
     
     //-------------------------------------------------------------------------------
@@ -103,20 +173,6 @@ public class EnemyController : MonoBehaviour
         _rootNode.Execute();
     }
     
-    //-------------------------------------------------------------------------------
-    // 
-    //-------------------------------------------------------------------------------
-    
-    //-------------------------------------------------------------------------------
-    // 
-    //-------------------------------------------------------------------------------
-    
-    //-------------------------------------------------------------------------------
-    // 
-    //-------------------------------------------------------------------------------
-    
-    
-
     private bool IsPlayerAway()
     {
         if (CanFrontAttack() || CanCenterAttack() || CanBackAttack())
