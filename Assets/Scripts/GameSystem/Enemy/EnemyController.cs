@@ -6,7 +6,12 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour
 {
     [SerializeField] private PlayerDummy player;
-    [SerializeField] private float attackRange;
+    [SerializeField] private Transform frontAttackPosition;
+    [SerializeField] private Transform centerAttackPosition;
+    [SerializeField] private Transform backAttackPosition;
+    [SerializeField] private float frontAttackRange;
+    [SerializeField] private float centerAttackRange;
+    [SerializeField] private float backAttackRange;
     [SerializeField] private float rotateThreshold;
     [SerializeField] private float rotateSpeed;
     [SerializeField] private float moveSpeed;
@@ -25,13 +30,34 @@ public class EnemyController : MonoBehaviour
         rotateSeq.Add(rotateAction);
         
         var chaseAction = new EnemyNodes.ActionNode(Chase);
-        var chaseCondition = new EnemyNodes.ConditionNode(IsPlayerOutOfAttackRange);
+        var chaseCondition = new EnemyNodes.ConditionNode(IsPlayerAway);
         var chaseSeq = new EnemyNodes.SequenceNode();
         chaseSeq.Add(chaseCondition);
         chaseSeq.Add(chaseAction);
+
+        var frontAttackAciton = new EnemyNodes.ActionNode(FrontAttack);
+        var frontAttackCondition = new EnemyNodes.ConditionNode(CanFrontAttack);
+        var frontAttackSeq = new EnemyNodes.SequenceNode();
+        frontAttackSeq.Add(frontAttackCondition);
+        frontAttackSeq.Add(frontAttackAciton);
+
+        var centerAttackAction = new EnemyNodes.ActionNode(CenterAttack);
+        var centerAttackCondition = new EnemyNodes.ConditionNode(CanCenterAttack);
+        var centerAttackSeq = new EnemyNodes.SequenceNode();
+        centerAttackSeq.Add(centerAttackCondition);
+        centerAttackSeq.Add(centerAttackAction);
+
+        var backAttackAction = new EnemyNodes.ActionNode(BackAttack);
+        var backAttackCondition = new EnemyNodes.ConditionNode(CanBackAttack);
+        var backAttackSeq = new EnemyNodes.SequenceNode();
+        backAttackSeq.Add(backAttackCondition);
+        backAttackSeq.Add(backAttackAction);
         
         _selector.Add(rotateSeq);
         _selector.Add(chaseSeq);
+        _selector.Add(frontAttackSeq);
+        _selector.Add(centerAttackSeq);
+        _selector.Add(backAttackSeq);
     }
 
     private void Update()
@@ -39,29 +65,58 @@ public class EnemyController : MonoBehaviour
         _selector.Execute();
     }
 
-    private bool IsPlayerOutOfAttackRange()
+    private void OnDrawGizmos()
     {
-        if (GetPlayerDistance() > attackRange)
-        {
-            _animator.SetBool("IsMoving", true);
-            return true;
-        }
-        else
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(frontAttackPosition.position, new Vector3(20f, 6f, frontAttackRange));
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(centerAttackPosition.position, new Vector3(20f, 6f, centerAttackRange));
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(backAttackPosition.position, new Vector3(20f, 6f, backAttackRange));
+    }
+
+    private bool IsPlayerAway()
+    {
+        if (CanFrontAttack() || CanCenterAttack() || CanBackAttack())
         {
             _animator.SetBool("IsMoving", false);
             return false;
         }
+        else
+        {
+            _animator.SetBool("IsMoving", true);
+            return true;
+        }
     }
 
-    private float GetPlayerDistance()
+    private bool CanFrontAttack()
     {
-        var playerPos = player.transform.position;
-        var fixedPlayerPos = new Vector3(playerPos.x, 0, playerPos.z);
-        
-        var enemyPos = transform.position;
-        var fixedEnemyPos = new Vector3(enemyPos.x, 0, enemyPos.z);   
-        
-        return Vector3.Distance(fixedPlayerPos, fixedEnemyPos);
+        var colliders = Physics.OverlapBox(frontAttackPosition.position, new Vector3(10f, 3f, frontAttackRange/2));
+        foreach (var collider in colliders)
+        {
+            if (collider.CompareTag("Player")) return true;
+        }
+        return false;
+    }
+
+    private bool CanCenterAttack()
+    {
+        var colliders = Physics.OverlapBox(centerAttackPosition.position, new Vector3(10f, 3f, centerAttackRange/2));
+        foreach (var collider in colliders)
+        {
+            if (collider.CompareTag("Player")) return true;
+        }
+        return false;
+    }
+
+    private bool CanBackAttack()
+    {
+        var colliders = Physics.OverlapBox(backAttackPosition.position, new Vector3(10f, 3f, backAttackRange/2));
+        foreach (var collider in colliders)
+        {
+            if (collider.CompareTag("Player")) return true;
+        }
+        return false;
     }
 
     private bool IsPlayerNotInFront()
@@ -102,8 +157,26 @@ public class EnemyController : MonoBehaviour
         dir.y = 0;
         dir.Normalize();
         var target = Quaternion.LookRotation(dir);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, target, rotateSpeed * 5f * Time.deltaTime);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, target, rotateSpeed * Time.deltaTime);
         transform.Translate(dir * moveSpeed * Time.deltaTime, Space.World);
         return EnemyNodes.NodeStatus.Running;
+    }
+
+    private EnemyNodes.NodeStatus FrontAttack()
+    {
+        Debug.Log("Front Attack.");
+        return EnemyNodes.NodeStatus.Success;
+    }
+
+    private EnemyNodes.NodeStatus CenterAttack()
+    {
+        Debug.Log("Center Attack.");
+        return EnemyNodes.NodeStatus.Success;
+    }
+
+    private EnemyNodes.NodeStatus BackAttack()
+    {
+        Debug.Log("Back Attack.");
+        return EnemyNodes.NodeStatus.Success;
     }
 }
