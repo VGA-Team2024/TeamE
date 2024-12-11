@@ -62,6 +62,23 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Design/Utsumi/Utsumi.unity
     guid: 83eed5395e0ebcc4cb5616107b69c9b4
+  - enabled: 1
+    path: Assets/Scenes/Debug/AudioManagerScene.unity
+    guid: 6250fd09eb762594b812b33bba79d230
+  - enabled: 1
+    path: Assets/Scenes/Debug/OptionScene.unity
+    guid: fb6ea1fc1a671814d85aae7eb85f2cad
+  - enabled: 1
+    path: Assets/Scenes/Design/shihosato.unity
+    guid: 8a49ffc916b31e840af97c5d6732934f
+  - enabled: 1
+    path: Assets/Scenes/Design/GotoNonomi/GotoNonomi.unity
+    guid: efe015fb63aea7c4ca4ff0b371bf17e0
+  - enabled: 1
+    path: Assets/Scenes/Design/SatoShiho/SatoShiho.unity
+    guid: 7a9125c5f8c994a9eac471966e70a216
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 7366e43fa3f777f4292c2095e8b63e4c,
+      type: 2}
+    com.unity.input.settings: {fileID: 11400000, guid: 4501d3d1552a48744b726937d5f49d41,
       type: 2}
