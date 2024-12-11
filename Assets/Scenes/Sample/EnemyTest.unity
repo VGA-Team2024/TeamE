@@ -474,7 +474,7 @@ GameObject:
   m_Component:
   - component: {fileID: 769517611}
   m_Layer: 0
-  m_Name: FrontAttackPosLeft
+  m_Name: LeftFrontAttackPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -489,7 +489,7 @@ Transform:
   m_GameObject: {fileID: 769517610}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3, z: 15.1}
+  m_LocalPosition: {x: -5, y: 3, z: 15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -505,7 +505,7 @@ GameObject:
   m_Component:
   - component: {fileID: 901080727}
   m_Layer: 0
-  m_Name: 'CenterAttackPos '
+  m_Name: CenterAttackPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -520,7 +520,7 @@ Transform:
   m_GameObject: {fileID: 901080726}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalPosition: {x: 0, y: 3, z: 2.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -643,15 +643,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 570447719}
-  frontAttackPosition: {fileID: 1777485858}
+  data: {fileID: 11400000, guid: 96e520d8266ffb6499f97ea6938c12fa, type: 2}
+  rightFrontAttackPosition: {fileID: 1777485858}
+  leftFrontAttackPosition: {fileID: 769517611}
   centerAttackPosition: {fileID: 901080727}
   backAttackPosition: {fileID: 1616846747}
-  frontAttackRange: 10
-  centerAttackRange: 20
-  backAttackRange: 15
-  rotateThreshold: 7.5
-  rotateSpeed: 1.25
-  moveSpeed: 5
 --- !u!95 &1149927288
 Animator:
   serializedVersion: 5
@@ -820,7 +816,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1616846747}
   m_Layer: 0
-  m_Name: BackAttackPos
+  m_Name: BackAttackPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -835,7 +831,7 @@ Transform:
   m_GameObject: {fileID: 1616846746}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: -1}
-  m_LocalPosition: {x: 0, y: 3, z: -17.5}
+  m_LocalPosition: {x: 0, y: 3, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -851,7 +847,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1777485858}
   m_Layer: 0
-  m_Name: FrontAttackPosRight
+  m_Name: RightFrontAttackPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -866,7 +862,7 @@ Transform:
   m_GameObject: {fileID: 1777485857}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3, z: 15.1}
+  m_LocalPosition: {x: 5, y: 3, z: 15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

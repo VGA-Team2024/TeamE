@@ -18,6 +18,18 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private readonly EnemyNodes.SelectorNode _rootNode;
     
+    [Header("右前足の攻撃範囲の中心")] 
+    [SerializeField] private Transform rightFrontAttackPosition;
+    
+    [Header("左前足の攻撃範囲の中心")] 
+    [SerializeField] private Transform leftFrontAttackPosition;
+    
+    [Header("胴体の攻撃範囲の中心")] 
+    [SerializeField] private Transform centerAttackPosition;
+    
+    [Header("後足の攻撃範囲の位置")] 
+    [SerializeField] private Transform backAttackPosition;
+    
     Animator _animator;
     
     //-------------------------------------------------------------------------------
@@ -182,7 +194,7 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private bool ShouldRightFrontAttackPlayer()
     {
-        var colliders = Physics.OverlapBox(data.rightFrontAttackPosition.position, 
+        var colliders = Physics.OverlapBox(rightFrontAttackPosition.position, 
             new Vector3(data.frontAttackWidth/4, data.frontAttackHeight/2, data.frontAttackDepth/2));
         
         foreach (var collider in colliders)
@@ -216,7 +228,7 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private bool ShouldLeftFrontAttackPlayer()
     {
-        var colliders = Physics.OverlapBox(data.leftFrontAttackPosition.position, 
+        var colliders = Physics.OverlapBox(leftFrontAttackPosition.position, 
             new Vector3(data.frontAttackWidth/4, data.frontAttackHeight/2, data.frontAttackDepth/2));
         
         foreach (var collider in colliders)
@@ -250,7 +262,7 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private bool ShouldCenterAttackPlayer()
     {
-        var colliders = Physics.OverlapBox(data.centerAttackPosition.position, 
+        var colliders = Physics.OverlapBox(centerAttackPosition.position, 
             new Vector3(data.centerAttackWidth/2, data.centerAttackHeight/2, data.centerAttackDepth/2));
         
         foreach (var collider in colliders)
@@ -284,7 +296,7 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private bool ShouldBackAttackPlayer()
     {
-        var colliders = Physics.OverlapBox(data.backAttackPosition.position, 
+        var colliders = Physics.OverlapBox(backAttackPosition.position, 
             new Vector3(data.backAttackWidth/2, data.backAttackHeight/2, data.backAttackDepth/2));
         
         foreach (var collider in colliders)
@@ -315,10 +327,10 @@ public class EnemyController : MonoBehaviour
     // 更新処理
     //-------------------------------------------------------------------------------
 
-    private void Update()
-    {
-        _rootNode.Execute();
-    }
+    // private void Update()
+    // {
+    //     _rootNode.Execute();
+    // }
 
     private EnemyNodes.NodeStatus FrontAttack()
     {
@@ -346,22 +358,22 @@ public class EnemyController : MonoBehaviour
     {
         // 右前足の攻撃範囲
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(data.rightFrontAttackPosition.position, 
+        Gizmos.DrawWireCube(rightFrontAttackPosition.position, 
             new Vector3(data.frontAttackWidth/2, data.frontAttackHeight, data.frontAttackDepth));
         
         // 左前足の攻撃範囲
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(data.leftFrontAttackPosition.position, 
+        Gizmos.DrawWireCube(leftFrontAttackPosition.position, 
             new Vector3(data.frontAttackWidth/2, data.frontAttackHeight, data.frontAttackDepth));
         
         // 胴体の攻撃範囲
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(data.centerAttackPosition.position, 
+        Gizmos.DrawWireCube(centerAttackPosition.position, 
             new Vector3(data.centerAttackWidth, data.centerAttackHeight, data.centerAttackDepth));
         
         // 後足の攻撃範囲
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(data.backAttackPosition.position, 
+        Gizmos.DrawWireCube(backAttackPosition.position, 
             new Vector3(data.backAttackWidth, data.backAttackHeight, data.backAttackDepth));
     }
 }

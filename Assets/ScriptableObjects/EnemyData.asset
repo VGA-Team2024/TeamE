@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42d76a27469714f479c856d4027ff587, type: 3}
   m_Name: EnemyData
   m_EditorClassIdentifier: 
-  frontAttackPosition: {fileID: 0}
-  frontAttackWidth: 0
-  frontAttackHeight: 0
-  frontAttackDepth: 0
-  centerAttackPosition: {fileID: 0}
-  centerAttackWidth: 0
-  centerAttackHeight: 0
-  centerAttackDepth: 0
-  backAttackPosition: {fileID: 0}
-  backAttackWidth: 0
-  backAttackHeight: 0
-  backAttackDepth: 0
+  frontAttackWidth: 20
+  frontAttackHeight: 6
+  frontAttackDepth: 10
+  centerAttackWidth: 20
+  centerAttackHeight: 6
+  centerAttackDepth: 15
+  backAttackWidth: 20
+  backAttackHeight: 6
+  backAttackDepth: 10
+  rotateSpeed: 1.25
+  rotateThreshold: 7.5
+  moveSpeed: 5
