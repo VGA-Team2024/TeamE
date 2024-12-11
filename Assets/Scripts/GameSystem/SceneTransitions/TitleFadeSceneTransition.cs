@@ -19,19 +19,19 @@ public class TitleFadeSceneTransition : MonoBehaviour
     {
         _fadePanelImage = _fadePanel.GetComponent<Image>();
         _fadePanelImage.color = _startColor;
-        _fadePanel.SetActive(false);
+        _fadePanelImage.enabled = false;
     }
 
     public void CollCoroutine()
     {
-        StartCoroutine(SceneChange());
+        StartCoroutine(FadeSceneTransition());
     }
 
-    IEnumerator SceneChange()
+    IEnumerator FadeSceneTransition()
     {
         if (_fadeTime != 0f)
         {
-            _fadePanel.SetActive(true);
+            _fadePanelImage.enabled = true;
             float deltaTime = 0f;
             while (deltaTime < _fadeTime)
             {
@@ -41,7 +41,7 @@ public class TitleFadeSceneTransition : MonoBehaviour
                 yield return null;
             }
             _fadePanelImage.color = _endColor;
-        }
+        }//フェード時間が０の場合フェードせずにそのまま遷移
         yield return new WaitForSeconds(_waitTime);
         SceneManager.LoadScene(_inGameSceneName);
     }
