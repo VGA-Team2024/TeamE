@@ -12,11 +12,13 @@ public class TitleFadeSceneTransition : MonoBehaviour
     [Header("FadeTime+WaitTime=待ち時間")]
     [SerializeField] float _fadeTime;
     [SerializeField] float _waitTime;
+    Color _startColor = new Color(0f, 0f, 0f, 0f);
+    Color _endColor = Color.black;
 
     void Start()
     {
         _fadePanelImage = _fadePanel.GetComponent<Image>();
-        _fadePanelImage.color = new Color(0f, 0f, 0f, 0f);
+        _fadePanelImage.color = _startColor;
         _fadePanel.SetActive(false);
     }
 
@@ -38,7 +40,7 @@ public class TitleFadeSceneTransition : MonoBehaviour
                 _fadePanelImage.color = new Color(0f, 0f, 0f, a);
                 yield return null;
             }
-            _fadePanelImage.color = new Color(0f, 0f, 0f, 1f);
+            _fadePanelImage.color = _endColor;
         }
         yield return new WaitForSeconds(_waitTime);
         SceneManager.LoadScene(_inGameSceneName);
