@@ -5,13 +5,13 @@ using UnityEngine.InputSystem;
 public class PlayerInputProvider : SingletonMonoBehavior<PlayerInputProvider>
 {
     private GameInputs _gameInputs;
-    private Vector3 _lookValue;
-    private Vector3 _moveValue;
+    private Vector2 _lookValue;
+    private Vector2 _moveValue;
     private readonly Subject<Unit> _jumpSubject = new();
     private readonly Subject<InputAction.CallbackContext> _aimSubject = new();
     private readonly Subject<Unit> _attackSubject = new();
-    public Vector3 LookValue => _lookValue;
-    public Vector3 MoveValue => _moveValue;
+    public Vector2 LookValue => _lookValue;
+    public Vector2 MoveValue => _moveValue;
     public Subject<Unit> JumpSubject => _jumpSubject;
     public Subject<InputAction.CallbackContext> AimSubject => _aimSubject;
     public Subject<Unit> AttackSubject => _attackSubject;
@@ -38,14 +38,14 @@ public class PlayerInputProvider : SingletonMonoBehavior<PlayerInputProvider>
         if (context.performed)
             _lookValue = context.ReadValue<Vector2>();
         else
-            _lookValue = Vector3.zero;
+            _lookValue = Vector2.zero;
     }
     void OnMove(InputAction.CallbackContext context)
     {
         if (context.performed)
             _moveValue = context.ReadValue<Vector2>();
         else
-            _moveValue = Vector3.zero;
+            _moveValue = Vector2.zero;
     }
     void OnJump(InputAction.CallbackContext context)
     {

@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 
 public class ECPlayerController : MonoBehaviour
 {
-    [SerializeField] private bool _boneSetParent = false;
     [SerializeField] private float _wallAngle = 55f;
     [SerializeField] private LayerMask _climbLayerMask;
     [SerializeField] private float _playerClimbRayLength = 0.5f;
@@ -22,6 +21,7 @@ public class ECPlayerController : MonoBehaviour
     [SerializeField] private PlayerBowController _playerBowController;
     [SerializeField] private PlayerCameraController _playerCameraController;
     [SerializeField] private ECClimbController _playerClimbController;
+    [SerializeField] private BoneChecker _boneChecker;
 
     [SerializeField] private float _overlapSphereOffset = 0.8f;
     [SerializeField] private float _overlapSphereRadius = 0.8f;
@@ -41,7 +41,7 @@ public class ECPlayerController : MonoBehaviour
     private RaycastHit _climeTargetHit;
     private Vector2 _currentMoveInput;
     private float _ignoreGroundTimer; //ジャンプ時等に一時的に接地判定を無視するためのタイマー
-    private BoneContainer _boneContainer;
+    //private BoneContainer _boneContainer;
     private Vector3 _currentNormal;
     private Vector3 _currentClosestPoint;
 
@@ -106,7 +106,6 @@ public class ECPlayerController : MonoBehaviour
         {
             _playerBowController.ArrowCharge();
         }
-        _boneContainer = FindObjectOfType<BoneContainer>();
         _currentMoveInput = PlayerInputProvider.Instance.MoveValue;
 
         IsLanding = _playerMoveController.IsLanding;
@@ -121,12 +120,14 @@ public class ECPlayerController : MonoBehaviour
             if (IsGround)
             {
                 _playerMoveController.GroundNormal = hit.normal;
+                _playerMoveController.CanWalk = Vector3.Angle(hit.normal, Vector3.up) < _wallAngle;
             }
             else
             {
                 _playerMoveController.GroundNormal = Vector3.up;
+                _playerMoveController.CanWalk = false;
             }
-            _playerMoveController.IsGrounded = IsGround;
+            _playerMoveController.IsGround = IsGround;
             _playerMoveController.SetIsGround(IsGround);
             if (IsGround)
             {
@@ -159,7 +160,8 @@ public class ECPlayerController : MonoBehaviour
         _overlapSphereOrigin = castOrigin;
         var hitColliders = Physics.OverlapSphere(castOrigin,
             _overlapSphereRadius, _climbLayerMask);
-        
+
+        //bool foundBoneContainer = false;
         foreach (var c in hitColliders)
         {
             if (c is MeshCollider && c.TryGetComponent(out MeshUpdater updater))
@@ -173,6 +175,11 @@ public class ECPlayerController : MonoBehaviour
                     subA.y * subB.z - subA.z * subB.y, 
                     subA.z * subB.x - subA.x * subB.z,
                     subA.x * subB.y - subA.y * subB.x).normalized;
+                // if (c.TryGetComponent(out BoneContainer bones))
+                // {
+                //     _boneContainer = bones;
+                //     foundBoneContainer = true;
+                // }
             }
             else
             {
@@ -181,31 +188,30 @@ public class ECPlayerController : MonoBehaviour
             }
         }
 
+        //if (!foundBoneContainer) _boneContainer = null;
+        
         //壁の判定
         IsClimbable.Value = hitColliders.Length > 0;
         
         //IsClimbable = Physics.Raycast(_playerClimbRayPoint.position , _playerClimbRayPoint.forward , out _climeTargetHit , _playerClimbRayLength , _climbLayerMask);
         //IsClimbable = IsClimbable && Vector3.Angle(_climeTargetHit.normal, Vector3.up) >= _wallAngle;
-
-        if (_boneSetParent)
+        
+        if (_boneChecker.BoneContainer)
         {
-            if (IsClimbable.Value)
+            (float dist, Transform trans) minDistance = (float.MaxValue, null);
+            foreach (var bone in _boneChecker.BoneContainer.Bones)
             {
-                (float dist, Transform trans) minDistance = (float.MaxValue, null);
-                foreach (var bone in _boneContainer.Bones)
+                var distance = (bone.position - _playerMoveController.transform.position).sqrMagnitude;
+                if (minDistance.dist > distance)
                 {
-                    var distance = (bone.position - _climeTargetHit.point).sqrMagnitude;
-                    if (minDistance.dist > distance)
-                    {
-                        minDistance = (distance, bone);
-                    }
+                    minDistance = (distance, bone);
                 }
-                _playerMoveController.transform.SetParent(minDistance.trans);
             }
-            else
-            {
-                _playerMoveController.transform.SetParent(transform);
-            }
+            _playerMoveController.transform.SetParent(minDistance.trans);
+        }
+        else
+        {
+            _playerMoveController.transform.SetParent(transform);
         }
         
         //  登っている途中で壁の判定が取れないかつ登りあがる処理が行われていなければければ登るのをやめる
@@ -225,7 +231,6 @@ public class ECPlayerController : MonoBehaviour
                 }
             })
             .AddTo(this);
-        
         if(IsGround && !_playerMoveController.IsLanding && !IsAiming && IsClimbable.Value && Vector3.Dot(-_currentNormal , _playerMoveController.transform.TransformDirection(new Vector3(_currentMoveInput.x , 0f , _currentMoveInput.y))) > _playerClimbThreshold)
         {
             _ignoreGroundTimer = _ignoreGroundTime;
