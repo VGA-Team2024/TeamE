@@ -63,7 +63,7 @@ public class EnemyController : MonoBehaviour
     private EnemyNodes.BaseNode SetUpRotateSequence()
     {
         var rotateSeq = new EnemyNodes.SequenceNode();
-        rotateSeq.Add(new EnemyNodes.ConditionNode(IsPlayerNotInFront));
+        rotateSeq.Add(new EnemyNodes.ConditionNode(ShouldRotateTowardsPlayer));
         rotateSeq.Add(new EnemyNodes.ActionNode(Rotate));
         return rotateSeq;
     }
@@ -71,6 +71,45 @@ public class EnemyController : MonoBehaviour
     //-------------------------------------------------------------------------------
     // 回転シーケンスに関連する処理
     //-------------------------------------------------------------------------------
+
+    /// <summary>
+    /// Y座標を無視したプレイヤーへの方向を取得する
+    /// </summary>
+    private Vector3 GetFixedDirectionToPlayer()
+    {
+        var playerPos = player.transform.position;
+        var enemyPos = transform.position;
+        var directionToPlayer = playerPos - enemyPos;
+        directionToPlayer.y = 0;
+        return directionToPlayer.normalized;
+    }
+    
+    /// <summary>
+    /// Y座標を無視したプレイヤーへの角度を取得する
+    /// </summary>
+    /// <returns></returns>
+    private float GetFixedAngleToPlayer()
+    {
+        return Vector3.Angle(transform.forward, GetFixedDirectionToPlayer());
+    }
+    
+    /// <summary>
+    /// プレイヤーへ回転するべきか（≒プレイヤーが正面方向にいるか）
+    /// </summary>
+    private bool ShouldRotateTowardsPlayer()
+    {
+        return GetFixedAngleToPlayer() > data.rotateThreshold;
+    }
+    
+    /// <summary>
+    /// プレイヤーへ回転する
+    /// </summary>
+    private EnemyNodes.NodeStatus Rotate()
+    {
+        var target = Quaternion.LookRotation(GetFixedDirectionToPlayer());
+        transform.rotation = Quaternion.Slerp(transform.rotation, target, data.rotateSpeed * Time.deltaTime);
+        return EnemyNodes.NodeStatus.Running;
+    }
     
     //-------------------------------------------------------------------------------
     // 追跡シーケンス
@@ -82,7 +121,7 @@ public class EnemyController : MonoBehaviour
     private EnemyNodes.BaseNode SetUpChaseSequence()
     {
         var chaseSeq = new EnemyNodes.SequenceNode();
-        chaseSeq.Add(new EnemyNodes.ConditionNode(IsPlayerAway));
+        chaseSeq.Add(new EnemyNodes.ConditionNode(ShouldChasePlayer));
         chaseSeq.Add(new EnemyNodes.ActionNode(Chase));
         return chaseSeq;
     }
@@ -91,24 +130,101 @@ public class EnemyController : MonoBehaviour
     // 追跡シーケンスに関連する処理
     //-------------------------------------------------------------------------------
     
+    /// <summary>
+    /// プレイヤーを追跡するべきか（≒プレイヤーが全ての攻撃範囲外にいるか）
+    /// </summary>
+    private bool ShouldChasePlayer()
+    {
+        if (ShouldRightFrontAttackPlayer() || ShouldCenterAttackPlayer() || ShouldBackAttackPlayer())
+        {
+            _animator.SetBool("IsMoving", false);
+            return false;
+        }
+        else
+        {
+            _animator.SetBool("IsMoving", true);
+            return true;
+        }
+    }
+    
+    /// <summary>
+    /// プレイヤーを追跡する
+    /// </summary>
+    private EnemyNodes.NodeStatus Chase()
+    {
+        var target = Quaternion.LookRotation(GetFixedDirectionToPlayer());
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, target, data.rotateSpeed * Time.deltaTime);
+        transform.Translate(Time.deltaTime * data.moveSpeed * GetFixedDirectionToPlayer(), Space.World);
+        return EnemyNodes.NodeStatus.Running;
+    }
+    
     //-------------------------------------------------------------------------------
-    // 前足の攻撃シーケンス
+    // 右前足の攻撃シーケンス
     //-------------------------------------------------------------------------------
 
     /// <summary>
-    /// 前足の攻撃シーケンスを構築するメソッド
+    /// 右前足の攻撃シーケンスを構築するメソッド
     /// </summary>
-    private EnemyNodes.BaseNode SetUpFrontAttackSequence()
+    private EnemyNodes.BaseNode SetUpRightFrontAttackSequence()
     {
         var frontAttackSeq = new EnemyNodes.SequenceNode();
-        frontAttackSeq.Add(new EnemyNodes.ConditionNode(CanFrontAttack));
+        frontAttackSeq.Add(new EnemyNodes.ConditionNode(ShouldRightFrontAttackPlayer));
         frontAttackSeq.Add(new EnemyNodes.ActionNode(FrontAttack));
         return frontAttackSeq;
     }
     
     //-------------------------------------------------------------------------------
-    // 前足の攻撃シーケンスに関連する処理
+    // 右前足の攻撃シーケンスに関連する処理
     //-------------------------------------------------------------------------------
+    
+    /// <summary>
+    /// プレイヤーを右前足で攻撃するべきか（≒プレイヤーが右前足の攻撃範囲内にいるか）
+    /// </summary>
+    private bool ShouldRightFrontAttackPlayer()
+    {
+        var colliders = Physics.OverlapBox(data.rightFrontAttackPosition.position, 
+            new Vector3(data.frontAttackWidth/4, data.frontAttackHeight/2, data.frontAttackDepth/2));
+        
+        foreach (var collider in colliders)
+        {
+            if (collider.CompareTag("Player")) return true;
+        }
+        return false;
+    }
+    
+    //-------------------------------------------------------------------------------
+    // 左前足の攻撃シーケンス
+    //-------------------------------------------------------------------------------
+
+    /// <summary>
+    /// 左前足の攻撃シーケンスを構築するメソッド
+    /// </summary>
+    private EnemyNodes.BaseNode SetUpLeftFrontAttackSequence()
+    {
+        var frontAttackSeq = new EnemyNodes.SequenceNode();
+        frontAttackSeq.Add(new EnemyNodes.ConditionNode(ShouldLeftFrontAttackPlayer));
+        frontAttackSeq.Add(new EnemyNodes.ActionNode(FrontAttack));
+        return frontAttackSeq;
+    }
+    
+    //-------------------------------------------------------------------------------
+    // 左前足の攻撃シーケンスに関連する処理
+    //-------------------------------------------------------------------------------
+    
+    /// <summary>
+    /// プレイヤーを左前足で攻撃するべきか（≒プレイヤーが左前足の攻撃範囲内にいるか）
+    /// </summary>
+    private bool ShouldLeftFrontAttackPlayer()
+    {
+        var colliders = Physics.OverlapBox(data.leftFrontAttackPosition.position, 
+            new Vector3(data.frontAttackWidth/4, data.frontAttackHeight/2, data.frontAttackDepth/2));
+        
+        foreach (var collider in colliders)
+        {
+            if (collider.CompareTag("Player")) return true;
+        }
+        return false;
+    }
     
     //-------------------------------------------------------------------------------
     // 胴体の攻撃シーケンス
@@ -120,7 +236,7 @@ public class EnemyController : MonoBehaviour
     private EnemyNodes.BaseNode SetUpCenterAttackSequence()
     {
         var centerAttackSeq = new EnemyNodes.SequenceNode();
-        centerAttackSeq.Add(new EnemyNodes.ConditionNode(CanCenterAttack));
+        centerAttackSeq.Add(new EnemyNodes.ConditionNode(ShouldCenterAttackPlayer));
         centerAttackSeq.Add(new EnemyNodes.ActionNode(CenterAttack));
         return centerAttackSeq;
     }
@@ -128,6 +244,21 @@ public class EnemyController : MonoBehaviour
     //-------------------------------------------------------------------------------
     // 胴体の攻撃シーケンスに関連する処理
     //-------------------------------------------------------------------------------
+    
+    /// <summary>
+    /// プレイヤーを胴体で攻撃すべきか（≒プレイヤーが胴体の攻撃範囲内にいるか）
+    /// </summary>
+    private bool ShouldCenterAttackPlayer()
+    {
+        var colliders = Physics.OverlapBox(data.centerAttackPosition.position, 
+            new Vector3(data.centerAttackWidth/2, data.centerAttackHeight/2, data.centerAttackDepth/2));
+        
+        foreach (var collider in colliders)
+        {
+            if (collider.CompareTag("Player")) return true;
+        }
+        return false;
+    }
     
     //-------------------------------------------------------------------------------
     // 後足の攻撃シーケンス
@@ -139,7 +270,7 @@ public class EnemyController : MonoBehaviour
     private EnemyNodes.BaseNode SetUpBackAttackSequence()
     {
         var backAttackSeq = new EnemyNodes.SequenceNode();
-        backAttackSeq.Add(new EnemyNodes.ConditionNode(CanBackAttack));
+        backAttackSeq.Add(new EnemyNodes.ConditionNode(ShouldBackAttackPlayer));
         backAttackSeq.Add(new EnemyNodes.ActionNode(BackAttack));
         return backAttackSeq;
     }
@@ -147,6 +278,21 @@ public class EnemyController : MonoBehaviour
     //-------------------------------------------------------------------------------
     // 後足の攻撃シーケンスに関連する処理
     //-------------------------------------------------------------------------------
+    
+    /// <summary>
+    /// プレイヤーを後足で攻撃すべきか（≒プレイヤーが後足の攻撃範囲内にいるか）
+    /// </summary>
+    private bool ShouldBackAttackPlayer()
+    {
+        var colliders = Physics.OverlapBox(data.backAttackPosition.position, 
+            new Vector3(data.backAttackWidth/2, data.backAttackHeight/2, data.backAttackDepth/2));
+        
+        foreach (var collider in colliders)
+        {
+            if (collider.CompareTag("Player")) return true;
+        }
+        return false;
+    }
     
     //-------------------------------------------------------------------------------
     // ルートノード
@@ -159,7 +305,8 @@ public class EnemyController : MonoBehaviour
     {
         _rootNode.Add(SetUpRotateSequence());
         _rootNode.Add(SetUpChaseSequence());
-        _rootNode.Add(SetUpFrontAttackSequence());
+        _rootNode.Add(SetUpRightFrontAttackSequence());
+        _rootNode.Add(SetUpLeftFrontAttackSequence());
         _rootNode.Add(SetUpCenterAttackSequence());
         _rootNode.Add(SetUpBackAttackSequence());
     }
@@ -171,93 +318,6 @@ public class EnemyController : MonoBehaviour
     private void Update()
     {
         _rootNode.Execute();
-    }
-    
-    private bool IsPlayerAway()
-    {
-        if (CanFrontAttack() || CanCenterAttack() || CanBackAttack())
-        {
-            _animator.SetBool("IsMoving", false);
-            return false;
-        }
-        else
-        {
-            _animator.SetBool("IsMoving", true);
-            return true;
-        }
-    }
-
-    private bool CanFrontAttack()
-    {
-        var colliders = Physics.OverlapBox(frontAttackPosition.position, new Vector3(10f, 3f, frontAttackRange/2));
-        foreach (var collider in colliders)
-        {
-            if (collider.CompareTag("Player")) return true;
-        }
-        return false;
-    }
-
-    private bool CanCenterAttack()
-    {
-        var colliders = Physics.OverlapBox(centerAttackPosition.position, new Vector3(10f, 3f, centerAttackRange/2));
-        foreach (var collider in colliders)
-        {
-            if (collider.CompareTag("Player")) return true;
-        }
-        return false;
-    }
-
-    private bool CanBackAttack()
-    {
-        var colliders = Physics.OverlapBox(backAttackPosition.position, new Vector3(10f, 3f, backAttackRange/2));
-        foreach (var collider in colliders)
-        {
-            if (collider.CompareTag("Player")) return true;
-        }
-        return false;
-    }
-
-    private bool IsPlayerNotInFront()
-    {
-        return GetPlayerAngle() > rotateThreshold;
-    }
-
-    private float GetPlayerAngle()
-    {
-        var playerPos = player.transform.position;
-        var enemyPos = transform.position;
-        var dir = playerPos - enemyPos;
-        dir.y = 0;
-        dir.Normalize();
-        var forward = transform.forward;
-        forward.y = 0;
-        forward.Normalize();
-        return Vector3.Angle(forward, dir);
-    }
-
-    private EnemyNodes.NodeStatus Rotate()
-    {
-        var playerPos = player.transform.position;
-        var enemyPos = transform.position;
-        var dir = playerPos - enemyPos;
-        dir.y = 0;
-        dir.Normalize();
-        var target = Quaternion.LookRotation(dir);
-        transform.rotation = Quaternion.Slerp(transform.rotation, target, rotateSpeed * Time.deltaTime);
-        return EnemyNodes.NodeStatus.Running;
-    }
-
-    private EnemyNodes.NodeStatus Chase()
-    {
-        var playerPos = player.transform.position;
-        var enemyPos = transform.position;
-        var dir = playerPos - enemyPos;
-        dir.y = 0;
-        dir.Normalize();
-        var target = Quaternion.LookRotation(dir);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, target, rotateSpeed * Time.deltaTime);
-        transform.Translate(dir * moveSpeed * Time.deltaTime, Space.World);
-        return EnemyNodes.NodeStatus.Running;
     }
 
     private EnemyNodes.NodeStatus FrontAttack()
@@ -284,10 +344,15 @@ public class EnemyController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        // 前足の攻撃範囲
+        // 右前足の攻撃範囲
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(data.frontAttackPosition.position, 
-            new Vector3(data.frontAttackWidth, data.frontAttackHeight, data.frontAttackDepth));
+        Gizmos.DrawWireCube(data.rightFrontAttackPosition.position, 
+            new Vector3(data.frontAttackWidth/2, data.frontAttackHeight, data.frontAttackDepth));
+        
+        // 左前足の攻撃範囲
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(data.leftFrontAttackPosition.position, 
+            new Vector3(data.frontAttackWidth/2, data.frontAttackHeight, data.frontAttackDepth));
         
         // 胴体の攻撃範囲
         Gizmos.color = Color.yellow;
