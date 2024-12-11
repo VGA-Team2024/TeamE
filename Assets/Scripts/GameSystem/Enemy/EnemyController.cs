@@ -1,27 +1,33 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>敵を制御するクラス</summary>
 public class EnemyController : MonoBehaviour
 {
+    /// <summary>
+    /// プレイヤーを制御するクラス
+    /// </summary>
     [SerializeField] private PlayerDummy player;
-    [SerializeField] private Transform frontAttackPosition;
-    [SerializeField] private Transform centerAttackPosition;
-    [SerializeField] private Transform backAttackPosition;
-    [SerializeField] private float frontAttackRange;
-    [SerializeField] private float centerAttackRange;
-    [SerializeField] private float backAttackRange;
-    [SerializeField] private float rotateThreshold;
-    [SerializeField] private float rotateSpeed;
-    [SerializeField] private float moveSpeed;
+    
+    /// <summary>
+    /// 敵のデータを管理するクラス
+    /// </summary>
+    [SerializeField] private EnemyData data;
 
-    readonly EnemyNodes.SelectorNode _selector = new EnemyNodes.SelectorNode();
+    /// <summary>
+    /// BehaviourTreeのRootノード
+    /// </summary>
+    private readonly EnemyNodes.SelectorNode _rootNode;
+    
     Animator _animator;
+    
+    //-------------------------------------------------------------------------------
+    // 初期化
+    //-------------------------------------------------------------------------------
 
     private void Start()
     {
-        _animator = GetComponent<Animator>();
+        // プレイヤーの初期設定を行う
+        Initialize();
         
         var rotateAction = new EnemyNodes.ActionNode(Rotate);
         var rotateCondition = new EnemyNodes.ConditionNode(IsPlayerNotInFront);
@@ -53,27 +59,63 @@ public class EnemyController : MonoBehaviour
         backAttackSeq.Add(backAttackCondition);
         backAttackSeq.Add(backAttackAction);
         
-        _selector.Add(rotateSeq);
-        _selector.Add(chaseSeq);
-        _selector.Add(frontAttackSeq);
-        _selector.Add(centerAttackSeq);
-        _selector.Add(backAttackSeq);
+        _rootNode.Add(rotateSeq);
+        _rootNode.Add(chaseSeq);
+        _rootNode.Add(frontAttackSeq);
+        _rootNode.Add(centerAttackSeq);
+        _rootNode.Add(backAttackSeq);
     }
+
+    /// <summary>
+    /// 敵の初期化処理を行うメソッド
+    /// </summary>
+    private void Initialize()
+    {
+        // コンポーネントを取得する
+        GetAllNecessaryComponents();
+        
+        // BehaviourTreeを構築する
+        SetUpBehaviourTree();
+    }
+
+    /// <summary>
+    /// 必要なコンポーネントを全て取得するメソッド
+    /// </summary>
+    private void GetAllNecessaryComponents()
+    {
+        _animator = GetComponent<Animator>();
+    }
+
+    /// <summary>
+    /// BehaviourTreeの構築を行うメソッド
+    /// </summary>
+    private void SetUpBehaviourTree()
+    {
+        
+    }
+    
+    //-------------------------------------------------------------------------------
+    // 更新処理
+    //-------------------------------------------------------------------------------
 
     private void Update()
     {
-        _selector.Execute();
+        _rootNode.Execute();
     }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(frontAttackPosition.position, new Vector3(20f, 6f, frontAttackRange));
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(centerAttackPosition.position, new Vector3(20f, 6f, centerAttackRange));
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(backAttackPosition.position, new Vector3(20f, 6f, backAttackRange));
-    }
+    
+    //-------------------------------------------------------------------------------
+    // 
+    //-------------------------------------------------------------------------------
+    
+    //-------------------------------------------------------------------------------
+    // 
+    //-------------------------------------------------------------------------------
+    
+    //-------------------------------------------------------------------------------
+    // 
+    //-------------------------------------------------------------------------------
+    
+    
 
     private bool IsPlayerAway()
     {
@@ -178,5 +220,27 @@ public class EnemyController : MonoBehaviour
     {
         Debug.Log("Back Attack.");
         return EnemyNodes.NodeStatus.Success;
+    }
+    
+    //-------------------------------------------------------------------------------
+    // Gizmo
+    //-------------------------------------------------------------------------------
+
+    private void OnDrawGizmos()
+    {
+        // 前足の攻撃範囲
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(data.frontAttackPosition.position, 
+            new Vector3(data.frontAttackWidth, data.frontAttackHeight, data.frontAttackDepth));
+        
+        // 胴体の攻撃範囲
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(data.centerAttackPosition.position, 
+            new Vector3(data.centerAttackWidth, data.centerAttackHeight, data.centerAttackDepth));
+        
+        // 後足の攻撃範囲
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(data.backAttackPosition.position, 
+            new Vector3(data.backAttackWidth, data.backAttackHeight, data.backAttackDepth));
     }
 }
