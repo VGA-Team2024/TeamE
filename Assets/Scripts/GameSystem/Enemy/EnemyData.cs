@@ -44,10 +44,18 @@ public class EnemyData : ScriptableObject
     [Header("移動速度")] public float moveSpeed = 5.0f;
     
     //-------------------------------------------------------------------------------
+    // 弱点に関するデータ
+    //-------------------------------------------------------------------------------
+
+    [Header("ダウン後回復時間")] public float recoveryTime = 30f;
+    
+    //-------------------------------------------------------------------------------
     // アニメーションのデータ
     //-------------------------------------------------------------------------------
 
     public string frontRightAttackTrigger = "RightFrontAttack";
     public string frontLeftAttackTrigger = "LeftFrontAttack";
     public string backAttackTrigger = "BackAttack";
+    public string rightDownFlag = "IsDownRight";
+    public string leftDownFlag = "IsDownLeft";
 }
