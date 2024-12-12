@@ -17,10 +17,13 @@ MonoBehaviour:
   frontAttackDepth: 10
   centerAttackWidth: 20
   centerAttackHeight: 6
-  centerAttackDepth: 15
+  centerAttackDepth: 10
   backAttackWidth: 20
   backAttackHeight: 6
   backAttackDepth: 10
   rotateSpeed: 1.25
   rotateThreshold: 7.5
   moveSpeed: 5
+  frontRightAttackTrigger: RightFrontAttack
+  frontLeftAttackTrigger: LeftFrontAttack
+  backAttackTrigger: BackAttack

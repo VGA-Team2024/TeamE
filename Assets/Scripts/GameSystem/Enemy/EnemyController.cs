@@ -16,7 +16,7 @@ public class EnemyController : MonoBehaviour
     /// <summary>
     /// BehaviourTreeのRootノード
     /// </summary>
-    private readonly EnemyNodes.SelectorNode _rootNode;
+    private readonly EnemyNodes.SelectorNode _rootNode = new EnemyNodes.SelectorNode();
     
     [Header("右前足の攻撃範囲の中心")] 
     [SerializeField] private Transform rightFrontAttackPosition;
@@ -62,7 +62,12 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private void SetUpBehaviourTree()
     {
-        SetUpRotateSequence();
+        _rootNode.Add(SetUpRotateSequence());
+        _rootNode.Add(SetUpChaseSequence());
+        _rootNode.Add(SetUpRightFrontAttackSequence());
+        _rootNode.Add(SetUpLeftFrontAttackSequence());
+        _rootNode.Add(SetUpCenterAttackSequence());
+        _rootNode.Add(SetUpBackAttackSequence());
     }
     
     //-------------------------------------------------------------------------------
@@ -181,7 +186,7 @@ public class EnemyController : MonoBehaviour
     {
         var frontAttackSeq = new EnemyNodes.SequenceNode();
         frontAttackSeq.Add(new EnemyNodes.ConditionNode(ShouldRightFrontAttackPlayer));
-        frontAttackSeq.Add(new EnemyNodes.ActionNode(FrontAttack));
+        frontAttackSeq.Add(new EnemyNodes.ActionNode(RightFrontAttack));
         return frontAttackSeq;
     }
     
@@ -204,6 +209,15 @@ public class EnemyController : MonoBehaviour
         return false;
     }
     
+    /// <summary>
+    /// プレイヤーを右前足で攻撃する
+    /// </summary>
+    private EnemyNodes.NodeStatus RightFrontAttack()
+    {
+        _animator.SetTrigger(data.frontRightAttackTrigger);
+        return EnemyNodes.NodeStatus.Success;
+    }
+    
     //-------------------------------------------------------------------------------
     // 左前足の攻撃シーケンス
     //-------------------------------------------------------------------------------
@@ -215,7 +229,7 @@ public class EnemyController : MonoBehaviour
     {
         var frontAttackSeq = new EnemyNodes.SequenceNode();
         frontAttackSeq.Add(new EnemyNodes.ConditionNode(ShouldLeftFrontAttackPlayer));
-        frontAttackSeq.Add(new EnemyNodes.ActionNode(FrontAttack));
+        frontAttackSeq.Add(new EnemyNodes.ActionNode(LeftFrontAttack));
         return frontAttackSeq;
     }
     
@@ -236,6 +250,15 @@ public class EnemyController : MonoBehaviour
             if (collider.CompareTag("Player")) return true;
         }
         return false;
+    }
+    
+    /// <summary>
+    /// プレイヤーを左前足で攻撃する
+    /// </summary>
+    private EnemyNodes.NodeStatus LeftFrontAttack()
+    {
+        _animator.SetTrigger(data.frontLeftAttackTrigger);
+        return EnemyNodes.NodeStatus.Success;
     }
     
     //-------------------------------------------------------------------------------
@@ -272,6 +295,14 @@ public class EnemyController : MonoBehaviour
         return false;
     }
     
+    /// <summary>
+    /// プレイヤーを胴体で攻撃する
+    /// </summary>
+    private EnemyNodes.NodeStatus CenterAttack()
+    {
+        return EnemyNodes.NodeStatus.Success;
+    }
+    
     //-------------------------------------------------------------------------------
     // 後足の攻撃シーケンス
     //-------------------------------------------------------------------------------
@@ -306,48 +337,60 @@ public class EnemyController : MonoBehaviour
         return false;
     }
     
+    /// <summary>
+    /// プレイヤーを後足で攻撃する
+    /// </summary>
+    private EnemyNodes.NodeStatus BackAttack()
+    {
+        _animator.SetTrigger(data.backAttackTrigger);
+        return EnemyNodes.NodeStatus.Success;
+    }
+    
     //-------------------------------------------------------------------------------
-    // ルートノード
+    // 弱点2に関連する処理
     //-------------------------------------------------------------------------------
 
     /// <summary>
-    /// ルートノードを構築するメソッド
+    /// 右方向にダウンする
     /// </summary>
-    private void SetUpRootNode()
+    public void GetDownRight()
     {
-        _rootNode.Add(SetUpRotateSequence());
-        _rootNode.Add(SetUpChaseSequence());
-        _rootNode.Add(SetUpRightFrontAttackSequence());
-        _rootNode.Add(SetUpLeftFrontAttackSequence());
-        _rootNode.Add(SetUpCenterAttackSequence());
-        _rootNode.Add(SetUpBackAttackSequence());
+        _animator.SetBool(data.rightDownFlag, true);
+        Invoke(nameof(RecoverDownRight), data.recoveryTime);
+    }
+
+    /// <summary>
+    /// 右方向のダウンから回復する
+    /// </summary>
+    public void RecoverDownRight()
+    {
+        _animator.SetBool(data.rightDownFlag, false);
+    }
+
+    /// <summary>
+    /// 左方向にダウンする
+    /// </summary>
+    public void GetDownLeft()
+    {
+        _animator.SetBool(data.leftDownFlag, true);
+        Invoke(nameof(RecoverDownLeft), data.recoveryTime);
+    }
+
+    /// <summary>
+    /// 左方向のダウンから回復する
+    /// </summary>
+    public void RecoverDownLeft()
+    {
+        _animator.SetBool(data.leftDownFlag, false);
     }
     
     //-------------------------------------------------------------------------------
     // 更新処理
     //-------------------------------------------------------------------------------
 
-    // private void Update()
-    // {
-    //     _rootNode.Execute();
-    // }
-
-    private EnemyNodes.NodeStatus FrontAttack()
+    private void Update()
     {
-        Debug.Log("Front Attack.");
-        return EnemyNodes.NodeStatus.Success;
-    }
-
-    private EnemyNodes.NodeStatus CenterAttack()
-    {
-        Debug.Log("Center Attack.");
-        return EnemyNodes.NodeStatus.Success;
-    }
-
-    private EnemyNodes.NodeStatus BackAttack()
-    {
-        Debug.Log("Back Attack.");
-        return EnemyNodes.NodeStatus.Success;
+        _rootNode.Execute();
     }
     
     //-------------------------------------------------------------------------------
