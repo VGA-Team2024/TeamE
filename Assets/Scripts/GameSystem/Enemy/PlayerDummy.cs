@@ -4,15 +4,26 @@ using UnityEngine;
 
 public class PlayerDummy : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     void Update()
     {
+        if (Input.GetKey(KeyCode.A))
+        {
+            transform.Translate(Time.deltaTime * 10.0f * Vector3.left);
+        }
+
+        if (Input.GetKey(KeyCode.D))
+        {
+            transform.Translate(Time.deltaTime * 10.0f * Vector3.right);
+        }
+
+        if (Input.GetKey(KeyCode.W))
+        {
+            transform.Translate(Time.deltaTime * 10.0f * Vector3.forward);
+        }
         
+        if (Input.GetKey(KeyCode.S))
+        {
+            transform.Translate(Time.deltaTime * 10.0f * Vector3.back);
+        }
     }
 }
