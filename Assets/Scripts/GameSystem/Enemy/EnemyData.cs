@@ -42,4 +42,12 @@ public class EnemyData : ScriptableObject
     //-------------------------------------------------------------------------------
 
     [Header("移動速度")] public float moveSpeed = 5.0f;
+    
+    //-------------------------------------------------------------------------------
+    // アニメーションのデータ
+    //-------------------------------------------------------------------------------
+
+    public string frontRightAttackTrigger = "RightFrontAttack";
+    public string frontLeftAttackTrigger = "LeftFrontAttack";
+    public string backAttackTrigger = "BackAttack";
 }
