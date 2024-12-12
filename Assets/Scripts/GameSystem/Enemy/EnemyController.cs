@@ -347,6 +347,44 @@ public class EnemyController : MonoBehaviour
     }
     
     //-------------------------------------------------------------------------------
+    // 弱点2に関連する処理
+    //-------------------------------------------------------------------------------
+
+    /// <summary>
+    /// 右方向にダウンする
+    /// </summary>
+    public void GetDownRight()
+    {
+        _animator.SetBool(data.rightDownFlag, true);
+        Invoke(nameof(RecoverDownRight), data.recoveryTime);
+    }
+
+    /// <summary>
+    /// 右方向のダウンから回復する
+    /// </summary>
+    public void RecoverDownRight()
+    {
+        _animator.SetBool(data.rightDownFlag, false);
+    }
+
+    /// <summary>
+    /// 左方向にダウンする
+    /// </summary>
+    public void GetDownLeft()
+    {
+        _animator.SetBool(data.leftDownFlag, true);
+        Invoke(nameof(RecoverDownLeft), data.recoveryTime);
+    }
+
+    /// <summary>
+    /// 左方向のダウンから回復する
+    /// </summary>
+    public void RecoverDownLeft()
+    {
+        _animator.SetBool(data.leftDownFlag, false);
+    }
+    
+    //-------------------------------------------------------------------------------
     // 更新処理
     //-------------------------------------------------------------------------------
 
