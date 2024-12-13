@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,11 +6,8 @@ using UnityEngine;
 public class EnemyTestCamera : MonoBehaviour
 {
     [SerializeField] PlayerDummy playerDummy;
-
-    void FixedUpdate()
+    private void LateUpdate()
     {
-        transform.rotation = playerDummy.transform.rotation;
-
-        transform.position = playerDummy.transform.position;
+        transform.position = playerDummy.transform.position + new Vector3(0, 2f, 0);
     }
 }
