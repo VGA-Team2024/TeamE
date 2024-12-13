@@ -24,10 +24,8 @@ public class PlayerCameraController : MonoBehaviour
     }
     private void Update()
     {
-        _currentInput = new Vector2(Input.GetAxis("R_XAxis"), Input.GetAxis("R_YAxis"));
-    }
-    private void FixedUpdate()
-    {
+        _currentInput = PlayerInputProvider.Instance.LookValue;
+        
         _rotationX += _inverseX ? -1 : 1 * _currentInput.x * XSensibility;
         _rotationY += _inverseY ? -1 : 1 * -_currentInput.y * YSensibility;
         _rotationY = Mathf.Clamp(_rotationY, -_maxUpAngle, -_minDownAngle);
