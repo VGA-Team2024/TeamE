@@ -8,6 +8,8 @@ TagManager:
   - Bullet
   - ClimbableWall
   - ClimbableWallTop
+  - Arrow
+  - Water
   layers:
   - Default
   - TransparentFX
