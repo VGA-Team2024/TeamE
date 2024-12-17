@@ -9,6 +9,7 @@ TagManager:
   - ClimbableWall
   - ClimbableWallTop
   - Arrow
+  - Water
   layers:
   - Default
   - TransparentFX
