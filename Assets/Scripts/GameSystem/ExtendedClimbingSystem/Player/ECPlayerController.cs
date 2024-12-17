@@ -5,6 +5,9 @@ using UnityEngine.InputSystem;
 
 public class ECPlayerController : MonoBehaviour
 {
+    [SerializeField] private float _climbHoppingLimit = 0.2f;
+    [SerializeField] private Material _vineMat;
+    [SerializeField] private RASCALSkinnedMeshCollider _rascalSkinnedMesh;
     [SerializeField] private float _wallAngle = 55f;
     [SerializeField] private LayerMask _climbLayerMask;
     [SerializeField] private float _playerClimbRayLength = 0.5f;
@@ -44,7 +47,10 @@ public class ECPlayerController : MonoBehaviour
     //private BoneContainer _boneContainer;
     private Vector3 _currentNormal;
     private Vector3 _currentClosestPoint;
-
+    private Vector3 _prevPos;
+    private bool _isClimbHopping;
+    private static readonly int IsClimbHoppingHash = Animator.StringToHash("IsClimbHopping");
+    
     private void Start()
     {
         PlayerInputProvider.Instance.JumpSubject.Subscribe(_ => Jump()).AddTo(this);
@@ -54,9 +60,17 @@ public class ECPlayerController : MonoBehaviour
 
     void Jump()
     {
-        if (IsClimbing || !IsClimbable.Value && !IsClimbPullUp)
+        if (IsClimbing)
         {
+            _playerClimbController.ClimbJump();
             _playerClimbController.ClimbEnd();
+            _isClimbHopping = true;
+            _playerMoveController.Animator.SetBool(IsClimbHoppingHash, true);
+            Observable.Timer(TimeSpan.FromSeconds(_climbHoppingLimit)).Subscribe(_ =>
+            {
+                _isClimbHopping = false;
+                _playerMoveController.Animator.SetBool(IsClimbHoppingHash, false);
+            }).AddTo(this);
             //climb Cancel
         }
         if (IsGround && !IsLanding && !IsJumping)
@@ -100,6 +114,23 @@ public class ECPlayerController : MonoBehaviour
             _playerBowController.ArrowRelease(canceled:true);
         }
     }
+    Material GetMaterial(Collider collider)
+    {
+        foreach (var skinfo in _rascalSkinnedMesh.skinfos) 
+        {
+            foreach (var bone in skinfo.bones) 
+            {
+                foreach (var boneMesh in bone.boneMeshes) 
+                {
+                    if (boneMesh.meshCol == collider) 
+                    {
+                        return skinfo.skinnedMesh.sharedMaterials[boneMesh.skinnedMeshMaterialIndex];
+                    }
+                }
+            }
+        }
+        return null;
+    }
     private void Update()
     {
         if (IsAiming)
@@ -113,19 +144,24 @@ public class ECPlayerController : MonoBehaviour
         IsClimbPullUp = _playerClimbController.IsPullUp;
         IsArrowReleasing = _playerBowController.IsArrowReleasing;
         IsArrowCharging = _playerBowController.IsArrowCharging;
+        _playerMoveController.IsClimbing = _playerClimbController.IsClimbing;
 
         if (_ignoreGroundTimer < Mathf.Epsilon)
         {
-            IsGround = Physics.SphereCast(_rigidBody.position + new Vector3(0f, _groundCheckRayCastOffsetY, 0f),_capsuleCollider.radius , Vector3.down, out var hit, _groundCheckRayCastLength - _capsuleCollider.radius, _groundCheckRayCastLayerMask);
+            IsGround = Physics.SphereCast(_rigidBody.position + new Vector3(0f, _groundCheckRayCastOffsetY, 0f),
+                _capsuleCollider.radius , Vector3.down, out var hitGround, 
+                _groundCheckRayCastLength - _capsuleCollider.radius, _groundCheckRayCastLayerMask);
             if (IsGround)
             {
-                _playerMoveController.GroundNormal = hit.normal;
-                _playerMoveController.CanWalk = Vector3.Angle(hit.normal, Vector3.up) < _wallAngle;
+                _playerMoveController.GroundNormal = hitGround.normal;
+                _playerMoveController.CanWalk = Vector3.Angle(hitGround.normal, Vector3.up) < _wallAngle;
+                _playerMoveController.transform.SetParent(hitGround.transform);
             }
             else
             {
                 _playerMoveController.GroundNormal = Vector3.up;
                 _playerMoveController.CanWalk = false;
+                _playerMoveController.transform.SetParent(transform);
             }
             _playerMoveController.IsGround = IsGround;
             _playerMoveController.SetIsGround(IsGround);
@@ -156,63 +192,89 @@ public class ECPlayerController : MonoBehaviour
             _ignoreGroundTimer -= Time.deltaTime;
         }
 
-        var castOrigin = _playerClimbRayPoint.position + _playerClimbRayPoint.forward * _overlapSphereOffset;
+        var castOrigin = _playerClimbRayPoint.position;
         _overlapSphereOrigin = castOrigin;
-        var hitColliders = Physics.OverlapSphere(castOrigin,
-            _overlapSphereRadius, _climbLayerMask);
-
-        //bool foundBoneContainer = false;
-        foreach (var c in hitColliders)
+        IsClimbable.Value = Physics.SphereCast(castOrigin, _overlapSphereRadius, _playerMoveController.transform.forward,
+            out RaycastHit hitWall, _overlapSphereRadius,
+            _climbLayerMask) && PlayerInputProvider.Instance.Grab && !_isClimbHopping;
+        if (IsClimbable.Value)
         {
-            if (c is MeshCollider && c.TryGetComponent(out MeshUpdater updater))
+            if (hitWall.collider is MeshCollider)
             {
-                var tris = new int[3];
-                _currentClosestPoint = updater.ClosestPoint(castOrigin, out tris);
-                var vertices = updater.BakedMesh.vertices;
-                var subA = vertices[tris[1]] - vertices[tris[0]];
-                var subB = vertices[tris[2]] - vertices[tris[0]];
-                _currentNormal = new Vector3(
-                    subA.y * subB.z - subA.z * subB.y, 
-                    subA.z * subB.x - subA.x * subB.z,
-                    subA.x * subB.y - subA.y * subB.x).normalized;
-                // if (c.TryGetComponent(out BoneContainer bones))
-                // {
-                //     _boneContainer = bones;
-                //     foundBoneContainer = true;
-                // }
+                var mat = GetMaterial(hitWall.collider);
+                if (mat != null)
+                {
+                    IsClimbable.Value = mat == _vineMat;
+                    if (!IsClimbable.Value) _playerMoveController.transform.position = _prevPos;
+                }
+                else
+                {
+                    IsClimbable.Value = false;
+                }
             }
-            else
+            else 
             {
-                _currentClosestPoint = c.ClosestPoint(castOrigin);
-                _currentNormal = (castOrigin - _currentClosestPoint).normalized;
+                IsClimbable.Value = hitWall.transform.CompareTag("ClimbableWall");
             }
         }
 
-        //if (!foundBoneContainer) _boneContainer = null;
-        
-        //壁の判定
-        IsClimbable.Value = hitColliders.Length > 0;
-        
-        //IsClimbable = Physics.Raycast(_playerClimbRayPoint.position , _playerClimbRayPoint.forward , out _climeTargetHit , _playerClimbRayLength , _climbLayerMask);
-        //IsClimbable = IsClimbable && Vector3.Angle(_climeTargetHit.normal, Vector3.up) >= _wallAngle;
-        
-        if (_boneChecker.BoneContainer)
+        if (IsClimbable.Value)
         {
-            (float dist, Transform trans) minDistance = (float.MaxValue, null);
-            foreach (var bone in _boneChecker.BoneContainer.Bones)
-            {
-                var distance = (bone.position - _playerMoveController.transform.position).sqrMagnitude;
-                if (minDistance.dist > distance)
-                {
-                    minDistance = (distance, bone);
-                }
-            }
-            _playerMoveController.transform.SetParent(minDistance.trans);
+            _currentNormal = hitWall.normal;
+            _currentClosestPoint = hitWall.point;
+
+            _playerMoveController.transform.SetParent(hitWall.transform);
         }
         else
         {
             _playerMoveController.transform.SetParent(transform);
         }
+        // var hitColliders = Physics.OverlapSphere(castOrigin, #latest
+        //     _overlapSphereRadius, _climbLayerMask);
+        //
+        // foreach (var c in hitColliders)
+        // {
+        //     if (c is MeshCollider && c.TryGetComponent(out MeshUpdater updater))
+        //     {
+        //         var tris = new int[3];
+        //         _currentClosestPoint = updater.ClosestPoint(castOrigin, out tris);
+        //         var vertices = updater.BakedMesh.vertices;
+        //         var subA = vertices[tris[1]] - vertices[tris[0]];
+        //         var subB = vertices[tris[2]] - vertices[tris[0]];
+        //         _currentNormal = new Vector3(
+        //             subA.y * subB.z - subA.z * subB.y, 
+        //             subA.z * subB.x - subA.x * subB.z,
+        //             subA.x * subB.y - subA.y * subB.x).normalized;
+        //     }
+        //     else
+        //     {
+        //         _currentClosestPoint = c.ClosestPoint(castOrigin);
+        //         _currentNormal = (castOrigin - _currentClosestPoint).normalized;
+        //     }
+        // }
+        //
+        //
+        // //壁の判定
+        // IsClimbable.Value = hitColliders.Length > 0;
+        
+        
+        // if (_boneChecker.BoneContainer) #latest
+        // {
+        //     (float dist, Transform trans) minDistance = (float.MaxValue, null);
+        //     foreach (var bone in _boneChecker.BoneContainer.Bones)
+        //     {
+        //         var distance = (bone.position - _playerMoveController.transform.position).sqrMagnitude;
+        //         if (minDistance.dist > distance)
+        //         {
+        //             minDistance = (distance, bone);
+        //         }
+        //     }
+        //     _playerMoveController.transform.SetParent(minDistance.trans);
+        // }
+        // else
+        // {
+        //     _playerMoveController.transform.SetParent(transform);
+        // }
         
         //  登っている途中で壁の判定が取れないかつ登りあがる処理が行われていなければければ登るのをやめる
         // if(IsClimbing && !IsClimbable.Value && !IsClimbPullUp)
@@ -231,7 +293,7 @@ public class ECPlayerController : MonoBehaviour
                 }
             })
             .AddTo(this);
-        if(IsGround && !_playerMoveController.IsLanding && !IsAiming && IsClimbable.Value && Vector3.Dot(-_currentNormal , _playerMoveController.transform.TransformDirection(new Vector3(_currentMoveInput.x , 0f , _currentMoveInput.y))) > _playerClimbThreshold)
+        if(!_playerMoveController.IsLanding && !IsAiming && IsClimbable.Value /*&& Vector3.Dot(-_currentNormal, _playerMoveController.transform.TransformDirection(new Vector3(_currentMoveInput.x , 0f , _currentMoveInput.y))) > _playerClimbThreshold*/)
         {
             _ignoreGroundTimer = _ignoreGroundTime;
             _playerClimbController.ClimbStart(hitWall: _climeTargetHit, _currentNormal, _currentClosestPoint);
@@ -245,16 +307,18 @@ public class ECPlayerController : MonoBehaviour
         {
             _playerClimbController.ClimbMove(_currentMoveInput , _climeTargetHit, _currentNormal, _currentClosestPoint);
         }
-        else
+        else if(!_isClimbHopping)
         {
             _playerMoveController.MovePlayer(_currentMoveInput , IsAiming , _playerCameraTransform);
         }
+
+        _prevPos = _playerMoveController.transform.position;
     }
     #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(_overlapSphereOrigin, _overlapSphereRadius);
+        Gizmos.DrawWireSphere(_overlapSphereOrigin + _playerMoveController.transform.forward * _overlapSphereRadius, _overlapSphereRadius);
         Gizmos.DrawLine(_playerClimbRayPoint.position, _playerClimbRayPoint.position + _playerClimbRayPoint.forward * _playerClimbRayLength);
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(_currentClosestPoint, 0.1f);
