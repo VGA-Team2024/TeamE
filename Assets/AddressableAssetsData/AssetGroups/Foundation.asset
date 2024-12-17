@@ -23,12 +23,17 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 89699af277e40ca4b89f086658c58412
-    m_Address: Assets/Prefabs/Review.prefab
+    m_Address: Assets/Prefabs/Review/Review.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c60c2ca92c2d30244a57d8d3d38604a1
     m_Address: Assets/Prefabs/CRI.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f9ffc6f7d617f47aabb020c5c6782494
+    m_Address: Assets/ThirdParty/Shapes2D/Materials/Shape.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
