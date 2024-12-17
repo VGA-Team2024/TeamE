@@ -29,6 +29,8 @@ public class EnemyController : MonoBehaviour
     
     [Header("後足の攻撃範囲の位置")] 
     [SerializeField] private Transform backAttackPosition;
+
+    private bool _isDown;
     
     Animator _animator;
     
@@ -355,6 +357,7 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     public void GetDownRight()
     {
+        _isDown = true;
         _animator.SetBool(data.rightDownFlag, true);
         Invoke(nameof(RecoverDownRight), data.recoveryTime);
     }
@@ -364,6 +367,7 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     public void RecoverDownRight()
     {
+        _isDown = false;
         _animator.SetBool(data.rightDownFlag, false);
     }
 
@@ -372,6 +376,7 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     public void GetDownLeft()
     {
+        _isDown = true;
         _animator.SetBool(data.leftDownFlag, true);
         Invoke(nameof(RecoverDownLeft), data.recoveryTime);
     }
@@ -381,6 +386,7 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     public void RecoverDownLeft()
     {
+        _isDown = false;
         _animator.SetBool(data.leftDownFlag, false);
     }
     
@@ -390,6 +396,7 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
+        if (_isDown) return;
         _rootNode.Execute();
     }
     

@@ -19,9 +19,9 @@ public class EnemyWeakPointHandler : MonoBehaviour
 
     [SerializeField] private EnemyController enemyController;
 
-    private void OnTriggerEnter(Collider bow)
+    private void OnTriggerEnter(Collider arrow)
     {
-        if (bow.CompareTag("Bow") && weakPointType == WeakPointType.WeakPoint2)
+        if (arrow.CompareTag("Arrow") && weakPointType == WeakPointType.WeakPoint2)
         {
             switch (weakPointSide)
             {
