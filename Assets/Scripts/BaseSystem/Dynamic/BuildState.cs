@@ -1,8 +1,7 @@
 public class BuildState
 {
-    const string _hash = "test build";
-
-    public const string TeamID = "Foundation";
+    const string _hash = "b873373c-9280-4d57-9f9f-6bae57c95e9f";
+    public const string TeamID = "TeamE2024";
 
     public static string BuildHash
     {
