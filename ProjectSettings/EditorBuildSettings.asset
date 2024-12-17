@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/System/GameLauncher.unity
+    guid: 8fddd8bd6df26f84eb0ce52c7a3f43e5
+  - enabled: 1
     path: Assets/Scenes/Design/Morning.unity
     guid: 0de2f053148d51d4c8255fd5ede95194
   - enabled: 1
@@ -14,7 +17,71 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/System/IngameSystem.unity
     guid: 28bbf92597792604b989fbdc7a1fb369
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  m_configObjects: {}
+  - enabled: 1
+    path: Assets/Scenes/Debug/PostProcessingScene.unity
+    guid: 38ddffc3a0c4df349ac0066743128d82
+  - enabled: 1
+    path: Assets/Scenes/Design/TomizawaTaiju.unity
+    guid: dfae4c73a2648e24b90cbbfb9a1cee0e
+  - enabled: 1
+    path: Assets/Scenes/Design/YamamotoKanta.unity
+    guid: 691a109fa2136f746aa16ce320da22e6
+  - enabled: 1
+    path: Assets/Scenes/Mockup/InGame.unity
+    guid: 01d335cff36f775488a0944d8c939628
+  - enabled: 1
+    path: Assets/Scenes/Mockup/Temple.unity
+    guid: 2d1d70084f94f5e4bafbbe818e2e0138
+  - enabled: 1
+    path: Assets/Scenes/Mockup/Result.unity
+    guid: 609f31d9a8ca35e4fbe1ae16f0539b8b
+  - enabled: 1
+    path: Assets/Scenes/Mockup/Title.unity
+    guid: bdf6c8373c01c934a878f66902665e81
+  - enabled: 1
+    path: Assets/Scenes/Sample/3DSoundSample.unity
+    guid: a174e69cd80e78248945d3373b6e48f0
+  - enabled: 1
+    path: Assets/Scenes/Sample/EnemyTest.unity
+    guid: ccd5a4ac6d16bf54cbdd4db2a6427625
+  - enabled: 1
+    path: Assets/Scenes/Sample/ExtendedClimbingSystem.unity
+    guid: bcbfb03d702ad424ea7bc4a3f02b5b56
+  - enabled: 1
+    path: Assets/Scenes/Sample/PlayerTest.unity
+    guid: f70149b4d5a9c2349a02123956318679
+  - enabled: 1
+    path: Assets/Scenes/Sample/Tutorial.unity
+    guid: b04e1040fc01f404fae3cf3bafde9f26
+  - enabled: 1
+    path: Assets/Scenes/System/IngameDebug.unity
+    guid: f344c073eba28c247a464cfb6b57ff22
+  - enabled: 1
+    path: Assets/Scenes/Design/Sumiya/Sumiya.unity
+    guid: fb7f27120da4a764e948a0a98f017ce7
+  - enabled: 1
+    path: Assets/Scenes/Design/Utsumi/Utsumi.unity
+    guid: 83eed5395e0ebcc4cb5616107b69c9b4
+  - enabled: 1
+    path: Assets/Scenes/Debug/AudioManagerScene.unity
+    guid: 6250fd09eb762594b812b33bba79d230
+  - enabled: 1
+    path: Assets/Scenes/Debug/OptionScene.unity
+    guid: fb6ea1fc1a671814d85aae7eb85f2cad
+  - enabled: 1
+    path: Assets/Scenes/Design/shihosato.unity
+    guid: 8a49ffc916b31e840af97c5d6732934f
+  - enabled: 1
+    path: Assets/Scenes/Design/GotoNonomi/GotoNonomi.unity
+    guid: efe015fb63aea7c4ca4ff0b371bf17e0
+  - enabled: 1
+    path: Assets/Scenes/Design/SatoShiho/SatoShiho.unity
+    guid: 7a9125c5f8c994a9eac471966e70a216
+  m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 7366e43fa3f777f4292c2095e8b63e4c,
+      type: 2}
+    com.unity.input.settings: {fileID: 11400000, guid: 4501d3d1552a48744b726937d5f49d41,
+      type: 2}

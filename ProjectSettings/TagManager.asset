@@ -3,7 +3,13 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Field
+  - Bullet
+  - ClimbableWall
+  - ClimbableWallTop
+  - Arrow
+  - Water
   layers:
   - Default
   - TransparentFX
@@ -11,9 +17,9 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
+  - Player
+  - PlayerArrow
+  - ClimbableWall
   - 
   - 
   - 
