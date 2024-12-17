@@ -8,7 +8,7 @@ using Cysharp.Threading.Tasks;
 /// </summary>
 public class GameEventRecorder
 {
-    const bool UnityEditorTest = true;
+    const bool UnityEditorTest = false;
 
     static GameEventRecorder _instance = new GameEventRecorder();
     private GameEventRecorder() { }
