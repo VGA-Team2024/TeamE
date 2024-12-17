@@ -38,9 +38,11 @@ public class ECClimbController : MonoBehaviour
     {
         _animator.SetBool(IsClimb, true);
         _rigidBody.useGravity = false;
-        _collider.isTrigger = true;
+        //_collider.isTrigger = true;
+        _collider.includeLayers = ~_wallLayer;
+        _collider.excludeLayers = _wallLayer;
         IsClimbing = true;
-        _animator.enabled = false;
+        //_animator.enabled = false;
         _rigidBody.position = new Vector3(point.x , _rigidBody.position.y , point.z) + normal * _cliffRelativeDistance;
     }
     public void ClimbMove(Vector2 input, RaycastHit hitWall, Vector3 normal, Vector3 closestPoint)
@@ -114,10 +116,12 @@ public class ECClimbController : MonoBehaviour
 
     public void PullUp(Vector3 pos)
     {
+        transform.forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
         _rigidBody.velocity = Vector3.zero;
         IsPullUp = true;
-        _collider.isTrigger = true;
-        _animator.enabled = true;
+        _collider.includeLayers = ~_wallLayer;
+        _collider.excludeLayers = _wallLayer;
+        //_animator.enabled = true;
         //_animator.applyRootMotion = true;
         _animator.SetBool("IsPullUp", true);
         _animator.SetBool(IsClimb, false);
@@ -131,13 +135,14 @@ public class ECClimbController : MonoBehaviour
     
     public void ClimbEnd()
     {
-        _collider.isTrigger = false;
+        _collider.includeLayers = 0;
+        _collider.excludeLayers = 0;
         _animator.SetBool(IsClimb, false);
         _animator.SetBool("IsPullUp", false);
         IsClimbing = false;
         IsPullUp = false;
         _animator.applyRootMotion = false;
-        _animator.enabled = true;
+        //_animator.enabled = true;
         _rigidBody.useGravity = true;  
     }
     #if UNITY_EDITOR

@@ -1,6 +1,7 @@
 using R3;
 using R3.Triggers;
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class ECMoveController : MonoBehaviour
@@ -30,13 +31,16 @@ public class ECMoveController : MonoBehaviour
     private Vector3 _currentVelocity;
     
     [HideInInspector] public bool IsLanding;
-    [HideInInspector] public bool IsGrounded;
-    
+    [HideInInspector] public bool IsGround;
+    [HideInInspector] public bool CanWalk;
+    [HideInInspector] public Vector3 GroundNormal = Vector3.up;
     int _baseLayerIndex;
     private ObservableStateMachineTrigger _stateMachineTrigger;
-    private static readonly int Speed = Animator.StringToHash("Speed");
-    private static readonly int Jump = Animator.StringToHash("Jump");
-    private static readonly int IsGround = Animator.StringToHash("IsGround");
+    private static readonly int SpeedHash = Animator.StringToHash("Speed");
+    private static readonly int JumpHash = Animator.StringToHash("Jump");
+    private static readonly int IsGroundHash = Animator.StringToHash("IsGround");
+    private static readonly int InputXHash = Animator.StringToHash("InputX");
+    private static readonly int InputYHash = Animator.StringToHash("InputY");
 
     private void Start()
     {
@@ -46,20 +50,35 @@ public class ECMoveController : MonoBehaviour
     private void Update()
     {
         var magnitude = new Vector3(_rigidBody.velocity.x , 0f , _rigidBody.velocity.z).magnitude;
-
-        
-        _animator.SetFloat(Speed , magnitude / _forwardSpeed);
+        _animator.SetFloat(SpeedHash , magnitude / _forwardSpeed);
+        var prevX = _animator.GetFloat(InputXHash);
+        var prevY = _animator.GetFloat(InputYHash);
+        _animator.SetFloat(InputXHash, Mathf.SmoothStep(prevX, PlayerInputProvider.Instance.MoveValue.x, Time.deltaTime * 15f));
+        _animator.SetFloat(InputYHash, Mathf.SmoothStep(prevY, PlayerInputProvider.Instance.MoveValue.y, Time.deltaTime * 15f));
     }
     
     public void JumpStart()
     {
-        _rigidBody.AddForce(Vector3.up * _jumpPower, ForceMode.Impulse);
-        _animator.SetBool(Jump, true);
+        StartCoroutine(JumpCoroutine());
     }
+
+    IEnumerator JumpCoroutine()
+    {
+        _jumpTrigger = true;
+        yield return new WaitForFixedUpdate();
+        var copy = _rigidBody.velocity;
+        copy.y = _jumpPower;
+        _rigidBody.velocity = copy;
+        _animator.SetBool(JumpHash, true);
+        yield return new WaitForSeconds(0.3f);
+        _jumpTrigger = false;
+    }
+
+    private bool _jumpTrigger;
 
     public void SetIsGround(bool isGround)
     {
-        _animator.SetBool(IsGround, isGround);
+        _animator.SetBool(IsGroundHash, isGround);
     }
 
     public void Landing()
@@ -123,15 +142,30 @@ public class ECMoveController : MonoBehaviour
                 }
                 var velocity = _playerTransform.forward * (dir.magnitude * _forwardSpeed);
                 _currentVelocity = velocity;
-                var centerPos = _playerCapsule.transform.position + _playerCapsule.center;
-                var radius = _playerCapsule.radius;
-                var halfHeight = _playerCapsule.height / 2.0f;
-                var pos1 = centerPos + _playerCapsule.transform.up * halfHeight;
-                var pos2 = centerPos - _playerCapsule.transform.up * halfHeight;
-                if (!IsGrounded && Physics.CapsuleCast(pos1, pos2, radius, new Vector3(velocity.x, 0, velocity.z), out RaycastHit hit, _wallCheckRayLength, _wallLayer) 
-                    && Vector3.Angle(hit.normal, Vector3.up) >= _wallAngle)
+                // var centerPos = _playerCapsule.transform.position + _playerCapsule.center;
+                // var radius = _playerCapsule.radius;
+                // var halfHeight = _playerCapsule.height / 2.0f;
+                // var pos1 = centerPos + _playerCapsule.transform.up * halfHeight;
+                // var pos2 = centerPos - _playerCapsule.transform.up * halfHeight;
+                // if (!IsGround && Physics.CapsuleCast(pos1, pos2, radius, new Vector3(velocity.x, 0, velocity.z), out RaycastHit hit, _wallCheckRayLength, _wallLayer) 
+                //     && Vector3.Angle(hit.normal, Vector3.up) >= _wallAngle)
+                // {
+                //     _rigidBody.velocity = new Vector3(0, _rigidBody.velocity.y, 0);
+                // }
+                // else
+                // {
+                //     if (!_jumpTrigger && CanWalk)
+                //     {
+                //         _rigidBody.velocity = Vector3.ProjectOnPlane(new Vector3(velocity.x, 0, velocity.z), GroundNormal).normalized * _forwardSpeed;
+                //     }
+                //     else
+                //     {
+                //         _rigidBody.velocity = new Vector3(velocity.x, _rigidBody.velocity.y, velocity.z);
+                //     }
+                // }
+                if (!_jumpTrigger && CanWalk)
                 {
-                    _rigidBody.velocity = new Vector3(0, _rigidBody.velocity.y, 0);
+                    _rigidBody.velocity = Vector3.ProjectOnPlane(new Vector3(velocity.x, 0, velocity.z), GroundNormal).normalized * _forwardSpeed;
                 }
                 else
                 {

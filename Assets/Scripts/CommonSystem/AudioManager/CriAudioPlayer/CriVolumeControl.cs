@@ -1,13 +1,14 @@
 using System.Globalization;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class CriVolumeControl : MonoBehaviour
 {
-    [SerializeField] private Text _volumeText;
+    [SerializeField] private TextMeshProUGUI _volumeText;
     [SerializeField] private Slider _volumeSlider;
-    [SerializeField] private InputField _volumeInputField;
+    [SerializeField] private TMP_InputField _volumeInputField;
     [SerializeField] private SoundType _soundType;
     public SoundType SoundType => _soundType;
     private float _currentValue;
