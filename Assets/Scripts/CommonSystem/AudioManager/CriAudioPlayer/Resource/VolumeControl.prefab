@@ -958,9 +958,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 535df431cfd51754fb10164945214524, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _volumeText: {fileID: 0}
+  _volumeText: {fileID: 8573357640463864505}
   _volumeSlider: {fileID: 8937142584929411763}
-  _volumeInputField: {fileID: 0}
+  _volumeInputField: {fileID: 4833013880317028321}
   _soundType: 0
 --- !u!1 &7067177706932672446
 GameObject:
