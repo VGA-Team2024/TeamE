@@ -62,6 +62,7 @@ Material:
     m_Floats:
     - _AO_float: 0
     - _Nomalfloat: 0.31
+    - _QueueControl: 0
     - _Roughnessfloat: -0.1
     m_Colors: []
   m_BuildTextureStacks: []
