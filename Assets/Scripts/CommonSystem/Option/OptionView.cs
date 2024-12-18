@@ -1,10 +1,20 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace CommonSystem.Option
 {
     public class OptionView : MonoBehaviour
     {
         [SerializeField] private GameObject _optionPanel;
+        [SerializeField] private Button _closeButton;
+
+        public void Initialize(System.Action onBackButtonPressed)
+        {
+            if (_closeButton != null)
+            {
+                _closeButton.onClick.AddListener(() => onBackButtonPressed?.Invoke());
+            }
+        }
 
         /// <summary>オプションパネルを表示します。</summary>
         public void ShowOptionPanel()

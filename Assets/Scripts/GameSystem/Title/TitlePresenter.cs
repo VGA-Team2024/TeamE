@@ -6,11 +6,12 @@ namespace GameSystem.Title
     {
         [SerializeField] private TitleView _titleView;
         [SerializeField] private OptionPresenter _optionPresenter;
+        [SerializeField] private TitleFadeSceneTransition _fadeSceneTransition;
         private TitleModel _titleModel;
 
         private void Start()
         {
-            _titleModel = new TitleModel();
+            _titleModel = new TitleModel(_fadeSceneTransition);
 
             // ボタンイベントの登録
             _titleView.SetButtonListeners(
@@ -19,7 +20,7 @@ namespace GameSystem.Title
                 _titleModel.ExitButton
             );
         }
-        
+
         /// <summary>
         /// オプションパネルを開く処理
         /// </summary>
@@ -30,7 +31,6 @@ namespace GameSystem.Title
                 _optionPresenter.OpenOptionPanel();
                 Debug.Log("Open Option Panel");
             }
-            
         }
     }
 }

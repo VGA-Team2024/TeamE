@@ -17,6 +17,8 @@ public class OptionPresenter : MonoBehaviour
 
         // オプション画面の初期化
         InitializeOptionSettings();
+
+        _optionView.Initialize(CloseOptionPanel);
     }
 
     /// <summary>

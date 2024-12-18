@@ -44,9 +44,9 @@ namespace CommonSystem.AudioManager.CriAudioPlayer
         {
             switch (soundType)
             {
-                // case SoundType.MASTER:
-                //     CRIAudioManager
-                //     break;
+                case SoundType.MASTER:
+                    // TODO: Master音量
+                    break;
                 case SoundType.BGM:
                     CRIAudioManager.BGM.SetVolume(normalizedValue);
                     break;
