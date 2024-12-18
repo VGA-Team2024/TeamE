@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace GameSystem
 {
     /// <summary>
@@ -5,6 +7,41 @@ namespace GameSystem
     /// </summary>
     public static class GameManager
     {
+        /// <summary>
+        /// イベントが発生したときに通知を受け取る
+        /// </summary>
+        /// <param name="eventName">発生したイベント名</param>
+        public static void NotifyEvent(string eventName)
+        {
+            Debug.Log($"GameManager Notified: {eventName}");
+            GameEventManager.AddEvent(eventName); // イベントを管理クラスに追加
+        }
+
+        /// <summary>
+        /// 発生したイベントを処理する
+        /// </summary>
+        /// <param name="eventName">処理するイベント名</param>
+        public static void HandleEvent(string eventName)
+        {
+            // イベント名に応じた処理
+            switch (eventName)
+            {
+                case "StartEvent":
+                    StartGame();
+                    break;
+                case "ClearEvent":
+                    GameClear();
+                    break;
+                case "GameOverEvent":
+                    GameOver();
+                    break;
+                default:
+                    Debug.LogWarning($"Unhandled Event: {eventName}");
+                    break;
+            }
+        }
+
+
         // セーブ/ロード関連
         /// <summary>セーブデータをロードします。</summary>
         public static void LoadSaveData()
