@@ -17,6 +17,7 @@ using UnityEngine.AddressableAssets;
 /// </summary>
 public enum SoundType
 {
+    MASTER,
     BGM,
     SE,
     VOICE
