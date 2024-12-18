@@ -1,6 +1,10 @@
+using Cinemachine;
 using UnityEngine;
 public class PlayerCameraController : MonoBehaviour
 {
+    [SerializeField] private Vector3 _normalFollowOffset;
+    [SerializeField] private Vector3 _aimFollowOffset;
+    [SerializeField] private CinemachineVirtualCamera _virtualCamera;
     [SerializeField] private GameObject _reticuleImage;
     [SerializeField] private Transform _playerTransform;
     [SerializeField] private Transform _cameraLookAtTarget;
@@ -12,7 +16,7 @@ public class PlayerCameraController : MonoBehaviour
     [Header("Y感度")] public float YSensibility = 1f;
     [SerializeField] [Header("YAxis上限角度")] private float _maxUpAngle = 40f;
     [SerializeField] [Header("YAxis下限角度")] private float _minDownAngle = -30f;
-
+    private CinemachineTransposer _transposer;
     private Vector3 _defaultTargetPosition;
     private Vector2 _currentInput;
     private float _rotationX;
@@ -21,13 +25,12 @@ public class PlayerCameraController : MonoBehaviour
     private void Start()
     {
         _defaultTargetPosition = _cameraLookAtTarget.localPosition;
-    }
-    private void Update()
-    {
-        _currentInput = new Vector2(Input.GetAxis("R_XAxis"), Input.GetAxis("R_YAxis"));
+        _transposer = _virtualCamera.GetCinemachineComponent<CinemachineTransposer>();
     }
     private void FixedUpdate()
     {
+        _currentInput = PlayerInputProvider.Instance.LookValue;
+        
         _rotationX += _inverseX ? -1 : 1 * _currentInput.x * XSensibility;
         _rotationY += _inverseY ? -1 : 1 * -_currentInput.y * YSensibility;
         _rotationY = Mathf.Clamp(_rotationY, -_maxUpAngle, -_minDownAngle);
@@ -41,11 +44,11 @@ public class PlayerCameraController : MonoBehaviour
         switch (cameraMode)
         {
             case CameraMode.Normal:
-                _cameraFollow.localPosition = Vector3.zero;
+                _transposer.m_FollowOffset = _normalFollowOffset;
                 _reticuleImage.SetActive(false);
                 break;
             case CameraMode.Aim:
-                _cameraFollow.localPosition = Vector3.right * _arrowTargetOffsetX;
+                _transposer.m_FollowOffset = _aimFollowOffset;
                 _reticuleImage.SetActive(true);
                 break;
         }

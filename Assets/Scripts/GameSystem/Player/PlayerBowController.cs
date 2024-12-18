@@ -1,9 +1,8 @@
-﻿using R3;
-using R3.Triggers;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Animations;
 public class PlayerBowController : MonoBehaviour
 {
+    [SerializeField] private Transform _waistBone;
     [SerializeField] private float _arrowChargeTime;
     [SerializeField , Range(0f , 1f)] private float _lookAtWeight;
     [SerializeField] float _arrowTargetDistance = 100f;
@@ -20,13 +19,15 @@ public class PlayerBowController : MonoBehaviour
     private float _arrowInterpolationTimer;
     private float _arrowChargeTimer ;
     private int _arrowMotionLayerIndex;
-    private ObservableStateMachineTrigger _stateMachineTrigger;
+    private int _aimJumpLayerIndex;
+    //private ObservableStateMachineTrigger _stateMachineTrigger;
     private static readonly int Charge = Animator.StringToHash("ArrowCharge");
     private static readonly int Release = Animator.StringToHash("ArrowRelease");
     private void Start()
     {
-        _arrowMotionLayerIndex = _animator.GetLayerIndex("ArrowMotionLayer");
-        _stateMachineTrigger = _animator.GetBehaviours<ObservableStateMachineTrigger>()[_arrowMotionLayerIndex];
+        _arrowMotionLayerIndex = _animator.GetLayerIndex("Upper");
+        _aimJumpLayerIndex = _animator.GetLayerIndex("AimJump");
+        //_stateMachineTrigger = _animator.GetBehaviours<ObservableStateMachineTrigger>()[_arrowMotionLayerIndex];
     }
     void OnAnimatorIK(int layerIndex)
     {
@@ -51,21 +52,22 @@ public class PlayerBowController : MonoBehaviour
             if (_arrowInterpolationTimer > 0f)
             {
                 float chargeRate = (_arrowInterpolationTimer / _arrowInterpolationTime);
-                _animator.bodyRotation *= Quaternion.Euler(0, 90 * chargeRate, 0);
                 if (IsArrowCharging || IsArrowReleasing)
                 {
                     var arrowDestination = _cameraTransform.position + _cameraTransform.forward * _arrowTargetDistance;
                     _animator.SetLookAtWeight(_lookAtWeight);
                     _animator.SetLookAtPosition(arrowDestination); 
                     _animator.SetIKPositionWeight(AvatarIKGoal.LeftHand , chargeRate); 
-                    _animator.SetIKPosition(AvatarIKGoal.LeftHand, arrowDestination);   
+                    _animator.SetIKPosition(AvatarIKGoal.LeftHand, arrowDestination);
+                    //  胴がフォーカスしている高さに向くように回転させる。
+                    var waist = _animator.GetBoneTransform(HumanBodyBones.Spine);
+                    waist.RotateAround(waist.position, waist.up, -_cameraTransform.eulerAngles.x);
+                    _animator.SetBoneLocalRotation(HumanBodyBones.Spine, waist.localRotation);
                 }
             }
-            
-
         }
     }
-    
+
     public void ArrowCharge()
     {
         if (!IsArrowCharging)
@@ -75,6 +77,7 @@ public class PlayerBowController : MonoBehaviour
             _resetBowStringConstraint.constraintActive = false;
             _bowStringConstraint.constraintActive = true;
             _animator.SetBool(Charge, true);
+            _animator.SetLayerWeight(_aimJumpLayerIndex, 1);
         }
         _animator.SetLayerWeight(_arrowMotionLayerIndex, (_arrowChargeTimer / _arrowChargeTime));
         _arrowChargeTimer += Time.deltaTime;
@@ -92,11 +95,12 @@ public class PlayerBowController : MonoBehaviour
                 var arrowDestination = _cameraTransform.position + _cameraTransform.forward * _arrowTargetDistance;
                 var arrowDirection = arrowDestination - arrowStart;
                 Instantiate(_arrowParticle, arrowStart, Quaternion.LookRotation(arrowDirection), null);
-                _stateMachineTrigger
-                    .OnStateExitAsObservable()
-                    .Where(x => x.LayerIndex == _arrowMotionLayerIndex && x.StateInfo.IsName("ArrowRelease"))
-                    .Subscribe( _ => ResetBow())
-                    .AddTo(this);
+                Invoke(nameof(ResetBow), 0.2f);
+                // _stateMachineTrigger
+                //     .OnStateExitAsObservable()
+                //     .Where(x => x.LayerIndex == _arrowMotionLayerIndex && x.StateInfo.IsName("ArrowRelease"))
+                //     .Subscribe( _ => ResetBow())
+                //     .AddTo(this);
             }
         }
         else
@@ -115,5 +119,6 @@ public class PlayerBowController : MonoBehaviour
         _bowStringConstraint.constraintActive = false;
         _resetBowStringConstraint.constraintActive = true;
         _animator.SetLayerWeight(_arrowMotionLayerIndex, 0f);
+        _animator.SetLayerWeight(_aimJumpLayerIndex, 0f);
     }
 }
