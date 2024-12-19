@@ -9,7 +9,7 @@
             _fadeSceneTransition = fadeSceneTransition;
             
             CRIAudioManager.Initialize();
-            CRIAudioManager.BGM.Play("BGM", "battlebgm"); 
+            CRIAudioManager.BGM.Play("CueSheet_BGM", "BGM_ending"); 
         }
 
         public void StartButton()

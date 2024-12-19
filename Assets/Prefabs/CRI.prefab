@@ -46,9 +46,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acfFile: Nirvana.acf
   cueSheets:
-  - name: BGM
-    acbFile: BGM.acb
-    awbFile: BGM.awb
+  - name: CueSheet_BGM
+    acbFile: CueSheet_BGM.acb
+    awbFile: CueSheet_BGM.awb
+    loaderStatus: 0
+  - name: CueSheet_SE
+    acbFile: CueSheet_SE.acb
+    awbFile: 
+    loaderStatus: 0
+  - name: CueSheet_VOICE
+    acbFile: CueSheet_VOICE.acb
+    awbFile: 
     loaderStatus: 0
   dspBusSetting: 
   dontDestroyOnLoad: 0

@@ -33,7 +33,7 @@ public class CRIAudioManager
     public static CRIAudioManager Instance => _instance;
 
     // サウンドプレイヤーの数はプロジェクトに応じて変えても良い
-    const int SoundTypeCount = 1;
+    const int SoundTypeCount = 3;
     const int AtomSourceBuffer = 10;
     private SoundPlayer[] _player = new SoundPlayer[SoundTypeCount];
     private BGMPlayer _bgmplayer;
@@ -43,8 +43,8 @@ public class CRIAudioManager
     CRIAudioManager()
     {
         _player[(int)SoundType.BGM] = _bgmplayer = new BGMPlayer();
-        // _player[(int)SoundType.SE] = _seplayer = new SEPlayerWith3D();
-        // _player[(int)SoundType.VOICE] = _voiceplayer = new SoundPlayer(SoundType.VOICE);
+        _player[(int)SoundType.SE] = _seplayer = new SEPlayerWith3D();
+        _player[(int)SoundType.VOICE] = _voiceplayer = new SoundPlayer(SoundType.VOICE);
     }
 
     static public BGMPlayer BGM => _instance._bgmplayer;
@@ -112,15 +112,7 @@ public class CRIAudioManager
         // Cue情報の取得
         foreach (var sheet in criAtom.cueSheets)
         {
-            Debug.Log($"Registering sheet: {sheet.name}");
-            if (!_soundDic.ContainsKey(sheet.name))
-            {
-                _soundDic.Add(sheet.name, new SoundDic(sheet.acb));
-            }
-            else
-            {
-                Debug.LogWarning($"Duplicate key detected: {sheet.name}");
-            }
+            _soundDic.Add(sheet.name, new SoundDic(sheet.acb));
         }
 
         _isReady = true;
