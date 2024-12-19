@@ -17,10 +17,10 @@ using UnityEngine.AddressableAssets;
 /// </summary>
 public enum SoundType
 {
-    MASTER,
     BGM,
     SE,
-    VOICE
+    VOICE,
+    MASTER,
 }
 
 
@@ -33,7 +33,7 @@ public class CRIAudioManager
     public static CRIAudioManager Instance => _instance;
 
     // サウンドプレイヤーの数はプロジェクトに応じて変えても良い
-    const int SoundTypeCount = 3;
+    const int SoundTypeCount = 1;
     const int AtomSourceBuffer = 10;
     private SoundPlayer[] _player = new SoundPlayer[SoundTypeCount];
     private BGMPlayer _bgmplayer;
@@ -43,8 +43,8 @@ public class CRIAudioManager
     CRIAudioManager()
     {
         _player[(int)SoundType.BGM] = _bgmplayer = new BGMPlayer();
-        _player[(int)SoundType.SE] = _seplayer = new SEPlayerWith3D();
-        _player[(int)SoundType.VOICE] = _voiceplayer = new SoundPlayer(SoundType.VOICE);
+        // _player[(int)SoundType.SE] = _seplayer = new SEPlayerWith3D();
+        // _player[(int)SoundType.VOICE] = _voiceplayer = new SoundPlayer(SoundType.VOICE);
     }
 
     static public BGMPlayer BGM => _instance._bgmplayer;
@@ -65,6 +65,14 @@ public class CRIAudioManager
         {
             _masterVolume = Mathf.Clamp01(value);
             ApplyMasterVolume();
+            //
+            // float clampedValue = Mathf.Clamp01(value);
+            // if (Math.Abs(_masterVolume - clampedValue) > 0.01f) // 変更がある場合のみログを出力
+            // {
+            //     Debug.Log($"MasterVolume changed: {_masterVolume} -> {clampedValue}");
+            //     _masterVolume = clampedValue;
+            //     ApplyMasterVolume();
+            // }
         }
     }
 
@@ -104,15 +112,23 @@ public class CRIAudioManager
         // Cue情報の取得
         foreach (var sheet in criAtom.cueSheets)
         {
-            _soundDic.Add(sheet.name, new SoundDic(sheet.acb));
+            Debug.Log($"Registering sheet: {sheet.name}");
+            if (!_soundDic.ContainsKey(sheet.name))
+            {
+                _soundDic.Add(sheet.name, new SoundDic(sheet.acb));
+            }
+            else
+            {
+                Debug.LogWarning($"Duplicate key detected: {sheet.name}");
+            }
         }
 
         _isReady = true;
 
         foreach (var player in _player)
         {
-            player.Setup();
-            player.SetVolume(1.0f);
+            player?.Setup();
+            player?.SetVolume(1.0f);
         }
 
         foreach (var s in _defferPlaySoundList)
@@ -202,7 +218,8 @@ public class CRIAudioManager
 
         public virtual void UpdateVolume()
         {
-            _atomExPlayer.SetVolume(_volume * CRIAudioManager.MasterVolume);
+            _atomExPlayer.SetVolume(_volume * MasterVolume);
+            _atomExPlayer.UpdateAll(); 
         }
 
         public virtual CriAtomExPlayback Play(string cueSheet, string cueName, float delay = 0.0f)
@@ -276,7 +293,7 @@ public class CRIAudioManager
 
             public void UpdateVolume()
             {
-                _atomExPlayer3D.SetVolume(CRIAudioManager.MasterVolume);
+                _atomExPlayer3D.SetVolume(MasterVolume);
             }
         }
 
