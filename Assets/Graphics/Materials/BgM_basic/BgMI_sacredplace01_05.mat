@@ -60,7 +60,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Nomalfloat: 0.14
+    - _Nomalfloat: 1.65
     - _QueueControl: 0
+    - _Roughnessfloat: 0
     m_Colors: []
   m_BuildTextureStacks: []
