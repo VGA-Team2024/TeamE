@@ -112,7 +112,14 @@ public class CRIAudioManager
         // Cue情報の取得
         foreach (var sheet in criAtom.cueSheets)
         {
-            _soundDic.Add(sheet.name, new SoundDic(sheet.acb));
+            if (!_soundDic.ContainsKey(sheet.name))
+            {
+                _soundDic.Add(sheet.name, new SoundDic(sheet.acb));
+            }
+            else
+            {
+                Debug.LogWarning($"Duplicate key detected: {sheet.name}");
+            }
         }
 
         _isReady = true;
@@ -211,7 +218,7 @@ public class CRIAudioManager
         public virtual void UpdateVolume()
         {
             _atomExPlayer.SetVolume(_volume * MasterVolume);
-            _atomExPlayer.UpdateAll(); 
+            _atomExPlayer.UpdateAll();
         }
 
         public virtual CriAtomExPlayback Play(string cueSheet, string cueName, float delay = 0.0f)
