@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 2f2e221d4b72ed444a7fff6514d01036
+guid: 302b52d1bc4837d4da638242403f2535
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -12,7 +12,7 @@ ScriptedImporter:
     rid: 1000
   awb: {instanceID: 0}
   assetInfo:
-    awb: {fileID: -6750239444755058063, guid: 5da88e9a42815a740ae616370ce581bb, type: 3}
+    awb: {instanceID: 0}
   references:
     version: 2
     RefIds:
