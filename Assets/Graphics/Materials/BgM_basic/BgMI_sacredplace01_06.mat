@@ -59,6 +59,6 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Nomalfloat: 6.68
+    - _Nomalfloat: 0.87
     m_Colors: []
   m_BuildTextureStacks: []

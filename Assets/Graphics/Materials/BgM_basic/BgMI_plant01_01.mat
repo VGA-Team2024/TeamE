@@ -7,15 +7,15 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: BgMD_Road01_01
-  m_Shader: {fileID: -6465566751694194690, guid: 1c873bd688f17444caa62c425f6c0f98,
+  m_Name: BgMI_plant01_01
+  m_Shader: {fileID: -6465566751694194690, guid: d6b7c888541478743a1e4c573e3fa6bf,
     type: 3}
-  m_Parent: {fileID: -876546973899608171, guid: 1c873bd688f17444caa62c425f6c0f98,
+  m_Parent: {fileID: -876546973899608171, guid: d6b7c888541478743a1e4c573e3fa6bf,
     type: 3}
-  m_ModifiedSerializedProperties: 2
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
-  m_LightmapFlags: 2
+  m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -25,33 +25,19 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _AO:
-        m_Texture: {fileID: 2800000, guid: f4fc2c17e2e023741a73537ee94e8872, type: 3}
+    - _Alpha:
+        m_Texture: {fileID: 2800000, guid: f78ca552fc4c986428bdf75fe827b7b0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseColor:
-        m_Texture: {fileID: 2800000, guid: 78dfc6f6118322441aedf036fe22037a, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Metallic:
-        m_Texture: {fileID: 2800000, guid: e3062d67f30347b49875b3798b4eff5c, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Nomal:
-        m_Texture: {fileID: 2800000, guid: afa0e11eab414e044b7decca67fe3373, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Roughness:
-        m_Texture: {fileID: 2800000, guid: d3992583fdcf4ce4d833aeb14a187625, type: 3}
+        m_Texture: {fileID: 2800000, guid: 5544d1416815ca04280839861fe1cd6a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
-    m_Floats:
-    - _QueueControl: 0
-    - _Roughnessfloat: -1
+    m_Floats: []
     m_Colors: []
   m_BuildTextureStacks: []
---- !u!114 &3884190264249654219
+--- !u!114 &1763402211196331560
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

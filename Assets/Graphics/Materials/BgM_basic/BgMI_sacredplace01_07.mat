@@ -49,7 +49,7 @@ Material:
     m_Floats:
     - _AO_float: 0
     - _AO_saturation: 0
-    - _Nomalfloat: 2.88
+    - _Nomalfloat: 0.9
     - _QueueControl: 0
     - _Roughnessfloat: 0
     m_Colors: []
