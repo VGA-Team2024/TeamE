@@ -17,13 +17,18 @@ MonoBehaviour:
   frontAttackDepth: 10
   centerAttackWidth: 20
   centerAttackHeight: 6
-  centerAttackDepth: 10
+  centerAttackDepth: 15
   backAttackWidth: 20
   backAttackHeight: 6
-  backAttackDepth: 10
+  backAttackDepth: 15
   rotateSpeed: 1.25
   rotateThreshold: 7.5
   moveSpeed: 5
-  frontRightAttackTrigger: RightFrontAttack
-  frontLeftAttackTrigger: LeftFrontAttack
-  backAttackTrigger: BackAttack
+  attackWaitTime: 1
+  recoveryTime: 30
+  rightFrontAttackTrigger: RightFrontAttack
+  leftFrontAttackTrigger: LeftFrontAttack
+  rightBackAttackTrigger: RightBackAttack
+  leftBackAttackTrigger: LeftBackAttack
+  rightDownFlag: IsDownRight
+  leftDownFlag: IsDownLeft
