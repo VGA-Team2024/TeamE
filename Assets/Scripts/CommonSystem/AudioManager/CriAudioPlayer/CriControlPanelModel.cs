@@ -1,9 +1,13 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace CommonSystem.AudioManager.CriAudioPlayer
 {
     public class CriControlPanelModel
     {
+        private Dictionary<SoundType, float> _currentVolumes;
+        public Dictionary<SoundType, float> GetCurrentVolumes() => _currentVolumes;
+        
         /// <summary>
         /// 音量変更処理（スライダー）
         /// </summary>
@@ -40,9 +44,9 @@ namespace CommonSystem.AudioManager.CriAudioPlayer
         {
             switch (soundType)
             {
-                // case SoundType.MASTER:
-                //     CRIAudioManager
-                //     break;
+                case SoundType.MASTER:
+                    // TODO: Master音量
+                    break;
                 case SoundType.BGM:
                     CRIAudioManager.BGM.SetVolume(normalizedValue);
                     break;

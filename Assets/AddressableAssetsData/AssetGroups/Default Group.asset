@@ -16,17 +16,7 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: 055b6216634c8ba4b80610294c57a4cb
-  m_SerializeEntries:
-  - m_GUID: 5842a28357383ef46ad89a28eeb57f31
-    m_Address: Assets/Scenes/SceneDependencies.asset
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c60c2ca92c2d30244a57d8d3d38604a1
-    m_Address: Assets/Prefabs/CRI.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: f7954a5e551c001488d9ecd8e2f3601d, type: 2}
   m_SchemaSet:
