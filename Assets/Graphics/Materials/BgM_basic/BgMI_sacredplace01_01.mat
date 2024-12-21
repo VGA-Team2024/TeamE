@@ -48,7 +48,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AO_float: 0
-    - _Nomalfloat: 3.95
+    - _Nomalfloat: 0.79
     - _QueueControl: 0
     - _Roughnessfloat: 0
     m_Colors: []

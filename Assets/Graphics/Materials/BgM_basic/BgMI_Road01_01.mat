@@ -1,18 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-1641065867839932692
-MonoBehaviour:
-  m_ObjectHideFlags: 11
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 7
 --- !u!21 &2100000
 Material:
   serializedVersion: 8
@@ -20,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: BgMD_Pot01_01
+  m_Name: BgMI_Road01_01
   m_Shader: {fileID: -6465566751694194690, guid: 1c873bd688f17444caa62c425f6c0f98,
     type: 3}
   m_Parent: {fileID: -876546973899608171, guid: 1c873bd688f17444caa62c425f6c0f98,
@@ -39,29 +26,41 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AO:
-        m_Texture: {fileID: 2800000, guid: 26fcebfd6b5d5774e88f9ba9755db35d, type: 3}
+        m_Texture: {fileID: 2800000, guid: f4fc2c17e2e023741a73537ee94e8872, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseColor:
-        m_Texture: {fileID: 2800000, guid: 75224a9b4c46c0141918e69eca8dbf28, type: 3}
+        m_Texture: {fileID: 2800000, guid: 78dfc6f6118322441aedf036fe22037a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Metallic:
-        m_Texture: {fileID: 2800000, guid: 4f4bea7ecf0d2af48ac6fbeb33fb2c47, type: 3}
+        m_Texture: {fileID: 2800000, guid: e3062d67f30347b49875b3798b4eff5c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Nomal:
-        m_Texture: {fileID: 2800000, guid: dd10f995988999b41bbf46ff8374bf53, type: 3}
+        m_Texture: {fileID: 2800000, guid: afa0e11eab414e044b7decca67fe3373, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Roughness:
-        m_Texture: {fileID: 2800000, guid: 0c07e8a32e579f744b24ab1abde3a4d0, type: 3}
+        m_Texture: {fileID: 2800000, guid: d3992583fdcf4ce4d833aeb14a187625, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Nomalfloat: 0.43
     - _QueueControl: 0
     - _Roughnessfloat: -1
     m_Colors: []
   m_BuildTextureStacks: []
+--- !u!114 &3884190264249654219
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 7
