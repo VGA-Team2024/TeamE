@@ -8,6 +8,7 @@ using UnityEngine;
 using R3;
 using UnityEngine.AddressableAssets;
 
+
 namespace HikanyanLaboratory.Audio
 {
     public class CriAudioManager : SingletonMonoBehaviour<CriAudioManager>
