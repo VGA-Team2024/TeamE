@@ -56,6 +56,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _Distance: 25.9
+    - _Emisstion: 0
     - _FoamAmount: 1.68
     - _FoamCuttoff: 1.82
     - _FoamScale: 18.53

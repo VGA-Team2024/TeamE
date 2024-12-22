@@ -53,6 +53,9 @@
         },
         {
             "m_Id": "e59bca04655d4ed8bead3938cf3291d1"
+        },
+        {
+            "m_Id": "89ef741b830b42eb992e12084bfc01b4"
         }
     ],
     "m_Keywords": [],
@@ -6935,6 +6938,34 @@
 }
 
 {
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
+    "m_ObjectId": "89ef741b830b42eb992e12084bfc01b4",
+    "m_Guid": {
+        "m_GuidSerialized": "b367ae83-12c1-4765-9a20-40e0d3c7c54b"
+    },
+    "m_Name": "Emisstion",
+    "m_DefaultRefNameVersion": 1,
+    "m_RefNameGeneratedByDisplayName": "Emisstion",
+    "m_DefaultReferenceName": "_Emisstion",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
+    "m_DismissedVersion": 0,
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 0,
+    "m_Hidden": false,
+    "m_Value": 0.0,
+    "m_FloatType": 0,
+    "m_RangeValues": {
+        "x": 0.0,
+        "y": 1.0
+    }
+}
+
+{
     "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.NormalStrengthNode",
     "m_ObjectId": "89f76b8fec064529893c0ec9aff8deb5",
@@ -7544,6 +7575,9 @@
         },
         {
             "m_Id": "e59bca04655d4ed8bead3938cf3291d1"
+        },
+        {
+            "m_Id": "89ef741b830b42eb992e12084bfc01b4"
         }
     ]
 }
