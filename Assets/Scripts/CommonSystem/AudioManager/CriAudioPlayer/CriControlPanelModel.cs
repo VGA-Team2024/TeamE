@@ -7,7 +7,7 @@ namespace CommonSystem.AudioManager.CriAudioPlayer
     {
         private Dictionary<SoundType, float> _currentVolumes;
         public Dictionary<SoundType, float> GetCurrentVolumes() => _currentVolumes;
-        
+
         /// <summary>
         /// 音量変更処理（スライダー）
         /// </summary>
@@ -45,7 +45,7 @@ namespace CommonSystem.AudioManager.CriAudioPlayer
             switch (soundType)
             {
                 case SoundType.MASTER:
-                    // TODO: Master音量
+                    CRIAudioManager.MasterVolume = normalizedValue;
                     break;
                 case SoundType.BGM:
                     CRIAudioManager.BGM.SetVolume(normalizedValue);

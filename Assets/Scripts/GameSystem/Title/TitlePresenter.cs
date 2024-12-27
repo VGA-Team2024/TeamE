@@ -12,6 +12,8 @@ namespace GameSystem.Title
         private void Start()
         {
             _titleModel = new TitleModel(_fadeSceneTransition);
+            
+            
 
             // ボタンイベントの登録
             _titleView.SetButtonListeners(

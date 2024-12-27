@@ -7,6 +7,9 @@
         public TitleModel(TitleFadeSceneTransition fadeSceneTransition)
         {
             _fadeSceneTransition = fadeSceneTransition;
+            
+            CRIAudioManager.Initialize();
+            CRIAudioManager.BGM.Play("CueSheet_BGM", "BGM_ending"); 
         }
 
         public void StartButton()
