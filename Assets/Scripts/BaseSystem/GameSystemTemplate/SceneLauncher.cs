@@ -17,7 +17,6 @@ public class SceneLauncher : MonoBehaviour
 
     private void Start()
     {
-#if UNITY_EDITOR
         if (_isDebug)
         {
             _debugRoot.SetActive(true);
@@ -44,8 +43,5 @@ public class SceneLauncher : MonoBehaviour
             //
             SceneLoader.LoadScene(_sceneName);
         }
-#else
-        SceneLoader.LoadScene(_sceneName);
-#endif
     }
 }

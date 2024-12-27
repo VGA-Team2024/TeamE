@@ -52,12 +52,27 @@ public class PreprocessBuild : IPreprocessBuildWithReport
             .Select(scene => scene.path)
             .First();
 
-        Debug.Log(scene);
-
         if(!scene.Contains("GameLauncher"))
         {
             Debug.LogWarning("GameLauncherが起動シーンではないので初期化が失敗する可能性があります");
         }
+
+        //ゲームランチャー設定確認
+        {
+            var gl = EditorBuildSettings.scenes
+                .Where(scene => scene.path.Contains("GameLauncher"))
+                .Select(scene => scene.path)
+                .First();
+
+            var grep = File.ReadAllLines(gl).Where(l => l.Contains("isDebug")).First();
+
+            Debug.Log(grep);
+            if (grep.Contains("1"))
+            {
+                Debug.LogWarning("GameLauncherのデバッグが有効です。提出ビルドの場合は注意しましょう。");
+            }
+        }
+
 
         //実装確認
         int implLine = 0;
