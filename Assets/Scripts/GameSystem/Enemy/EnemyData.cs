@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// 敵のデータを管理するクラス
@@ -44,6 +45,12 @@ public class EnemyData : ScriptableObject
     [Header("移動速度")] public float moveSpeed = 5.0f;
     
     //-------------------------------------------------------------------------------
+    // 攻撃に関するデータ
+    //-------------------------------------------------------------------------------
+
+    [Header("攻撃後の待機時間")] public float attackWaitTime = 1.0f;
+    
+    //-------------------------------------------------------------------------------
     // 弱点に関するデータ
     //-------------------------------------------------------------------------------
 
@@ -53,9 +60,10 @@ public class EnemyData : ScriptableObject
     // アニメーションのデータ
     //-------------------------------------------------------------------------------
 
-    public string frontRightAttackTrigger = "RightFrontAttack";
-    public string frontLeftAttackTrigger = "LeftFrontAttack";
-    public string backAttackTrigger = "BackAttack";
+    public string rightFrontAttackTrigger = "RightFrontAttack";
+    public string leftFrontAttackTrigger = "LeftFrontAttack";
+    public string rightBackAttackTrigger = "RightBackAttack";
+    public string leftBackAttackTrigger = "LeftBackAttack";
     public string rightDownFlag = "IsDownRight";
     public string leftDownFlag = "IsDownLeft";
 }

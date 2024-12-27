@@ -15,10 +15,10 @@ using Cysharp.Threading.Tasks.CompilerServices;
 /// </summary>
 public enum SoundType
 {
-    MASTER,
     BGM,
     SE,
-    VOICE
+    VOICE,
+    MASTER,
 }
 
 
@@ -54,6 +54,33 @@ public class CRIAudioManager
     private Dictionary<string, SoundDic> _soundDic = new Dictionary<string, SoundDic>();
     private List<Tuple<SoundType, string, string>> _defferPlaySoundList = new List<Tuple<SoundType, string, string>>();
 
+    private static float _masterVolume = 1.0f;
+
+    public static float MasterVolume
+    {
+        get => _masterVolume;
+        set
+        {
+            _masterVolume = Mathf.Clamp01(value);
+            ApplyMasterVolume();
+            //
+            // float clampedValue = Mathf.Clamp01(value);
+            // if (Math.Abs(_masterVolume - clampedValue) > 0.01f) // 変更がある場合のみログを出力
+            // {
+            //     Debug.Log($"MasterVolume changed: {_masterVolume} -> {clampedValue}");
+            //     _masterVolume = clampedValue;
+            //     ApplyMasterVolume();
+            // }
+        }
+    }
+
+    private static void ApplyMasterVolume()
+    {
+        foreach (var player in _instance._player)
+        {
+            player?.UpdateVolume();
+        }
+    }
 
     static public void Initialize()
     {
@@ -64,7 +91,7 @@ public class CRIAudioManager
     {
         //CriAtomの取得
         var criAtom = GameObject.FindObjectOfType<CriAtom>();
-        if(criAtom == null)
+        if (criAtom == null)
         {
             _isReady = false;
 
@@ -83,21 +110,29 @@ public class CRIAudioManager
         // Cue情報の取得
         foreach (var sheet in criAtom.cueSheets)
         {
-            _soundDic.Add(sheet.name, new SoundDic(sheet.acb));
+            if (!_soundDic.ContainsKey(sheet.name))
+            {
+                _soundDic.Add(sheet.name, new SoundDic(sheet.acb));
+            }
+            else
+            {
+                Debug.LogWarning($"Duplicate key detected: {sheet.name}");
+            }
         }
 
         _isReady = true;
 
-        foreach(var player in _player)
+        foreach (var player in _player)
         {
-            player.Setup();
-            player.SetVolume(1.0f);
+            player?.Setup();
+            player?.SetVolume(1.0f);
         }
 
-        foreach(var s in _defferPlaySoundList)
+        foreach (var s in _defferPlaySoundList)
         {
             _player[(int)s.Item1].Play(s.Item2, s.Item3);
         }
+
         _defferPlaySoundList.Clear();
     }
 
@@ -177,7 +212,13 @@ public class CRIAudioManager
         public virtual void SetVolume(float vol)
         {
             _volume = vol;
-            _atomExPlayer.SetVolume(_volume);
+            UpdateVolume();
+        }
+
+        public virtual void UpdateVolume()
+        {
+            _atomExPlayer.SetVolume(_volume * MasterVolume);
+            _atomExPlayer.UpdateAll();
         }
 
         /// <summary>
@@ -190,7 +231,7 @@ public class CRIAudioManager
         public virtual SoundPlayer Play(string cueSheet, string cueName, float delay = 0.0f)
         {
             //準備待ちの時は準備終わり次第再生
-            if(!_instance._isReady)
+            if (!_instance._isReady)
             {
                 PlayQueue(_type, cueSheet, cueName);
                 return this;
@@ -235,7 +276,7 @@ public class CRIAudioManager
         }
 
         public virtual void Stop()
-        { 
+        {
             _atomExPlayer.Stop();
         }
     }
@@ -246,7 +287,9 @@ public class CRIAudioManager
     /// </summary>
     public class BGMPlayer : SoundPlayer
     {
-        public BGMPlayer() : base(SoundType.BGM) { }
+        public BGMPlayer() : base(SoundType.BGM)
+        {
+        }
     }
 
     /// <summary>
@@ -295,6 +338,11 @@ public class CRIAudioManager
                 //_atomExPlayer3D.Set3dListener(_instance._listener.3d as CriAtomEx3dListener);
                 return _atomExPlayer3D.Start();
             }
+
+            public void UpdateVolume()
+            {
+                _atomExPlayer3D.SetVolume(MasterVolume);
+            }
         }
 
         CriAtomEx3dListener _lintener;
@@ -313,6 +361,16 @@ public class CRIAudioManager
                 _sound3Ds[i] = new Sound3D();
             }
         }
+
+        public override void UpdateVolume()
+        {
+            base.UpdateVolume();
+            foreach (var sound3D in _sound3Ds)
+            {
+                sound3D.UpdateVolume();
+            }
+        }
+
         public override void Dispose()
         {
             base.Dispose();

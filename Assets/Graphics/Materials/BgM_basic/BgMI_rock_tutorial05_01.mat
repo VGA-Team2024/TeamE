@@ -47,8 +47,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Nomalfloat: 0
+    - _Nomalfloat: 0.63
     - _QueueControl: 0
+    - _Roughnessfloat: 1
     m_Colors: []
   m_BuildTextureStacks: []
 --- !u!114 &6613410544371440901

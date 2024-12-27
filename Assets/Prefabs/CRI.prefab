@@ -44,18 +44,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91f529aa944b914449d62b8c40f188fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acfFile: TGS2023.acf
+  acfFile: Nirvana.acf
   cueSheets:
-  - name: BGM
-    acbFile: BGM.acb
-    awbFile: BGM.awb
+  - name: CueSheet_BGM
+    acbFile: CueSheet_BGM.acb
+    awbFile: CueSheet_BGM.awb
     loaderStatus: 0
-  - name: SE
-    acbFile: SE.acb
+  - name: CueSheet_SE
+    acbFile: CueSheet_SE.acb
     awbFile: 
     loaderStatus: 0
-  - name: ME
-    acbFile: ME.acb
+  - name: CueSheet_VOICE
+    acbFile: CueSheet_VOICE.acb
     awbFile: 
     loaderStatus: 0
   dspBusSetting: 
