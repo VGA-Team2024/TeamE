@@ -47,11 +47,14 @@ public class PreprocessBuild : IPreprocessBuildWithReport
         }
 
         //シーンランチャ―を最初に登録していること
-        var scenes = EditorBuildSettings.scenes
+        var scene = EditorBuildSettings.scenes
             .Where(scene => scene.enabled)
             .Select(scene => scene.path)
             .First();
-        if(scenes != "GameLauncher")
+
+        Debug.Log(scene);
+
+        if(!scene.Contains("GameLauncher"))
         {
             Debug.LogWarning("GameLauncherが起動シーンではないので初期化が失敗する可能性があります");
         }
@@ -90,7 +93,17 @@ public class PreprocessBuild : IPreprocessBuildWithReport
     void AddressableCheck(string path)
     {
         var settings = AddressableAssetSettingsDefaultObject.Settings;
+        if (settings == null)
+        {
+            throw new BuildFailedException($"そもそもAddressablesの設定がされていません。");
+        }
+
         var guid = AssetDatabase.AssetPathToGUID(path);
+        if (guid == null)
+        {
+            throw new BuildFailedException($"対象のアセットがありませんでした。[{path}]");
+        }
+
         var find = settings.FindAssetEntry(guid);
         if (find == null)
         {
