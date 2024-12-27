@@ -36,5 +36,5 @@ Material:
     - _MatrixForward: {r: 0, g: 0, b: 1, a: 0}
     - _MatrixRight: {r: 1, g: 0, b: 0, a: 0}
     - _MatrixUp: {r: 0, g: 1, b: 0, a: 0}
-    - _Tint: {r: 1, g: 1, b: 1, a: 1}
+    - _Tint: {r: 0.8632076, g: 1, b: 0.99786264, a: 1}
   m_BuildTextureStacks: []
