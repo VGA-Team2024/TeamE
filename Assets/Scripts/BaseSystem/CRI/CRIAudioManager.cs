@@ -1,14 +1,12 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using CriWare;
 using Cysharp.Threading.Tasks;
 using static CriWare.CriAtomEx;
 using System.Linq;
-using static CriWare.CriAtomExBeatSync;
 using System;
-using System.Reflection;
 using UnityEngine.AddressableAssets;
+using Cysharp.Threading.Tasks.CompilerServices;
 
 
 /// <summary>
@@ -161,6 +159,7 @@ public class CRIAudioManager
     {
         CriAtomExAcb _atomExAcb;
         private Dictionary<string, CueInfo> _cueInfoDic = new Dictionary<string, CueInfo>();
+        public bool IaContainsKey(string key) => _cueInfoDic.ContainsKey(key);
 
         public SoundDic(CriAtomExAcb acb)
         {
@@ -190,6 +189,7 @@ public class CRIAudioManager
         SoundType _type;
         protected float _volume = 1.0f;
         protected CriAtomExPlayer _atomExPlayer;
+        protected CriAtomExPlayback _playbackMemory;    //直前のものしか覚えていない
 
         public bool IsPlaying => _atomExPlayer.GetStatus() == CriAtomExPlayer.Status.Playing;
 
@@ -221,19 +221,58 @@ public class CRIAudioManager
             _atomExPlayer.UpdateAll();
         }
 
-        public virtual CriAtomExPlayback Play(string cueSheet, string cueName, float delay = 0.0f)
+        /// <summary>
+        /// サウンドを再生する
+        /// </summary>
+        /// <param name="cueSheet">キューシート名</param>
+        /// <param name="cueName">キューネーム名</param>
+        /// <param name="delay">遅延時間</param>
+        /// <returns>メソッドチェーン用に自分自身を返す</returns>
+        public virtual SoundPlayer Play(string cueSheet, string cueName, float delay = 0.0f)
         {
             //準備待ちの時は準備終わり次第再生
             if (!_instance._isReady)
             {
                 PlayQueue(_type, cueSheet, cueName);
-                return default;
+                return this;
+            }
+
+            if (_instance._soundDic.ContainsKey(cueSheet) == false)
+            {
+                Debug.LogError($"CueSheet:{cueSheet}が見つかりません");
+                return this;
+            }
+
+            if (_instance._soundDic[cueSheet] == null || _instance._soundDic[cueSheet].IaContainsKey(cueName) == false)
+            {
+                Debug.LogError($"CueName:{cueName}が見つかりません");
+                return this;
             }
 
             CueInfo info = _instance._soundDic[cueSheet].GetCueInfo(cueName);
             _atomExPlayer.SetCue(_instance._soundDic[cueSheet].GetAcb(), info.id);
             _atomExPlayer.SetPreDelayTime(delay);
-            return _atomExPlayer.Start();
+            _playbackMemory = _atomExPlayer.Start();    //最後に再生したものを記録
+            return this;
+        }
+
+        /// <summary>
+        /// 最後に再生したサウンドの状態取得クラスを受け取る
+        /// </summary>
+        /// <returns></returns>
+        public CriAtomExPlayback GetLastPlayback()
+        {
+            return _playbackMemory;
+        }
+
+        /// <summary>
+        /// 最後に再生したサウンドの再生終了まで待つ
+        /// </summary>
+        /// <returns></returns>
+        public async virtual UniTask WaitUntil()
+        {
+            await UniTask.WaitUntil(() => { return (_instance._defferPlaySoundList.Count == 0); });
+            await UniTask.WaitUntil(() => { return (_atomExPlayer.GetStatus() == CriAtomExPlayer.Status.PlayEnd); });
         }
 
         public virtual void Stop()
@@ -274,8 +313,18 @@ public class CRIAudioManager
                 _source.Dispose();
             }
 
-            public void Play3D(Vector3 playPos, string cueSheet, string cueName)
+            public CriAtomExPlayback Play3D(Vector3 playPos, string cueSheet, string cueName)
             {
+                if (_instance._soundDic.ContainsKey(cueSheet) == false)
+                {
+                    Debug.LogError($"CueSheet:{cueSheet}が見つかりません");
+                }
+
+                if (_instance._soundDic[cueSheet] == null || _instance._soundDic[cueSheet].IaContainsKey(cueName) == false)
+                {
+                    Debug.LogError($"CueName:{cueName}が見つかりません");
+                }
+
                 //_source.SetMinMaxDistance(minDistance, maxDistance);
                 //_source.SetDopplerFactor(dopplerFactor);
                 _source.SetPosition(playPos.x, playPos.y, playPos.z);
@@ -287,7 +336,7 @@ public class CRIAudioManager
                 _atomExPlayer3D.Set3dSource(_source);
                 _atomExPlayer3D.UpdateAll();
                 //_atomExPlayer3D.Set3dListener(_instance._listener.3d as CriAtomEx3dListener);
-                _atomExPlayer3D.Start();
+                return _atomExPlayer3D.Start();
             }
 
             public void UpdateVolume()
@@ -342,16 +391,23 @@ public class CRIAudioManager
             return null;
         }
 
-        public void Play3D(Vector3 playPos, string cueSheet, string cueName)
+        public SEPlayerWith3D Play3D(Vector3 playPos, string cueSheet, string cueName)
         {
             Sound3D player = GetPlayer();
             if (player == null)
             {
                 Debug.LogWarning("3D音声の再生上限です");
-                return;
+                return this;
             }
 
-            player.Play3D(playPos, cueSheet, cueName);
+            _playbackMemory = player.Play3D(playPos, cueSheet, cueName);
+            return this;
+        }
+
+        public async override UniTask WaitUntil()
+        {
+            await UniTask.WaitUntil(() => { return (_instance._defferPlaySoundList.Count == 0); });
+            await UniTask.WaitUntil(() => { return (_atomExPlayer.GetStatus() == CriAtomExPlayer.Status.PlayEnd); });
         }
     }
 }

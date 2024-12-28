@@ -1,4 +1,5 @@
 ﻿
+using UnityEditor;
 using UnityEngine;
 
 public class CriSoundExecuter : GameExecuterBase
@@ -7,7 +8,8 @@ public class CriSoundExecuter : GameExecuterBase
     public override void InitializeScene()
     {
         CRIAudioManager.Initialize(); //初期化
-        CRIAudioManager.BGM.Play("CueSheet_BGM", "BGM_ending"); //NOTE: 準備待ちがあるため遅延して再生されるが、指定する分には問題ない
+        PlayBGM();
+        //CRIAudioManager.BGM.Play("CueSheet_BGM", "BGM_ending"); //NOTE: 準備待ちがあるため遅延して再生されるが、指定する分には問題ない
     }
 
     //Sceneで最後に何かする処理があれば書く
@@ -27,7 +29,8 @@ public class CriSoundExecuter : GameExecuterBase
         //SEの再生
         if (Input.GetKeyDown(KeyCode.X))
         {
-            CRIAudioManager.SE.Play("CueSheet_BGM", "BGM_ending");
+            PlaySE();
+            //CRIAudioManager.SE.Play("CueSheet_BGM", "BGM_ending");
         }
 
         //SEの遅延再生
@@ -41,5 +44,18 @@ public class CriSoundExecuter : GameExecuterBase
         {
             CRIAudioManager.BGM.Play("BGM", "BGM_Stage_Final");
         }
+    }
+    async void PlayBGM()
+    {
+        Debug.Log("再生BGM");
+        await CRIAudioManager.BGM.Play("BGM", "BGM").WaitUntil(); //NOTE: 準備待ちがあるため遅延して再生されるが、指定する分には問題ない
+        Debug.Log("再生終了BGM");
+    }
+
+    async void PlaySE()
+    {
+        Debug.Log("再生SE");
+        await CRIAudioManager.SE.Play("ME", "FM_Reverb").WaitUntil();
+        Debug.Log("再生終了SE");
     }
 }
