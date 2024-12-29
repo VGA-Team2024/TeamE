@@ -319,7 +319,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &817238547
 RectTransform:
   m_ObjectHideFlags: 0
@@ -411,6 +411,7 @@ MonoBehaviour:
   _isDebug: 1
   _sceneName: 3DSoundSample
   _base: {fileID: 1315228428}
+  _debugRoot: {fileID: 817238546}
 --- !u!1 &1315228428
 GameObject:
   m_ObjectHideFlags: 0
