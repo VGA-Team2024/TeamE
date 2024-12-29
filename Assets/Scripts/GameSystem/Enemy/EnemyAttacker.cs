@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 /// <summary>敵の攻撃を制御するクラス</summary>
