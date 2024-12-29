@@ -255,6 +255,34 @@ public class CRIAudioManager
             _playbackMemory = _atomExPlayer.Start();    //最後に再生したものを記録
             return this;
         }
+        public virtual SoundPlayer Play(string cueSheet, int cueId, float delay = 0.0f)
+        {
+            // 準備待ちの時は準備終わり次第再生
+            if (!_instance._isReady)
+            {
+                Debug.LogWarning("CRIAudioManager is not ready yet. Defering playback.");
+                return this;
+            }
+
+            if (!_instance._soundDic.ContainsKey(cueSheet))
+            {
+                Debug.LogError($"CueSheet:{cueSheet}が見つかりません");
+                return this;
+            }
+
+            var acb = _instance._soundDic[cueSheet].GetAcb();
+            if (acb == null)
+            {
+                Debug.LogError($"ACB is null for CueSheet:{cueSheet}");
+                return this;
+            }
+
+            // 再生処理
+            _atomExPlayer.SetCue(acb, cueId);
+            _atomExPlayer.SetPreDelayTime(delay);
+            _playbackMemory = _atomExPlayer.Start(); // 最後に再生したものを記録
+            return this;
+        }
 
         /// <summary>
         /// 最後に再生したサウンドの状態取得クラスを受け取る

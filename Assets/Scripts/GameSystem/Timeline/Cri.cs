@@ -1,7 +1,10 @@
-﻿namespace GameSystem.Timeline
+﻿using System;
+using UnityEngine;
+
+public class Cri : MonoBehaviour
 {
-    public class Cri
+    public void Awake()
     {
-        
+        CRIAudioManager.Initialize();
     }
 }
