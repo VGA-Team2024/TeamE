@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>敵を制御するクラス</summary>
 public class EnemyController : MonoBehaviour
@@ -42,6 +43,20 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private EnemyAttacker leftBackAttackCollider1;
     
     [SerializeField] private EnemyAttacker leftBackAttackCollider2;
+    
+    [Header("前脚の攻撃コライダー")]
+
+    [SerializeField] private EnemyAttacker rightFrontAttackCollider1;
+    
+    [SerializeField] private EnemyAttacker rightFrontAttackCollider2;
+
+    [SerializeField] private EnemyAttacker leftFrontAttackCollider1;
+    
+    [SerializeField] private EnemyAttacker leftFrontAttackCollider2;
+
+    [Header("胴体の攻撃コライダー")] 
+    
+    [SerializeField] private EnemyAttacker centerAttackCollider;
 
     private bool _isDown;
     private bool _isAttacking;
@@ -233,6 +248,15 @@ public class EnemyController : MonoBehaviour
         return EnemyNodes.NodeStatus.Success;
     }
     
+    /// <summary>
+    /// 右前脚の攻撃コライダーを一時的に有効化する
+    /// </summary>
+    public void TemporarilyActivateRightFrontAttackCollider()
+    {
+        rightFrontAttackCollider1.TemporarilyActivateCollider();
+        rightFrontAttackCollider2.TemporarilyActivateCollider();
+    }
+    
     //-------------------------------------------------------------------------------
     // 左前足の攻撃シーケンス
     //-------------------------------------------------------------------------------
@@ -277,6 +301,15 @@ public class EnemyController : MonoBehaviour
         return EnemyNodes.NodeStatus.Success;
     }
     
+    /// <summary>
+    /// 左前脚の攻撃コライダーを一時的に有効化する
+    /// </summary>
+    public void TemporarilyActivateLeftFrontAttackCollider()
+    {
+        leftFrontAttackCollider1.TemporarilyActivateCollider();
+        leftFrontAttackCollider2.TemporarilyActivateCollider();
+    }
+    
     //-------------------------------------------------------------------------------
     // 胴体の攻撃シーケンス
     //-------------------------------------------------------------------------------
@@ -316,7 +349,17 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private EnemyNodes.NodeStatus CenterAttack()
     {
+        _animator.SetTrigger(data.centerAttackTrigger);
+        _isAttacking = true;
         return EnemyNodes.NodeStatus.Success;
+    }
+    
+    /// <summary>
+    /// 胴体の攻撃コライダーを一時的に有効化する
+    /// </summary>
+    public void TemporarilyActivateCenterAttackCollider()
+    {
+        centerAttackCollider.TemporarilyActivateCollider();
     }
     
     //-------------------------------------------------------------------------------

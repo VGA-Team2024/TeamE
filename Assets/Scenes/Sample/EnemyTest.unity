@@ -450,7 +450,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae62bf711b89cbf4c93f7ee69a15b864, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 100
+  damage: 75
+--- !u!1 &266030892
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 266030893}
+  m_Layer: 0
+  m_Name: RightFrontAttackEffectPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &266030893
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266030892}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1032576553}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &326211820
 GameObject:
   m_ObjectHideFlags: 0
@@ -517,7 +548,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae62bf711b89cbf4c93f7ee69a15b864, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 50
+  damage: 25
 --- !u!1 &391884321
 GameObject:
   m_ObjectHideFlags: 0
@@ -583,7 +614,8 @@ Transform:
   m_LocalPosition: {x: -2.85, y: 1.5, z: 0.575}
   m_LocalScale: {x: 11.5, y: 0.1, z: 6}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2031540407}
   m_Father: {fileID: 2106475626}
   m_LocalEulerAnglesHint: {x: 1.5, y: 0, z: -3.5}
 --- !u!65 &408722994
@@ -959,6 +991,73 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!1 &563490359
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 563490360}
+  - component: {fileID: 563490362}
+  - component: {fileID: 563490361}
+  m_Layer: 0
+  m_Name: LeftFrontAttackCollider 2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &563490360
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 563490359}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 10, y: 3, z: 35}
+  m_LocalScale: {x: 20, y: 6, z: 20}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2039311894}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &563490361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 563490359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae62bf711b89cbf4c93f7ee69a15b864, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 50
+--- !u!65 &563490362
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 563490359}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &570447714
 GameObject:
   m_ObjectHideFlags: 0
@@ -1461,7 +1560,8 @@ Transform:
   m_LocalPosition: {x: 2.5, y: -1.75, z: -1}
   m_LocalScale: {x: 11.5, y: 0.1, z: 6}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 266030893}
   m_Father: {fileID: 2106475625}
   m_LocalEulerAnglesHint: {x: 0, y: 7, z: -3.25}
 --- !u!65 &1032576554
@@ -1500,6 +1600,73 @@ MonoBehaviour:
   weakPointType: 1
   weakPointSide: 0
   enemyController: {fileID: 2106475628}
+--- !u!1 &1160659917
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1160659918}
+  - component: {fileID: 1160659920}
+  - component: {fileID: 1160659919}
+  m_Layer: 0
+  m_Name: RightFrontAttackCollider 2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1160659918
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1160659917}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -10, y: 3, z: 35}
+  m_LocalScale: {x: 20, y: 6, z: 20}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2039311894}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1160659919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1160659917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae62bf711b89cbf4c93f7ee69a15b864, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 50
+--- !u!65 &1160659920
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1160659917}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1195071245
 GameObject:
   m_ObjectHideFlags: 0
@@ -1739,7 +1906,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae62bf711b89cbf4c93f7ee69a15b864, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 100
+  damage: 75
 --- !u!1 &1347645509
 GameObject:
   m_ObjectHideFlags: 0
@@ -1750,8 +1917,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1347645510}
   - component: {fileID: 1347645511}
+  - component: {fileID: 1347645512}
   m_Layer: 0
-  m_Name: 'LeftFrontAttackCollider '
+  m_Name: LeftFrontAttackCollider 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1793,6 +1961,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1347645512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1347645509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae62bf711b89cbf4c93f7ee69a15b864, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 100
 --- !u!1 &1493732703
 GameObject:
   m_ObjectHideFlags: 0
@@ -1859,7 +2040,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae62bf711b89cbf4c93f7ee69a15b864, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 50
+  damage: 25
 --- !u!1 &1596276028
 GameObject:
   m_ObjectHideFlags: 0
@@ -2073,6 +2254,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2106475622}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2031540406
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2031540407}
+  m_Layer: 0
+  m_Name: LeftFrontAttackEffectPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2031540407
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2031540406}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 408722993}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2039311893
 GameObject:
   m_ObjectHideFlags: 0
@@ -2103,7 +2315,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2055851448}
+  - {fileID: 1160659918}
   - {fileID: 1347645510}
+  - {fileID: 563490360}
   m_Father: {fileID: 1195071246}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2055851447
@@ -2116,8 +2330,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2055851448}
   - component: {fileID: 2055851449}
+  - component: {fileID: 2055851450}
   m_Layer: 0
-  m_Name: 'RightFrontAttackCollider '
+  m_Name: RightFrontAttackCollider 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2159,6 +2374,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2055851450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2055851447}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae62bf711b89cbf4c93f7ee69a15b864, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 100
 --- !u!1 &2066659925
 GameObject:
   m_ObjectHideFlags: 0
@@ -2169,6 +2397,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2066659926}
   - component: {fileID: 2066659927}
+  - component: {fileID: 2066659928}
   m_Layer: 0
   m_Name: 'CenterAttackCollider '
   m_TagString: Untagged
@@ -2212,6 +2441,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2066659928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066659925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae62bf711b89cbf4c93f7ee69a15b864, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 100
 --- !u!1001 &2106475620
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2436,6 +2678,11 @@ MonoBehaviour:
   rightBackAttackCollider2: {fileID: 326211823}
   leftBackAttackCollider1: {fileID: 1273047271}
   leftBackAttackCollider2: {fileID: 1493732706}
+  rightFrontAttackCollider1: {fileID: 2055851450}
+  rightFrontAttackCollider2: {fileID: 1160659919}
+  leftFrontAttackCollider1: {fileID: 1347645512}
+  leftFrontAttackCollider2: {fileID: 563490361}
+  centerAttackCollider: {fileID: 2066659928}
 --- !u!114 &2106475629
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2452,6 +2699,10 @@ MonoBehaviour:
     type: 3}
   rightBackAttackEffectPos: {fileID: 834911425}
   leftBackAttackEffectPos: {fileID: 463334078}
+  frontAttackEffect: {fileID: 6771687754775417217, guid: 966db5285f9e5664598476473b2f513b,
+    type: 3}
+  rightFrontAttackEffectPos: {fileID: 266030893}
+  leftFrontAttackEffectPos: {fileID: 2031540407}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

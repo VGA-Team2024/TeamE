@@ -62,6 +62,7 @@ public class EnemyData : ScriptableObject
 
     public string rightFrontAttackTrigger = "RightFrontAttack";
     public string leftFrontAttackTrigger = "LeftFrontAttack";
+    public string centerAttackTrigger = "CenterAttack";
     public string rightBackAttackTrigger = "RightBackAttack";
     public string leftBackAttackTrigger = "LeftBackAttack";
     public string rightDownFlag = "IsDownRight";
