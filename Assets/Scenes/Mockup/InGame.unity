@@ -5427,6 +5427,11 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: -0.74783874
       objectReference: {fileID: 0}
+    - target: {fileID: 2892596342099039560, guid: 1d2e8b46229171545a1354b42a826d51,
+        type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 2913932699795217195, guid: 1d2e8b46229171545a1354b42a826d51,
         type: 3}
       propertyPath: m_LocalPosition.x

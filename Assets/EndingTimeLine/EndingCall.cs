@@ -5,7 +5,7 @@ using UnityEngine;
 public class EndingCall : MonoBehaviour
 {
     GameObject _endingOne;
-    GameObject _endingTwo;
+    GameObject _endingTwo; 
     void Start()
     {
         _endingOne = transform.GetChild(0).gameObject;
