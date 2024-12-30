@@ -13,11 +13,14 @@ public class SceneLauncher : MonoBehaviour
     [SerializeField] bool _isDebug;
     [SerializeField] string _sceneName;
     [SerializeField] GameObject _base;
+    [SerializeField] GameObject _debugRoot;
 
     private void Start()
     {
         if (_isDebug)
         {
+            _debugRoot.SetActive(true);
+
             var sceneDB = Addressables.LoadAssetAsync<SceneDependencies>(SceneDependencies.AssetPath).WaitForCompletion();
             var scenes = sceneDB.GetAll().Where(s => s.CanIDebugSelect).ToList();
 
