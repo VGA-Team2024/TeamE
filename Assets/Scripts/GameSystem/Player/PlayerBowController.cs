@@ -2,7 +2,6 @@
 using UnityEngine.Animations;
 public class PlayerBowController : MonoBehaviour
 {
-    [SerializeField] private Transform _waistBone;
     [SerializeField] private float _arrowChargeTime;
     [SerializeField , Range(0f , 1f)] private float _lookAtWeight;
     [SerializeField] float _arrowTargetDistance = 100f;
@@ -31,27 +30,23 @@ public class PlayerBowController : MonoBehaviour
     }
     void OnAnimatorIK(int layerIndex)
     {
+        if (IsArrowCharging)
+        {
+            _arrowInterpolationTimer += Time.deltaTime;
+            if (_arrowInterpolationTimer > _arrowInterpolationTime)
+            {
+                _arrowInterpolationTimer = _arrowInterpolationTime;
+            }
+        }
+        else
+        {
+            _arrowInterpolationTimer = 0f;
+        }
         if (layerIndex == _arrowMotionLayerIndex)
         {
-            if (IsArrowCharging)
-            {
-                _arrowInterpolationTimer += Time.deltaTime;
-                if (_arrowInterpolationTimer > _arrowInterpolationTime)
-                {
-                    _arrowInterpolationTimer = _arrowInterpolationTime;
-                }
-            }
-            else
-            {
-                if(_arrowInterpolationTimer > 0f)
-                {
-                    _arrowInterpolationTimer -= Time.deltaTime; 
-                }
-            }
-
             if (_arrowInterpolationTimer > 0f)
             {
-                float chargeRate = (_arrowInterpolationTimer / _arrowInterpolationTime);
+                float chargeRate = _arrowInterpolationTimer / _arrowInterpolationTime;
                 if (IsArrowCharging || IsArrowReleasing)
                 {
                     var arrowDestination = _cameraTransform.position + _cameraTransform.forward * _arrowTargetDistance;
@@ -68,7 +63,7 @@ public class PlayerBowController : MonoBehaviour
         }
     }
 
-    public void ArrowCharge()
+    public float ArrowCharge()
     {
         if (!IsArrowCharging)
         {
@@ -79,8 +74,11 @@ public class PlayerBowController : MonoBehaviour
             _animator.SetBool(Charge, true);
             _animator.SetLayerWeight(_aimJumpLayerIndex, 1);
         }
-        _animator.SetLayerWeight(_arrowMotionLayerIndex, (_arrowChargeTimer / _arrowChargeTime));
-        _arrowChargeTimer += Time.deltaTime;
+
+        var chargeRate = _arrowChargeTimer / _arrowChargeTime;
+        _animator.SetLayerWeight(_arrowMotionLayerIndex, 1);
+        if(_arrowChargeTimer < _arrowChargeTime) _arrowChargeTimer += Time.deltaTime;
+        return chargeRate;
     }
     public void ArrowRelease(bool canceled)
     {

@@ -21,11 +21,15 @@ public class PlayerCameraController : MonoBehaviour
     private Vector2 _currentInput;
     private float _rotationX;
     private float _rotationY;
+    private CameraMode _currentCameraMode;
+    private Vector3 _currentOffset;
+    [HideInInspector] public float ArrowChargeRate;
 
     private void Start()
     {
         _defaultTargetPosition = _cameraLookAtTarget.localPosition;
         _transposer = _virtualCamera.GetCinemachineComponent<CinemachineTransposer>();
+        _currentOffset = _normalFollowOffset;
     }
     private void FixedUpdate()
     {
@@ -37,10 +41,15 @@ public class PlayerCameraController : MonoBehaviour
         var playerPosition = _playerTransform.position;
         _cameraLookAtTarget.position = playerPosition + _defaultTargetPosition;
         _cameraLookAtTarget.rotation = Quaternion.Euler(-_rotationY, _rotationX, 0f);
+        if (_currentCameraMode == CameraMode.Aim)
+        {
+            _transposer.m_FollowOffset = Vector3.Lerp(_normalFollowOffset, _aimFollowOffset, ArrowChargeRate);
+        }
     }
 
     public void ChangeMode(CameraMode cameraMode)
     {
+        _currentCameraMode = cameraMode;
         switch (cameraMode)
         {
             case CameraMode.Normal:
@@ -48,7 +57,6 @@ public class PlayerCameraController : MonoBehaviour
                 _reticuleImage.SetActive(false);
                 break;
             case CameraMode.Aim:
-                _transposer.m_FollowOffset = _aimFollowOffset;
                 _reticuleImage.SetActive(true);
                 break;
         }

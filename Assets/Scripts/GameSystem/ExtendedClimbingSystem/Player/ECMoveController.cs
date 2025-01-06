@@ -6,10 +6,7 @@ using UnityEngine;
 
 public class ECMoveController : MonoBehaviour
 {
-    [SerializeField] private float _footIKWeightIncreaseRate = 0.5f;
-    [SerializeField] private float _maxFootIKWeight = 0.6f;
-    [SerializeField] private Vector3 _footIKOffset;
-    [SerializeField] private float _forwardSpeed;
+    [SerializeField] private float _moveSpeed;
     [SerializeField , Range(0f , 1f)] private float _moveInputThreshold;
     [SerializeField , Range(0f , 1f)] private float _aimSpeedDecrease;
     [SerializeField , Range(0f , 50f)] private float _stoppingRate;
@@ -33,28 +30,24 @@ public class ECMoveController : MonoBehaviour
     [SerializeField] private float _wallCheckRayRadius = 0.3f;
     private Vector3 _currentVelocity;
 
-    [HideInInspector] public bool IsSwimming;
     [HideInInspector] public bool IsLanding;
     [HideInInspector] public bool IsGround;
     [HideInInspector] public bool CanWalk;
     [HideInInspector] public bool IsClimbing;
     [HideInInspector] public Vector3 GroundNormal = Vector3.up;
     private int _baseLayerIndex;
-    private float _currentFootIKWeight;
     private ObservableStateMachineTrigger _stateMachineTrigger;
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int JumpHash = Animator.StringToHash("Jump");
     private static readonly int IsGroundHash = Animator.StringToHash("IsGround");
     private static readonly int InputXHash = Animator.StringToHash("InputX");
     private static readonly int InputYHash = Animator.StringToHash("InputY");
-    private static readonly int SwimHash = Animator.StringToHash("Swim");
-    private Vector3 _leftFootIKLineFrom, _leftFootIKLineTo;
-    private Vector3 _rightFootIKLineFrom, _rightFootIKLineTo;
+    private static readonly int DirectionHash = Animator.StringToHash("Direction");
     private float _normalForwardSpeed;
     public Animator Animator => _animator;
     private void Start()
     {
-        _normalForwardSpeed = _forwardSpeed;
+        _normalForwardSpeed = _moveSpeed;
         _baseLayerIndex = _animator.GetLayerIndex("BaseLayer");
         _stateMachineTrigger = _stateMachineTrigger = _animator.GetBehaviours<ObservableStateMachineTrigger>()[_baseLayerIndex];
     }
@@ -66,12 +59,10 @@ public class ECMoveController : MonoBehaviour
         var prevY = _animator.GetFloat(InputYHash);
         _animator.SetFloat(InputXHash, Mathf.SmoothStep(prevX, PlayerInputProvider.Instance.MoveValue.x, Time.deltaTime * 15f));
         _animator.SetFloat(InputYHash, Mathf.SmoothStep(prevY, PlayerInputProvider.Instance.MoveValue.y, Time.deltaTime * 15f));
-        if (_currentFootIKWeight < _maxFootIKWeight) _currentFootIKWeight += Time.deltaTime * _footIKWeightIncreaseRate;
     }
     
     public void JumpStart()
     {
-        if (IsSwimming) return;
         StartCoroutine(JumpCoroutine());
     }
 
@@ -102,13 +93,13 @@ public class ECMoveController : MonoBehaviour
             .OnStateExitAsObservable()
             .Where(x => x.LayerIndex == _baseLayerIndex && x.StateInfo.IsName("Landing"))
             .Select(_ => Unit.Default)
-            .Merge(Observable.Timer(TimeSpan.FromSeconds(1)))
+            .Merge(Observable.Timer(TimeSpan.FromSeconds(0.3f)))
             .Subscribe(_ => IsLanding = false)
             .AddTo(this);
     }
 
     
-    public void MovePlayer(Vector2 input , bool IsAiming , in Transform _playerCameraTransform)
+    public void MovePlayer(Vector2 input , bool IsAiming , in Transform _playerCameraTransform, bool isAttack)
     {
         var forward = _playerCameraTransform.forward;
         var right = _playerCameraTransform.right;
@@ -129,15 +120,17 @@ public class ECMoveController : MonoBehaviour
             }
         }
         
-        if (!IsLanding && Mathf.Abs(input.magnitude) > _moveInputThreshold)
+        if (!IsLanding && input != Vector2.zero && !isAttack)
         {
+            _animator.SetFloat(DirectionHash, input.x);
+            var inputPower = input.magnitude;
             var moveX = new Vector3(forward.x, 0f, forward.z).normalized * input.y;
             var moveZ = new Vector3(right.x, 0f, right.z).normalized * input.x;
-            var dir = ((moveX + moveZ).magnitude < 1f ? (moveX + moveZ) : (moveX + moveZ).normalized);
+            var dir = (moveX + moveZ).normalized;
             if (IsAiming)
             {
                 //エイム時カメラ基準で移動を行う
-                var velocity = dir * (_forwardSpeed * _aimSpeedDecrease);
+                var velocity = dir * (inputPower * _moveSpeed * _aimSpeedDecrease);
                 _rigidBody.velocity = new Vector3(velocity.x, _rigidBody.velocity.y, velocity.z);
             }
             else
@@ -153,32 +146,12 @@ public class ECMoveController : MonoBehaviour
                 {
                     _playerTransform.forward = dir;
                 }
-                var velocity = _playerTransform.forward * (dir.magnitude * _forwardSpeed);
+
+                var velocity = dir * (inputPower * _moveSpeed);
                 _currentVelocity = velocity;
-                // var centerPos = _playerCapsule.transform.position + _playerCapsule.center;
-                // var radius = _playerCapsule.radius;
-                // var halfHeight = _playerCapsule.height / 2.0f;
-                // var pos1 = centerPos + _playerCapsule.transform.up * halfHeight;
-                // var pos2 = centerPos - _playerCapsule.transform.up * halfHeight;
-                // if (!IsGround && Physics.CapsuleCast(pos1, pos2, radius, new Vector3(velocity.x, 0, velocity.z), out RaycastHit hit, _wallCheckRayLength, _wallLayer) 
-                //     && Vector3.Angle(hit.normal, Vector3.up) >= _wallAngle)
-                // {
-                //     _rigidBody.velocity = new Vector3(0, _rigidBody.velocity.y, 0);
-                // }
-                // else
-                // {
-                //     if (!_jumpTrigger && CanWalk)
-                //     {
-                //         _rigidBody.velocity = Vector3.ProjectOnPlane(new Vector3(velocity.x, 0, velocity.z), GroundNormal).normalized * _forwardSpeed;
-                //     }
-                //     else
-                //     {
-                //         _rigidBody.velocity = new Vector3(velocity.x, _rigidBody.velocity.y, velocity.z);
-                //     }
-                // }
                 if (!_jumpTrigger && CanWalk)
                 {
-                    _rigidBody.velocity = Vector3.ProjectOnPlane(new Vector3(velocity.x, 0, velocity.z), GroundNormal).normalized * _forwardSpeed;
+                    _rigidBody.velocity = Vector3.ProjectOnPlane(new Vector3(velocity.x, 0, velocity.z), GroundNormal).normalized * (inputPower *  _moveSpeed);
                 }
                 else
                 {
@@ -191,74 +164,11 @@ public class ECMoveController : MonoBehaviour
             _rigidBody.velocity = Vector3.Lerp(_rigidBody.velocity, new Vector3(0f, _rigidBody.velocity.y, 0f), _stoppingRate * Time.fixedDeltaTime);
         }
     }
-
-    private void OnAnimatorIK(int layerIndex)
-    {
-        if (!IsGround || IsClimbing || IsSwimming)
-        {
-            _currentFootIKWeight = 0;
-            return;
-        }
-
-        Vector3 leftFoot = _animator.GetBoneTransform(HumanBodyBones.LeftFoot).position;
-        Vector3 rightFoot = _animator.GetBoneTransform(HumanBodyBones.RightFoot).position;
-        
-        leftFoot = GetFootPoint(leftFoot + Vector3.up, leftFoot, 0.8f, false);
-        rightFoot = GetFootPoint(rightFoot + Vector3.up, rightFoot, 0.8f, true);
-        
-        _animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, _currentFootIKWeight);
-        _animator.SetIKPosition(AvatarIKGoal.LeftFoot, leftFoot);
-        _animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, _currentFootIKWeight);
-        _animator.SetIKPosition(AvatarIKGoal.RightFoot, rightFoot);
-    }
-
-    Vector3 GetFootPoint(Vector3 upperLeg, Vector3 foot, float addDistance, bool isRight)
-    {
-        var prevFoot = foot;
-        var vector = (foot - upperLeg).normalized;
-        foot += vector * addDistance;
-        if (isRight)
-        {
-            _rightFootIKLineFrom = upperLeg;
-            _rightFootIKLineTo = foot;
-        }
-        else
-        {
-            _leftFootIKLineFrom = upperLeg;
-            _leftFootIKLineTo = foot;
-        }
-        if (Physics.Linecast(upperLeg, foot, out var hit, ~_playerLayer))
-        {
-            return hit.point + _footIKOffset;
-        }
-
-        return prevFoot;
-    }
-
-    private void OnCollisionStay(Collision other)
-    {
-        if (other.transform.CompareTag("Water"))
-        {
-            IsSwimming = true;
-            _forwardSpeed = _normalForwardSpeed * 0.35f;
-            _animator.SetBool(SwimHash, true);
-        }
-    }
-
-    private void OnCollisionExit(Collision other)
-    {
-        IsSwimming = false;
-        _forwardSpeed = _normalForwardSpeed;
-        _animator.SetBool(SwimHash, false);
-    }
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
         Gizmos.DrawLine(_wallCheckRayPoint.position, _wallCheckRayPoint.position + new Vector3(_currentVelocity.x, 0, _currentVelocity.z) * _wallCheckRayLength);
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawLine(_leftFootIKLineFrom, _leftFootIKLineTo);
-        Gizmos.DrawLine(_rightFootIKLineFrom, _rightFootIKLineTo);
     }
 #endif
 }

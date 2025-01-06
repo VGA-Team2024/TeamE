@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
 public class ECPlayerController : MonoBehaviour
 {
+    private static readonly int ClimbJumpHash = Animator.StringToHash("ClimbJump");
+    private static readonly int FallDistanceHash = Animator.StringToHash("FallDistance");
     [SerializeField] private float _climbHoppingLimit = 0.2f;
     [SerializeField] private Material _vineMat;
     [SerializeField] private RASCALSkinnedMeshCollider _rascalSkinnedMesh;
@@ -18,125 +20,70 @@ public class ECPlayerController : MonoBehaviour
     [SerializeField] private float _groundCheckRayCastOffsetY;
     [SerializeField] private float _groundCheckRayCastLength;
     [SerializeField] private GameObject _bowObject;
-    [SerializeField] Transform _playerCameraTransform;
-    [SerializeField] Rigidbody _rigidBody;
+    [SerializeField] private Transform _playerCameraTransform;
+    [SerializeField] private Rigidbody _rigidBody;
     [SerializeField] private ECMoveController _playerMoveController;
     [SerializeField] private PlayerBowController _playerBowController;
     [SerializeField] private PlayerCameraController _playerCameraController;
     [SerializeField] private ECClimbController _playerClimbController;
-    [SerializeField] private BoneChecker _boneChecker;
-
+    [SerializeField] private PlayerHealthCalculator _playerHealthCalculator;
+    [SerializeField] private PlayerAttackController _playerAttackController;
     [SerializeField] private float _overlapSphereOffset = 0.8f;
     [SerializeField] private float _overlapSphereRadius = 0.8f;
     [SerializeField] private CapsuleCollider _capsuleCollider;
-    private Vector3 _overlapSphereOrigin;
-    
     public bool IsAiming;
     public bool IsArrowReleasing;
     public bool IsArrowCharging;
     public bool IsJumping;
     public bool PreviousIsGround = true;
-    public bool IsGround = true;
-    public ReactiveProperty<bool> IsClimbable = new();
+    public ReactiveProperty<bool> IsGround = new(true);
     public bool IsClimbing;
     public bool IsClimbPullUp;
     public bool IsLanding;
     private RaycastHit _climeTargetHit;
-    private Vector2 _currentMoveInput;
-    private float _ignoreGroundTimer; //ジャンプ時等に一時的に接地判定を無視するためのタイマー
-    //private BoneContainer _boneContainer;
-    private Vector3 _currentNormal;
     private Vector3 _currentClosestPoint;
-    private Vector3 _prevPos;
+    private Vector2 _currentMoveInput;
+    private Vector3 _currentNormal;
+    private readonly ReactiveProperty<bool> _hasParent = new();
+    private float _ignoreGroundTimer; //ジャンプ時等に一時的に接地判定を無視するためのタイマー
+    private float _highestPoint;
     private bool _isClimbHopping;
-    private static readonly int IsClimbHoppingHash = Animator.StringToHash("IsClimbHopping");
-    
+    private Vector3 _overlapSphereOrigin;
+    private Vector3 _prevPos;
+    public ReactiveProperty<bool> IsClimbable = new();
+
     private void Start()
     {
         PlayerInputProvider.Instance.JumpSubject.Subscribe(_ => Jump()).AddTo(this);
         PlayerInputProvider.Instance.AimSubject.Subscribe(Aim).AddTo(this);
         PlayerInputProvider.Instance.AttackSubject.Subscribe(_ => Attack()).AddTo(this);
-    }
 
-    void Jump()
-    {
-        if (IsClimbing)
-        {
-            _playerClimbController.ClimbJump();
-            _playerClimbController.ClimbEnd();
-            _isClimbHopping = true;
-            _playerMoveController.Animator.SetBool(IsClimbHoppingHash, true);
-            Observable.Timer(TimeSpan.FromSeconds(_climbHoppingLimit)).Subscribe(_ =>
+        IsClimbable.Where(flag => !flag) // falseになった瞬間のみ通す
+            .SelectMany(_ => Observable.Timer(TimeSpan.FromSeconds(0.2f)).TakeUntil(IsClimbable.Where(flag => flag)))
+            .Subscribe(_ => _playerClimbController.ClimbEnd())
+            .AddTo(this);
+        _hasParent.Where(flag => !flag)
+            .SelectMany(_ => Observable.Timer(TimeSpan.FromSeconds(0.2f)).TakeUntil(_hasParent.Where(flag => flag)))
+            .Subscribe(_ =>
             {
-                _isClimbHopping = false;
-                _playerMoveController.Animator.SetBool(IsClimbHoppingHash, false);
-            }).AddTo(this);
-            //climb Cancel
-        }
-        if (IsGround && !IsLanding && !IsJumping)
-        {
-            IsJumping = true;
-            _ignoreGroundTimer = _ignoreGroundTime;
-            _playerMoveController.JumpStart();
-        }
+                _playerMoveController.transform.parent = null;
+                SetLossyScale(_playerMoveController.transform);
+            }) //  元の親に戻す
+            .AddTo(this);
+        IsGround.Where(flag => !flag).Subscribe(_ => _highestPoint = _playerMoveController.transform.position.y).AddTo(this);
     }
 
-    void Aim(InputAction.CallbackContext context)
+    private void UpdateHighestPoint()
     {
-        if (context.started)
+        var currentHeight = _playerMoveController.transform.position.y;
+        if (currentHeight > _highestPoint)
         {
-            IsAiming = true;
-            _bowObject.SetActive(true);
-            _playerCameraController.ChangeMode(CameraMode.Aim);
+            _highestPoint = currentHeight;
         }
-
-        if (context.canceled)
-        {
-            AimStop();
-            if(IsArrowCharging)
-            {
-                _playerBowController.ArrowRelease(canceled:false);
-            } 
-        }
-    }
-
-    void AimStop()
-    {
-        IsAiming = false;
-        _bowObject.SetActive(false);
-        _playerCameraController.ChangeMode(CameraMode.Normal);
-    }
-    void Attack()
-    {
-        AimStop();
-        if (IsArrowCharging)
-        {
-            _playerBowController.ArrowRelease(canceled:true);
-        }
-    }
-    Material GetMaterial(Collider collider)
-    {
-        foreach (var skinfo in _rascalSkinnedMesh.skinfos) 
-        {
-            foreach (var bone in skinfo.bones) 
-            {
-                foreach (var boneMesh in bone.boneMeshes) 
-                {
-                    if (boneMesh.meshCol == collider) 
-                    {
-                        return skinfo.skinnedMesh.sharedMaterials[boneMesh.skinnedMeshMaterialIndex];
-                    }
-                }
-            }
-        }
-        return null;
     }
     private void Update()
     {
-        if (IsAiming)
-        {
-            _playerBowController.ArrowCharge();
-        }
+        if (IsAiming) _playerCameraController.ArrowChargeRate = _playerBowController.ArrowCharge();
         _currentMoveInput = PlayerInputProvider.Instance.MoveValue;
 
         IsLanding = _playerMoveController.IsLanding;
@@ -148,55 +95,58 @@ public class ECPlayerController : MonoBehaviour
 
         if (_ignoreGroundTimer < Mathf.Epsilon)
         {
-            IsGround = Physics.SphereCast(_rigidBody.position + new Vector3(0f, _groundCheckRayCastOffsetY, 0f),
-                _capsuleCollider.radius , Vector3.down, out var hitGround, 
+            IsGround.Value = Physics.SphereCast(_rigidBody.position + new Vector3(0f, _groundCheckRayCastOffsetY, 0f),
+                _capsuleCollider.radius, Vector3.down, out var hitGround,
                 _groundCheckRayCastLength - _capsuleCollider.radius, _groundCheckRayCastLayerMask);
-            if (IsGround)
+            if (IsGround.Value)
             {
                 _playerMoveController.GroundNormal = hitGround.normal;
                 _playerMoveController.CanWalk = Vector3.Angle(hitGround.normal, Vector3.up) < _wallAngle;
-                _playerMoveController.transform.SetParent(hitGround.transform);
+                //_playerMoveController.transform.parent = hitGround.collider.transform;
+                //SetLossyScale(_playerMoveController.transform);
+                _hasParent.Value = true;
             }
             else
             {
                 _playerMoveController.GroundNormal = Vector3.up;
                 _playerMoveController.CanWalk = false;
-                _playerMoveController.transform.SetParent(transform);
+                _hasParent.Value = false;
+                UpdateHighestPoint();
             }
-            _playerMoveController.IsGround = IsGround;
-            _playerMoveController.SetIsGround(IsGround);
-            if (IsGround)
+
+            _playerMoveController.IsGround = IsGround.Value;
+            _playerMoveController.SetIsGround(IsGround.Value);
+            if (IsGround.Value)
             {
-                if (!IsClimbPullUp && !IsLanding && !PreviousIsGround && IsGround)
+                if (!IsClimbPullUp && !IsLanding && !PreviousIsGround && IsGround.Value)
                 {
                     _playerMoveController.Landing();
+                    _playerHealthCalculator.FallDamage(_highestPoint, _playerMoveController.transform.position.y);
+                    _playerMoveController.Animator.SetFloat(FallDistanceHash, _highestPoint - _playerMoveController.transform.position.y);
                 }
                 if (!IsLanding)
-                {
                     if (IsJumping)
-                    {
                         IsJumping = false;
-                    }
-                    // if (IsClimbing && !IsClimbPullUp)
-                    // {
-                    //     _playerClimbController.ClimbEnd();
-                    // }
-                }
-
+                // if (IsClimbing && !IsClimbPullUp)
+                // {
+                //     _playerClimbController.ClimbEnd();
+                // }
             }
-            PreviousIsGround = IsGround;
+
+            PreviousIsGround = IsGround.Value;
         }
         else
         {
-            IsGround = false;
+            IsGround.Value = false;
             _ignoreGroundTimer -= Time.deltaTime;
         }
 
         var castOrigin = _playerClimbRayPoint.position;
         _overlapSphereOrigin = castOrigin;
-        IsClimbable.Value = Physics.SphereCast(castOrigin, _overlapSphereRadius, _playerMoveController.transform.forward,
-            out RaycastHit hitWall, _overlapSphereRadius,
-            _climbLayerMask) && PlayerInputProvider.Instance.Grab && !_isClimbHopping;
+        IsClimbable.Value = Physics.SphereCast(castOrigin, _overlapSphereRadius,
+            _playerMoveController.transform.forward,
+            out var hitWall, _overlapSphereRadius,
+            _climbLayerMask) && (PlayerInputProvider.Instance.Grab || _playerAttackController.IsAttack) && !_isClimbHopping;
         if (IsClimbable.Value)
         {
             if (hitWall.collider is MeshCollider)
@@ -212,117 +162,136 @@ public class ECPlayerController : MonoBehaviour
                     IsClimbable.Value = false;
                 }
             }
-            else 
-            {
-                IsClimbable.Value = hitWall.transform.CompareTag("ClimbableWall");
-            }
+
+            IsClimbable.Value = hitWall.transform.CompareTag("ClimbableWall");
         }
 
         if (IsClimbable.Value)
         {
             _currentNormal = hitWall.normal;
             _currentClosestPoint = hitWall.point;
-
-            _playerMoveController.transform.SetParent(hitWall.transform);
+            //_playerMoveController.transform.parent = hitWall.collider.transform;
+            //SetLossyScale(_playerMoveController.transform);
+            _hasParent.Value = true;
         }
         else
         {
-            _playerMoveController.transform.SetParent(transform);
+            _hasParent.Value = false;
         }
-        // var hitColliders = Physics.OverlapSphere(castOrigin, #latest
-        //     _overlapSphereRadius, _climbLayerMask);
-        //
-        // foreach (var c in hitColliders)
-        // {
-        //     if (c is MeshCollider && c.TryGetComponent(out MeshUpdater updater))
-        //     {
-        //         var tris = new int[3];
-        //         _currentClosestPoint = updater.ClosestPoint(castOrigin, out tris);
-        //         var vertices = updater.BakedMesh.vertices;
-        //         var subA = vertices[tris[1]] - vertices[tris[0]];
-        //         var subB = vertices[tris[2]] - vertices[tris[0]];
-        //         _currentNormal = new Vector3(
-        //             subA.y * subB.z - subA.z * subB.y, 
-        //             subA.z * subB.x - subA.x * subB.z,
-        //             subA.x * subB.y - subA.y * subB.x).normalized;
-        //     }
-        //     else
-        //     {
-        //         _currentClosestPoint = c.ClosestPoint(castOrigin);
-        //         _currentNormal = (castOrigin - _currentClosestPoint).normalized;
-        //     }
-        // }
-        //
-        //
-        // //壁の判定
-        // IsClimbable.Value = hitColliders.Length > 0;
-        
-        
-        // if (_boneChecker.BoneContainer) #latest
-        // {
-        //     (float dist, Transform trans) minDistance = (float.MaxValue, null);
-        //     foreach (var bone in _boneChecker.BoneContainer.Bones)
-        //     {
-        //         var distance = (bone.position - _playerMoveController.transform.position).sqrMagnitude;
-        //         if (minDistance.dist > distance)
-        //         {
-        //             minDistance = (distance, bone);
-        //         }
-        //     }
-        //     _playerMoveController.transform.SetParent(minDistance.trans);
-        // }
-        // else
-        // {
-        //     _playerMoveController.transform.SetParent(transform);
-        // }
-        
-        //  登っている途中で壁の判定が取れないかつ登りあがる処理が行われていなければければ登るのをやめる
-        // if(IsClimbing && !IsClimbable.Value && !IsClimbPullUp)
-        // {
-        //     _playerClimbController.ClimbEnd();
-        // }
 
-        IsClimbable.Where(flag => !flag) // falseになった瞬間のみ通す
-            .SelectMany(_ => Observable.Timer(TimeSpan.FromSeconds(0.2f))) // 指定時間のタイマーを開始
-            .TakeUntil(IsClimbable.Where(flag => flag)) // フラグがtrueになったらキャンセル
-            .Subscribe(_ =>
-            {
-                if (IsClimbing && !IsClimbPullUp)
-                {
-                    _playerClimbController.ClimbEnd();
-                }
-            })
-            .AddTo(this);
-        if(!_playerMoveController.IsLanding && !IsAiming && IsClimbable.Value /*&& Vector3.Dot(-_currentNormal, _playerMoveController.transform.TransformDirection(new Vector3(_currentMoveInput.x , 0f , _currentMoveInput.y))) > _playerClimbThreshold*/)
+        if (!_playerMoveController.IsLanding && !IsAiming && IsClimbable.Value && !IsClimbing)
         {
             _ignoreGroundTimer = _ignoreGroundTime;
-            _playerClimbController.ClimbStart(hitWall: _climeTargetHit, _currentNormal, _currentClosestPoint);
+            _playerClimbController.ClimbStart(_climeTargetHit, _currentNormal, _currentClosestPoint);
             //ClimbStart
         }
     }
 
     private void FixedUpdate()
     {
-        if(IsClimbable.Value && IsClimbing || IsClimbPullUp)
+        if ((IsClimbable.Value && IsClimbing) || IsClimbPullUp)
         {
-            _playerClimbController.ClimbMove(_currentMoveInput , _climeTargetHit, _currentNormal, _currentClosestPoint);
+            _playerClimbController.ClimbMove(_currentMoveInput, _climeTargetHit, _currentNormal, _currentClosestPoint, _playerAttackController.IsAttack);
         }
-        else if(!_isClimbHopping)
+        else if (!_isClimbHopping)
         {
-            _playerMoveController.MovePlayer(_currentMoveInput , IsAiming , _playerCameraTransform);
+            _playerMoveController.MovePlayer(_currentMoveInput, IsAiming, _playerCameraTransform, _playerAttackController.IsAttack);
         }
 
-        _prevPos = _playerMoveController.transform.position;
+        //_prevPos = _playerMoveController.transform.position;
     }
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(_overlapSphereOrigin + _playerMoveController.transform.forward * _overlapSphereRadius, _overlapSphereRadius);
-        Gizmos.DrawLine(_playerClimbRayPoint.position, _playerClimbRayPoint.position + _playerClimbRayPoint.forward * _playerClimbRayLength);
+        Gizmos.DrawWireSphere(_overlapSphereOrigin + _playerMoveController.transform.forward * _overlapSphereRadius,
+            _overlapSphereRadius);
+        Gizmos.DrawLine(_playerClimbRayPoint.position,
+            _playerClimbRayPoint.position + _playerClimbRayPoint.forward * _playerClimbRayLength);
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(_currentClosestPoint, 0.1f);
         Gizmos.DrawLine(_currentClosestPoint, _currentClosestPoint + _currentNormal * 5);
     }
 #endif
+
+    private void Jump()
+    {
+        if (_playerAttackController.IsAttack) return;
+        if (IsClimbing)
+        {
+            _playerMoveController.Animator.SetTrigger(ClimbJumpHash);
+            Observable.Timer(TimeSpan.FromSeconds(0.23f)).Subscribe(_ =>
+            {
+                _isClimbHopping = true;
+                _playerClimbController.ClimbJump();
+            }).AddTo(this);
+            Observable.Timer(TimeSpan.FromSeconds(0.53f)).Subscribe(_ =>
+            {
+                _isClimbHopping = false;
+                _playerClimbController.ClimbEnd();
+            }).AddTo(this);
+        }
+
+        if (IsGround.Value && !IsLanding && !IsJumping)
+        {
+            IsJumping = true;
+            _ignoreGroundTimer = _ignoreGroundTime;
+            _playerMoveController.JumpStart();
+        }
+    }
+
+    private void Aim(InputAction.CallbackContext context)
+    {
+        if (context.started && !_playerAttackController.IsAttack)
+        {
+            IsAiming = true;
+            _bowObject.SetActive(true);
+            _playerCameraController.ChangeMode(CameraMode.Aim);
+        }
+
+        if (context.canceled)
+        {
+            AimStop();
+            if (IsArrowCharging) _playerBowController.ArrowRelease(false);
+        }
+    }
+
+    private void AimStop()
+    {
+        IsAiming = false;
+        _bowObject.SetActive(false);
+        _playerCameraController.ChangeMode(CameraMode.Normal);
+    }
+
+    private void Attack()
+    {
+        AimStop();
+        if (IsArrowCharging) _playerBowController.ArrowRelease(true);
+        _playerAttackController.Attack(IsClimbing, _playerMoveController.Animator);
+    }
+
+    private Material GetMaterial(Collider collider)
+    {
+        if (!_rascalSkinnedMesh) return null;
+        foreach (var skinfo in _rascalSkinnedMesh.skinfos)
+        foreach (var bone in skinfo.bones)
+        foreach (var boneMesh in bone.boneMeshes)
+            if (boneMesh.meshCol == collider)
+                return skinfo.skinnedMesh.sharedMaterials[boneMesh.skinnedMeshMaterialIndex];
+        return null;
+    }
+
+    private void SetLossyScale(Transform target)
+    {
+        if (target.parent)
+        {
+            var worldDirectionLocalScale = target.parent.TransformDirection(Vector3.one);
+            var scaleUnaffectedByParents = target.parent.InverseTransformVector(worldDirectionLocalScale);
+            target.localScale = scaleUnaffectedByParents;
+        }
+        else
+        {
+            target.localScale = Vector3.one;
+        }
+    }
 }

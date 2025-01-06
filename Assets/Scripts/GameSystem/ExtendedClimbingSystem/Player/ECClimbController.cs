@@ -49,7 +49,7 @@ public class ECClimbController : MonoBehaviour
         //_animator.enabled = false;
         _rigidBody.position = new Vector3(point.x , _rigidBody.position.y , point.z) + normal * _wallDistance;
     }
-    public void ClimbMove(Vector2 input, RaycastHit hitWall, Vector3 normal, Vector3 closestPoint)
+    public void ClimbMove(Vector2 input, RaycastHit hitWall, Vector3 normal, Vector3 closestPoint, bool isAttack)
     {
         if (IsPullUp) return;
         _pullUpRayFrom = _climbUpRayCastPoint.position;
@@ -74,38 +74,35 @@ public class ECClimbController : MonoBehaviour
         // }
 
         Plane plane = new Plane(normal, closestPoint);
+        // _rigidBody.position = plane.ClosestPointOnPlane(_rigidBody.position) + normal * _wallDistance;
+        // _rigidBody.transform.forward = -normal;
         _rigidBody.transform.position = Vector3.Lerp(_rigidBody.transform.position, plane.ClosestPointOnPlane(_rigidBody.transform.position) + normal * _wallDistance, 10f * Time.fixedDeltaTime);
-        //plane.ClosestPointOnPlane(_rigidBody.transform.position) + normal * _wallDistance;
-        _rigidBody.transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(-normal), 10f * Time.fixedDeltaTime);
-        //_rigidBody.transform.forward = -normal;
-       
+        _rigidBody.transform.rotation = Quaternion.Lerp(_rigidBody.transform.rotation, Quaternion.LookRotation(-normal), 10f * Time.fixedDeltaTime);
+
+        if (isAttack)
+        {
+            _rigidBody.velocity = Vector3.zero;
+            return;
+        }
         // 壁に対しての軸を計算
-        Vector3 moveDir;
-        if (Vector3.up.Equals(normal))
-        {
-            moveDir = new Vector3(input.x, 0, input.y);
-        }
-        else
-        {
-            Vector3 xAxis = Vector3.Cross(Vector3.up, normal).normalized;
-            Vector3 yAxis = Vector3.Cross(normal, xAxis).normalized;
-            
-            moveDir = -xAxis * input.x + yAxis * input.y;
-            moveDir = moveDir.magnitude > 1f ? moveDir.normalized : moveDir;
-        }
+        Vector3 xAxis = Vector3.Cross(transform.up, normal).normalized;
+        Vector3 yAxis = Vector3.Cross(normal, xAxis).normalized;
+        
+        Vector3 moveDir = -xAxis * input.x + yAxis * input.y;
+        moveDir = moveDir.magnitude > 1f ? moveDir.normalized : moveDir;
 
         // 結果のベクトルを適用（壁に対して並行に移動）
         _rigidBody.velocity = moveDir * _climbSpeed;
 
-        float animateDeltaTime = Time.fixedDeltaTime * moveDir.magnitude;
-        if (input.y > 0f)
-        {
-            _animator.Update(animateDeltaTime);
-        }
-        else
-        {
-            _animator.Update(animateDeltaTime);
-        }
+        // float animateDeltaTime = Time.fixedDeltaTime * moveDir.magnitude;
+        // if (input.y > 0f)
+        // {
+        //     _animator.Update(animateDeltaTime);
+        // }
+        // else
+        // {
+        //     _animator.Update(animateDeltaTime);
+        // }
     }
     public void PullUp(Vector3 goalPos)
     {
@@ -163,22 +160,12 @@ public class ECClimbController : MonoBehaviour
 
     public void ClimbJump()
     {
-        //ClimbEnd();
-        var moveValue = PlayerInputProvider.Instance.MoveValue;
-        Vector3 moveDir;
-        if (Vector3.up.Equals(-transform.forward))
-        {
-            moveDir = new Vector3(moveValue.x, 0, moveValue.y);
-        }
-        else
-        {
-            Vector3 xAxis = Vector3.Cross(Vector3.up, -transform.forward).normalized;
-            Vector3 yAxis = Vector3.Cross(-transform.forward, xAxis).normalized;
-            
-            moveDir = -xAxis * moveValue.x + yAxis * moveValue.y;
-            moveDir = moveDir.magnitude > 1f ? moveDir.normalized : moveDir;
-        }
-
+        var input = PlayerInputProvider.Instance.MoveValue;
+        Vector3 normal = -transform.forward;
+        Vector3 xAxis = Vector3.Cross(transform.up, normal).normalized;
+        Vector3 yAxis = Vector3.Cross(normal, xAxis).normalized;
+        Vector3 moveDir = -xAxis * input.x + yAxis * input.y;
+        moveDir = moveDir.magnitude > 1f ? moveDir.normalized : moveDir;
         // 結果のベクトルを適用（壁に対して並行に移動）
         _rigidBody.velocity = moveDir * _climbJumpPower;
     }
