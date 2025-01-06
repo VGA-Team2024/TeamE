@@ -15,6 +15,7 @@
         public void StartButton()
         {
             _fadeSceneTransition.CollCoroutine();
+            GameEventRecorder.GameStart();
         }
 
         public void OptionButton()
