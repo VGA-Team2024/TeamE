@@ -43,7 +43,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: standardSurface2
-    second: {fileID: 2100000, guid: 59392c83fb0712640bf8c580def1e003, type: 2}
+    second: {fileID: 2100000, guid: b348098112c0e894db32fdae34a078bb, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -72,7 +72,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages: []
     globalScale: 1
