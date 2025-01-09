@@ -189,7 +189,7 @@ public class CRIAudioManager
         SoundType _type;
         protected float _volume = 1.0f;
         protected CriAtomExPlayer _atomExPlayer;
-        protected CriAtomExPlayback _playbackMemory;    //直前のものしか覚えていない
+        protected CriAtomExPlayback _playbackMemory; //直前のものしか覚えていない
 
         public bool IsPlaying => _atomExPlayer.GetStatus() == CriAtomExPlayer.Status.Playing;
 
@@ -252,9 +252,10 @@ public class CRIAudioManager
             CueInfo info = _instance._soundDic[cueSheet].GetCueInfo(cueName);
             _atomExPlayer.SetCue(_instance._soundDic[cueSheet].GetAcb(), info.id);
             _atomExPlayer.SetPreDelayTime(delay);
-            _playbackMemory = _atomExPlayer.Start();    //最後に再生したものを記録
+            _playbackMemory = _atomExPlayer.Start(); //最後に再生したものを記録
             return this;
         }
+
         public virtual SoundPlayer Play(string cueSheet, int cueId, float delay = 0.0f)
         {
             // 準備待ちの時は準備終わり次第再生
@@ -271,6 +272,7 @@ public class CRIAudioManager
             }
 
             var acb = _instance._soundDic[cueSheet].GetAcb();
+            Debug.Log($"{acb}");
             if (acb == null)
             {
                 Debug.LogError($"ACB is null for CueSheet:{cueSheet}");
@@ -348,7 +350,8 @@ public class CRIAudioManager
                     Debug.LogError($"CueSheet:{cueSheet}が見つかりません");
                 }
 
-                if (_instance._soundDic[cueSheet] == null || _instance._soundDic[cueSheet].IaContainsKey(cueName) == false)
+                if (_instance._soundDic[cueSheet] == null ||
+                    _instance._soundDic[cueSheet].IaContainsKey(cueName) == false)
                 {
                     Debug.LogError($"CueName:{cueName}が見つかりません");
                 }
