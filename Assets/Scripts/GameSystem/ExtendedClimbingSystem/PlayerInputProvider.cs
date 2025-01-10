@@ -1,6 +1,7 @@
 using R3;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerInputProvider : SingletonMonoBehavior<PlayerInputProvider>
 {
@@ -32,6 +33,7 @@ public class PlayerInputProvider : SingletonMonoBehavior<PlayerInputProvider>
         _gameInputs.Player.Attack.started += OnAttack;
         _gameInputs.Player.Grab.started += OnGrab;
         _gameInputs.Player.Grab.canceled += OnGrab;
+        _gameInputs.Player.Pause.started += OnPause;
         _gameInputs.Enable();
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -66,5 +68,13 @@ public class PlayerInputProvider : SingletonMonoBehavior<PlayerInputProvider>
     void OnGrab(InputAction.CallbackContext context)
     {
         _grab = context.started;
+    }
+    void OnPause(InputAction.CallbackContext context)
+    {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        SceneManager.LoadScene("Title");
+        _gameInputs.Dispose();
+        Destroy(gameObject);
     }
 }
