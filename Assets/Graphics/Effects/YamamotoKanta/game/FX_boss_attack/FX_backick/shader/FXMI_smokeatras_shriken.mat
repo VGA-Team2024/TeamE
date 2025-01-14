@@ -45,6 +45,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: 8a6962113b3a8134ea8e8de49f87cbec, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _maintex:
+        m_Texture: {fileID: 2800000, guid: e3c23602f980b54499673bf8f5a003f8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _steptex:
         m_Texture: {fileID: 2800000, guid: aa1a05e93d59bff418484e63d81d0c6d, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -76,7 +80,7 @@ Material:
     - _stepwarptiley: 1
     - _tile: 1
     - _waro_intesity: 0.01
-    - _warp_speed: 1
+    - _warp_speed: 0.21
     - _warpx: 1
     - _warpy: 2
     m_Colors:

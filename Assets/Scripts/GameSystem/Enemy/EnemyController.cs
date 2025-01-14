@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>敵を制御するクラス</summary>
 public class EnemyController : MonoBehaviour
@@ -18,17 +19,47 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private readonly EnemyNodes.SelectorNode _rootNode = new EnemyNodes.SelectorNode();
     
-    [Header("右前足の攻撃範囲の中心")] 
+    [Header("右前脚の攻撃範囲の中心")] 
     [SerializeField] private Transform rightFrontAttackPosition;
     
-    [Header("左前足の攻撃範囲の中心")] 
+    [Header("左前脚の攻撃範囲の中心")] 
     [SerializeField] private Transform leftFrontAttackPosition;
     
     [Header("胴体の攻撃範囲の中心")] 
     [SerializeField] private Transform centerAttackPosition;
     
-    [Header("後足の攻撃範囲の位置")] 
-    [SerializeField] private Transform backAttackPosition;
+    [Header("右後脚の攻撃範囲の位置")] 
+    [SerializeField] private Transform rightBackAttackPosition;
+    
+    [Header("左後脚の攻撃範囲の位置")] 
+    [SerializeField] private Transform leftBackAttackPosition;
+    
+    [Header("後脚の攻撃コライダー")]
+
+    [SerializeField] private EnemyAttacker rightBackAttackCollider1;
+    
+    [SerializeField] private EnemyAttacker rightBackAttackCollider2;
+    
+    [SerializeField] private EnemyAttacker leftBackAttackCollider1;
+    
+    [SerializeField] private EnemyAttacker leftBackAttackCollider2;
+    
+    [Header("前脚の攻撃コライダー")]
+
+    [SerializeField] private EnemyAttacker rightFrontAttackCollider1;
+    
+    [SerializeField] private EnemyAttacker rightFrontAttackCollider2;
+
+    [SerializeField] private EnemyAttacker leftFrontAttackCollider1;
+    
+    [SerializeField] private EnemyAttacker leftFrontAttackCollider2;
+
+    [Header("胴体の攻撃コライダー")] 
+    
+    [SerializeField] private EnemyAttacker centerAttackCollider;
+
+    private bool _isDown;
+    private bool _isAttacking;
     
     Animator _animator;
     
@@ -62,12 +93,13 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private void SetUpBehaviourTree()
     {
-        _rootNode.Add(SetUpRotateSequence());
-        _rootNode.Add(SetUpChaseSequence());
         _rootNode.Add(SetUpRightFrontAttackSequence());
         _rootNode.Add(SetUpLeftFrontAttackSequence());
         _rootNode.Add(SetUpCenterAttackSequence());
-        _rootNode.Add(SetUpBackAttackSequence());
+        _rootNode.Add(SetUpRightBackAttackSequence());
+        _rootNode.Add(SetUpLeftBackAttackSequence());
+        _rootNode.Add(SetUpRotateSequence());
+        _rootNode.Add(SetUpChaseSequence());
     }
     
     //-------------------------------------------------------------------------------
@@ -152,16 +184,13 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private bool ShouldChasePlayer()
     {
-        if (ShouldRightFrontAttackPlayer() || ShouldCenterAttackPlayer() || ShouldBackAttackPlayer())
+        if (ShouldRightFrontAttackPlayer() || ShouldLeftFrontAttackPlayer() || ShouldCenterAttackPlayer() || 
+            ShouldRightBackAttackPlayer() || ShouldLeftBackAttackPlayer())
         {
-            _animator.SetBool("IsMoving", false);
             return false;
         }
-        else
-        {
-            _animator.SetBool("IsMoving", true);
-            return true;
-        }
+
+        return true;
     }
     
     /// <summary>
@@ -214,8 +243,18 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private EnemyNodes.NodeStatus RightFrontAttack()
     {
-        _animator.SetTrigger(data.frontRightAttackTrigger);
+        _animator.SetTrigger(data.rightFrontAttackTrigger);
+        _isAttacking = true;
         return EnemyNodes.NodeStatus.Success;
+    }
+    
+    /// <summary>
+    /// 右前脚の攻撃コライダーを一時的に有効化する
+    /// </summary>
+    public void TemporarilyActivateRightFrontAttackCollider()
+    {
+        rightFrontAttackCollider1.TemporarilyActivateCollider();
+        rightFrontAttackCollider2.TemporarilyActivateCollider();
     }
     
     //-------------------------------------------------------------------------------
@@ -257,8 +296,18 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private EnemyNodes.NodeStatus LeftFrontAttack()
     {
-        _animator.SetTrigger(data.frontLeftAttackTrigger);
+        _animator.SetTrigger(data.leftFrontAttackTrigger);
+        _isAttacking = true;
         return EnemyNodes.NodeStatus.Success;
+    }
+    
+    /// <summary>
+    /// 左前脚の攻撃コライダーを一時的に有効化する
+    /// </summary>
+    public void TemporarilyActivateLeftFrontAttackCollider()
+    {
+        leftFrontAttackCollider1.TemporarilyActivateCollider();
+        leftFrontAttackCollider2.TemporarilyActivateCollider();
     }
     
     //-------------------------------------------------------------------------------
@@ -300,35 +349,56 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private EnemyNodes.NodeStatus CenterAttack()
     {
+        _animator.SetTrigger(data.centerAttackTrigger);
+        _isAttacking = true;
         return EnemyNodes.NodeStatus.Success;
     }
     
-    //-------------------------------------------------------------------------------
-    // 後足の攻撃シーケンス
-    //-------------------------------------------------------------------------------
-
     /// <summary>
-    /// 後足の攻撃シーケンスを構築するメソッド
+    /// 胴体の攻撃コライダーを一時的に有効化する
     /// </summary>
-    private EnemyNodes.BaseNode SetUpBackAttackSequence()
+    public void TemporarilyActivateCenterAttackCollider()
     {
-        var backAttackSeq = new EnemyNodes.SequenceNode();
-        backAttackSeq.Add(new EnemyNodes.ConditionNode(ShouldBackAttackPlayer));
-        backAttackSeq.Add(new EnemyNodes.ActionNode(BackAttack));
-        return backAttackSeq;
+        centerAttackCollider.TemporarilyActivateCollider();
     }
     
     //-------------------------------------------------------------------------------
-    // 後足の攻撃シーケンスに関連する処理
+    // 後脚の攻撃シーケンス
+    //-------------------------------------------------------------------------------
+
+    /// <summary>
+    /// 右後脚の攻撃シーケンスを構築する
+    /// </summary>
+    private EnemyNodes.BaseNode SetUpRightBackAttackSequence()
+    {
+        var rightBackAttackSeq = new EnemyNodes.SequenceNode();
+        rightBackAttackSeq.Add(new EnemyNodes.ConditionNode(ShouldRightBackAttackPlayer));
+        rightBackAttackSeq.Add(new EnemyNodes.ActionNode(RightBackAttack));
+        return rightBackAttackSeq;
+    }
+
+    /// <summary>
+    /// 左後脚の攻撃シーケンスを構築する
+    /// </summary>
+    private EnemyNodes.BaseNode SetUpLeftBackAttackSequence()
+    {
+        var leftBackAttackSeq = new EnemyNodes.SequenceNode();
+        leftBackAttackSeq.Add(new EnemyNodes.ConditionNode(ShouldLeftBackAttackPlayer));
+        leftBackAttackSeq.Add(new EnemyNodes.ActionNode(LeftBackAttack));
+        return leftBackAttackSeq;
+    }
+    
+    //-------------------------------------------------------------------------------
+    // 後脚の攻撃シーケンスの処理
     //-------------------------------------------------------------------------------
     
     /// <summary>
-    /// プレイヤーを後足で攻撃すべきか（≒プレイヤーが後足の攻撃範囲内にいるか）
+    /// プレイヤーを右後脚で攻撃すべきか（≒プレイヤーが後足の攻撃範囲内にいるか）
     /// </summary>
-    private bool ShouldBackAttackPlayer()
+    private bool ShouldRightBackAttackPlayer()
     {
-        var colliders = Physics.OverlapBox(backAttackPosition.position, 
-            new Vector3(data.backAttackWidth/2, data.backAttackHeight/2, data.backAttackDepth/2));
+        var colliders = Physics.OverlapBox(rightBackAttackPosition.position, 
+            new Vector3(data.backAttackWidth/4, data.backAttackHeight/2, data.backAttackDepth/2));
         
         foreach (var collider in colliders)
         {
@@ -338,12 +408,72 @@ public class EnemyController : MonoBehaviour
     }
     
     /// <summary>
-    /// プレイヤーを後足で攻撃する
+    /// プレイヤーを左後脚で攻撃すべきか（≒プレイヤーが後足の攻撃範囲内にいるか）
     /// </summary>
-    private EnemyNodes.NodeStatus BackAttack()
+    private bool ShouldLeftBackAttackPlayer()
     {
-        _animator.SetTrigger(data.backAttackTrigger);
+        var colliders = Physics.OverlapBox(leftBackAttackPosition.position, 
+            new Vector3(data.backAttackWidth/4, data.backAttackHeight/2, data.backAttackDepth/2));
+        
+        foreach (var collider in colliders)
+        {
+            if (collider.CompareTag("Player")) return true;
+        }
+        return false;
+    }
+    
+    /// <summary>
+    /// プレイヤーを右後脚で攻撃する
+    /// </summary>
+    private EnemyNodes.NodeStatus RightBackAttack()
+    {
+        _animator.SetTrigger(data.rightBackAttackTrigger);
+        _isAttacking = true;
         return EnemyNodes.NodeStatus.Success;
+    }
+    
+    /// <summary>
+    /// プレイヤーを左後脚で攻撃する
+    /// </summary>
+    private EnemyNodes.NodeStatus LeftBackAttack()
+    {
+        _animator.SetTrigger(data.leftBackAttackTrigger);
+        _isAttacking = true;
+        return EnemyNodes.NodeStatus.Success;
+    }
+
+    /// <summary>
+    /// 右後脚の攻撃コライダーを一時的に有効化する
+    /// </summary>
+    public void TemporarilyActivateRightBackAttackCollider()
+    {
+        rightBackAttackCollider1.TemporarilyActivateCollider();
+        rightBackAttackCollider2.TemporarilyActivateCollider();
+    }
+
+    /// <summary>
+    /// 左後脚の攻撃コライダーを一時的に有効化する
+    /// </summary>
+    public void TemporarilyActivateLeftBackAttackCollider()
+    {
+        leftBackAttackCollider1.TemporarilyActivateCollider();
+        leftBackAttackCollider2.TemporarilyActivateCollider();
+    }
+
+    /// <summary>
+    /// 攻撃フラグをオフにする（遅延あり）
+    /// </summary>
+    public void ResetAttackFlagWithDelay()
+    {
+        Invoke(nameof(ResetAttackFlag), data.attackWaitTime);
+    }
+
+    /// <summary>
+    /// 攻撃フラグをオフにする
+    /// </summary>
+    public void ResetAttackFlag()
+    {
+        _isAttacking = false;
     }
     
     //-------------------------------------------------------------------------------
@@ -355,6 +485,7 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     public void GetDownRight()
     {
+        _isDown = true;
         _animator.SetBool(data.rightDownFlag, true);
         Invoke(nameof(RecoverDownRight), data.recoveryTime);
     }
@@ -364,6 +495,7 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     public void RecoverDownRight()
     {
+        _isDown = false;
         _animator.SetBool(data.rightDownFlag, false);
     }
 
@@ -372,6 +504,7 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     public void GetDownLeft()
     {
+        _isDown = true;
         _animator.SetBool(data.leftDownFlag, true);
         Invoke(nameof(RecoverDownLeft), data.recoveryTime);
     }
@@ -381,6 +514,7 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     public void RecoverDownLeft()
     {
+        _isDown = false;
         _animator.SetBool(data.leftDownFlag, false);
     }
     
@@ -390,7 +524,7 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
-        _rootNode.Execute();
+        if (!_isDown && !_isAttacking) _rootNode.Execute();
     }
     
     //-------------------------------------------------------------------------------
@@ -399,12 +533,12 @@ public class EnemyController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        // 右前足の攻撃範囲
+        // 右前脚の攻撃範囲
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(rightFrontAttackPosition.position, 
             new Vector3(data.frontAttackWidth/2, data.frontAttackHeight, data.frontAttackDepth));
         
-        // 左前足の攻撃範囲
+        // 左前脚の攻撃範囲
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(leftFrontAttackPosition.position, 
             new Vector3(data.frontAttackWidth/2, data.frontAttackHeight, data.frontAttackDepth));
@@ -414,9 +548,14 @@ public class EnemyController : MonoBehaviour
         Gizmos.DrawWireCube(centerAttackPosition.position, 
             new Vector3(data.centerAttackWidth, data.centerAttackHeight, data.centerAttackDepth));
         
-        // 後足の攻撃範囲
+        // 右後脚の攻撃範囲
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(backAttackPosition.position, 
-            new Vector3(data.backAttackWidth, data.backAttackHeight, data.backAttackDepth));
+        Gizmos.DrawWireCube(rightBackAttackPosition.position, 
+            new Vector3(data.backAttackWidth/2, data.backAttackHeight, data.backAttackDepth));
+        
+        // 左後脚の攻撃範囲
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(leftBackAttackPosition.position, 
+            new Vector3(data.backAttackWidth/2, data.backAttackHeight, data.backAttackDepth));
     }
 }

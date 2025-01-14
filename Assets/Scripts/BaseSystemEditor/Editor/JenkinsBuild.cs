@@ -7,15 +7,19 @@ using System;
 using UnityEngine.AddressableAssets;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Build;
+using System.Text;
 
 public class BuildCommand
 {
-    [MenuItem("Assets/Build Application")]
+    [MenuItem("VTNTools/Build Application")]
     public static void Build()
     {
         //プラットフォーム、オプション
         bool isDevelopment = true;
         BuildTarget platform = BuildTarget.StandaloneWindows;
+
+        // チーム名
+        var teamID = "Foundation";
 
         // 出力名とか
         var exeName = PlayerSettings.productName;
@@ -34,6 +38,9 @@ public class BuildCommand
         {
             switch (args[i])
             {
+                case "-team":
+                    teamID = args[i + 1].Trim();
+                    break;
                 case "-projectPath":
                     outpath = args[i + 1] + "\\Build";
                     break;
@@ -81,6 +88,9 @@ public class BuildCommand
         }
         option.target = platform; //ビルドターゲットを設定. 今回はWin64
 
+        // Dynamicパスにソースコードを生成
+        BuildStateBuild(teamID);
+
         // 実行
         var report = BuildPipeline.BuildPlayer(option);
 
@@ -104,45 +114,6 @@ public class BuildCommand
         }
     }
 
-    [MenuItem("Assets/BuildAndCopyAddressables")]
-    public static void BuildAndCopyAddressables()
-    {
-        var outPath = "Assets/Addressables";
-
-        // ビルド対象シーンリスト
-        var scenes = EditorBuildSettings.scenes
-            .Where(scene => scene.enabled)
-            .Select(scene => scene.path)
-            .ToArray();
-
-        if (!Directory.Exists(outPath))
-        {
-            Directory.CreateDirectory(outPath);
-        }
-
-        // addressables_content_state.binを取得
-        // ファイル選択パネルを出したい場合は引数をfalseに
-        var path = ContentUpdateScript.GetContentStateDataPath(false);
-
-        // 変更があった組み込みリソースを取得
-        var settings = AddressableAssetSettingsDefaultObject.Settings;
-        var modifiedEntries = ContentUpdateScript.GatherModifiedEntriesWithDependencies(settings, path);
-
-        foreach (var modifiedEntry in modifiedEntries)
-        {
-            // 変更があったアセットのアドレスを出力
-            Debug.Log(modifiedEntry.Key.address);
-        }
-
-        // Addressablesのビルド
-        UnityEditor.AddressableAssets.Settings.AddressableAssetSettings.BuildPlayerContent();
-        
-        //更新分においてローカルビルドのリソースIDを生成する
-
-        //ローカルビルドをAWSにコピーする
-
-    }
-
     static string sha256(string planeStr, string key)
     {
         System.Text.UTF8Encoding ue = new System.Text.UTF8Encoding();
@@ -157,5 +128,41 @@ public class BuildCommand
             hashStr += string.Format("{0,0:x2}", b);
         }
         return hashStr;
+    }
+
+
+    const string targetPath = "Assets/Scripts/BaseSystem/Dynamic";
+    const string source = @"
+public class BuildState
+{
+    const string _hash = ""<Hash>"";
+    public const string TeamID = ""<TeamID>"";
+
+    public static string BuildHash
+    {
+        get
+        {
+#if UNITY_EDITOR
+            return ""UNITY_EDITOR"";
+#else
+            return _hash;
+#endif
+        }
+    }
+};";
+
+    static public void BuildStateBuild(string teamID)
+    {
+        Directory.CreateDirectory(targetPath);
+
+        //動的生成
+        using (FileStream fs = new FileStream(targetPath + "/BuildState.cs", FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+        {
+            string sourceCode = source;
+            sourceCode = sourceCode.Replace("<Hash>", Guid.NewGuid().ToString()); //ビルドハッシュを新規生成する
+            sourceCode = sourceCode.Replace("<TeamID>", teamID); //チームID
+            byte[] bytes = Encoding.UTF8.GetBytes(sourceCode);
+            fs.Write(bytes, 0, bytes.Length);
+        }
     }
 }
