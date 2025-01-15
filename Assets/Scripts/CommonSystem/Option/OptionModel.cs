@@ -1,14 +1,15 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace CommonSystem.Option
 {
+    [Serializable]
     public class OptionModel
     {
-        // 各種設定値（音量、難易度、その他の設定）
-        private float _masterVolume;
-        private float _bgmVolume;
-        private float _seVolume;
-        private float _voiceVolume;
+       [SerializeField,] private float _masterVolume;
+       [SerializeField] private float _bgmVolume;
+       [SerializeField] private float _seVolume;
+       [SerializeField] private float _voiceVolume;
 
         /// <summary>
         /// 設定を保存します。
@@ -27,10 +28,10 @@ namespace CommonSystem.Option
         /// </summary>
         public void ResetToDefault()
         {
-            _masterVolume = 0.8f;
-            _bgmVolume = 0.5f;
-            _seVolume = 0.5f;
-            _voiceVolume = 0.5f;
+            _masterVolume = 1.0f;
+            _bgmVolume = 0.8f;
+            _seVolume = 0.8f;
+            _voiceVolume = 0.8f;
             SaveSettings();
         }
 
