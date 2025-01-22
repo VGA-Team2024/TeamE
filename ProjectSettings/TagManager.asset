@@ -10,6 +10,7 @@ TagManager:
   - ClimbableWallTop
   - Arrow
   - Water
+  - Knockback
   layers:
   - Default
   - TransparentFX
@@ -20,7 +21,7 @@ TagManager:
   - Player
   - PlayerArrow
   - ClimbableWall
-  - 
+  - BossAreaGround
   - 
   - 
   - 
