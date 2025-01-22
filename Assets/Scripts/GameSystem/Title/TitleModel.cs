@@ -9,12 +9,13 @@
             _fadeSceneTransition = fadeSceneTransition;
             
             CRIAudioManager.Initialize();
-            CRIAudioManager.BGM.Play("CueSheet_BGM", "BGM_ending"); 
+            CRIAudioManager.BGM.Play("CueSheet_BGM", "BGM_title"); 
         }
 
         public void StartButton()
         {
             _fadeSceneTransition.CollCoroutine();
+            GameEventRecorder.GameStart();
         }
 
         public void OptionButton()

@@ -20,12 +20,11 @@ public class ArrowController : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.collider.CompareTag("Field") || collision.collider.CompareTag("ClimbableWall"))
-        {
-            var obj = Instantiate(_destroyEffect , transform.position , transform.rotation ,null);
-            if (_trail) _trail.SetParent(obj.transform);
-            Destroy(obj , 3f);
-            Destroy(gameObject);
-        }
+        if (collision.collider.CompareTag("Player")) return;
+        
+        var obj = Instantiate(_destroyEffect , transform.position , transform.rotation ,null);
+        if (_trail) _trail.SetParent(obj.transform);
+        Destroy(obj , 3f);
+        Destroy(gameObject, 0.01f);
     }
 }

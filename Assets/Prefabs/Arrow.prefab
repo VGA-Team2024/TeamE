@@ -150,7 +150,7 @@ GameObject:
   - component: {fileID: 4334087308158654746}
   m_Layer: 7
   m_Name: Arrow
-  m_TagString: Bullet
+  m_TagString: Arrow
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -238,7 +238,7 @@ MonoBehaviour:
   _trail: {fileID: 6035472783052326511}
   _gravity: 0.98
   _destroyTime: 5
-  _moveSpeed: 10
+  _moveSpeed: 20
 --- !u!1001 &4465262074513208591
 PrefabInstance:
   m_ObjectHideFlags: 0

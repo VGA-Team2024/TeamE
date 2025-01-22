@@ -1,12 +1,9 @@
 ﻿using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class TitleFadeSceneTransition : MonoBehaviour
 {
-    [SerializeField] string _inGameSceneName;
     [SerializeField] GameObject _fadePanel;
     Image _fadePanelImage;
     [Header("FadeTime+WaitTime=待ち時間")]
@@ -43,6 +40,6 @@ public class TitleFadeSceneTransition : MonoBehaviour
             _fadePanelImage.color = _endColor;
         }//フェード時間が０の場合フェードせずにそのまま遷移
         yield return new WaitForSeconds(_waitTime);
-        SceneManager.LoadScene(_inGameSceneName);
+        TimelineManager.Instance.Play().Forget();
     }
 }
