@@ -56,7 +56,7 @@ MonoBehaviour:
     loaderStatus: 0
   - name: CueSheet_VOICE
     acbFile: CueSheet_VOICE.acb
-    awbFile: 
+    awbFile: CueSheet_VOICE.awb
     loaderStatus: 0
   dspBusSetting: 
   dontDestroyOnLoad: 0

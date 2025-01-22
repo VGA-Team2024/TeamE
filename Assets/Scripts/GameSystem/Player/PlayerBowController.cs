@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Animations;
-public class PlayerBowController : MonoBehaviour
+public class PlayerBowController : MonoBehaviour, IHasPlayerVariable
 {
     [SerializeField] private float _arrowChargeTime;
     [SerializeField , Range(0f , 1f)] private float _lookAtWeight;
@@ -8,29 +8,24 @@ public class PlayerBowController : MonoBehaviour
     [SerializeField] private float _arrowInterpolationTime = 0.1f;
     [SerializeField] ParentConstraint _bowStringConstraint;
     [SerializeField] PositionConstraint _resetBowStringConstraint;
-    [SerializeField] private Transform _cameraTransform;
     [SerializeField] GameObject _arrowObject;
     [SerializeField] GameObject _arrowParticle;
     [SerializeField] GameObject _arrowStart;
-    [SerializeField] private Animator _animator;
-    public bool IsArrowCharging;
-    public bool IsArrowReleasing;
+    private bool _isArrowReleasing;
     private float _arrowInterpolationTimer;
     private float _arrowChargeTimer ;
     private int _arrowMotionLayerIndex;
     private int _aimJumpLayerIndex;
-    //private ObservableStateMachineTrigger _stateMachineTrigger;
-    private static readonly int Charge = Animator.StringToHash("ArrowCharge");
-    private static readonly int Release = Animator.StringToHash("ArrowRelease");
+    private PlayerVariable _variable;
     private void Start()
     {
-        _arrowMotionLayerIndex = _animator.GetLayerIndex("Upper");
-        _aimJumpLayerIndex = _animator.GetLayerIndex("AimJump");
+        _arrowMotionLayerIndex = _variable.Animator.GetLayerIndex("Upper");
+        _aimJumpLayerIndex = _variable.Animator.GetLayerIndex("AimJump");
         //_stateMachineTrigger = _animator.GetBehaviours<ObservableStateMachineTrigger>()[_arrowMotionLayerIndex];
     }
     void OnAnimatorIK(int layerIndex)
     {
-        if (IsArrowCharging)
+        if (_variable.IsArrowCharging)
         {
             _arrowInterpolationTimer += Time.deltaTime;
             if (_arrowInterpolationTimer > _arrowInterpolationTime)
@@ -47,17 +42,17 @@ public class PlayerBowController : MonoBehaviour
             if (_arrowInterpolationTimer > 0f)
             {
                 float chargeRate = _arrowInterpolationTimer / _arrowInterpolationTime;
-                if (IsArrowCharging || IsArrowReleasing)
+                if (_variable.IsArrowCharging || _isArrowReleasing)
                 {
-                    var arrowDestination = _cameraTransform.position + _cameraTransform.forward * _arrowTargetDistance;
-                    _animator.SetLookAtWeight(_lookAtWeight);
-                    _animator.SetLookAtPosition(arrowDestination); 
-                    _animator.SetIKPositionWeight(AvatarIKGoal.LeftHand , chargeRate); 
-                    _animator.SetIKPosition(AvatarIKGoal.LeftHand, arrowDestination);
+                    var arrowDestination = _variable.CameraTransform.position + _variable.CameraTransform.forward * _arrowTargetDistance;
+                    _variable.Animator.SetLookAtWeight(_lookAtWeight);
+                    _variable.Animator.SetLookAtPosition(arrowDestination); 
+                    _variable.Animator.SetIKPositionWeight(AvatarIKGoal.LeftHand , chargeRate); 
+                    _variable.Animator.SetIKPosition(AvatarIKGoal.LeftHand, arrowDestination);
                     //  胴がフォーカスしている高さに向くように回転させる。
-                    var waist = _animator.GetBoneTransform(HumanBodyBones.Spine);
-                    waist.RotateAround(waist.position, waist.up, -_cameraTransform.eulerAngles.x);
-                    _animator.SetBoneLocalRotation(HumanBodyBones.Spine, waist.localRotation);
+                    var waist = _variable.Animator.GetBoneTransform(HumanBodyBones.Spine);
+                    waist.RotateAround(waist.position, waist.up, -_variable.CameraTransform.eulerAngles.x);
+                    _variable.Animator.SetBoneLocalRotation(HumanBodyBones.Spine, waist.localRotation);
                 }
             }
         }
@@ -65,18 +60,18 @@ public class PlayerBowController : MonoBehaviour
 
     public float ArrowCharge()
     {
-        if (!IsArrowCharging)
+        if (!_variable.IsArrowCharging)
         {
-            IsArrowCharging = true;
+            _variable.IsArrowCharging = true;
             _arrowObject.SetActive(true);
             _resetBowStringConstraint.constraintActive = false;
             _bowStringConstraint.constraintActive = true;
-            _animator.SetBool(Charge, true);
-            _animator.SetLayerWeight(_aimJumpLayerIndex, 1);
+            _variable.Animator.SetBool(AnimHashUtil.Charge, true);
+            _variable.Animator.SetLayerWeight(_aimJumpLayerIndex, 1);
         }
 
         var chargeRate = _arrowChargeTimer / _arrowChargeTime;
-        _animator.SetLayerWeight(_arrowMotionLayerIndex, 1);
+        _variable.Animator.SetLayerWeight(_arrowMotionLayerIndex, 1);
         if(_arrowChargeTimer < _arrowChargeTime) _arrowChargeTimer += Time.deltaTime;
         return chargeRate;
     }
@@ -84,13 +79,14 @@ public class PlayerBowController : MonoBehaviour
     {
         if (!canceled &&  _arrowChargeTimer > _arrowChargeTime)
         {
-            if (!IsArrowReleasing)
+            if (!_isArrowReleasing)
             {
-                _animator.SetTrigger(Release);
-                _animator.SetBool(Charge, false);
-                IsArrowReleasing = true;
+                CRIAudioManager.SE.Play("CueSheet_SE", "SE_player_bow_shot");
+                _variable.Animator.SetTrigger(AnimHashUtil.Release);
+                _variable.Animator.SetBool(AnimHashUtil.Charge, false);
+                _isArrowReleasing = true;
                 var arrowStart = _arrowStart.transform.position;
-                var arrowDestination = _cameraTransform.position + _cameraTransform.forward * _arrowTargetDistance;
+                var arrowDestination = _variable.CameraTransform.position + _variable.CameraTransform.forward * _arrowTargetDistance;
                 var arrowDirection = arrowDestination - arrowStart;
                 Instantiate(_arrowParticle, arrowStart, Quaternion.LookRotation(arrowDirection), null);
                 Invoke(nameof(ResetBow), 0.2f);
@@ -103,20 +99,25 @@ public class PlayerBowController : MonoBehaviour
         }
         else
         {
-            _animator.SetBool(Charge, false);
-            IsArrowCharging = false;
+            _variable.Animator.SetBool(AnimHashUtil.Charge, false);
+            _variable.IsArrowCharging = false;
             ResetBow();
         }
     }
     private void ResetBow()
     {
-        IsArrowCharging = false;
-        IsArrowReleasing = false;
+        _variable.IsArrowCharging = false;
+        _isArrowReleasing = false;
         _arrowChargeTimer = 0f;
         _arrowObject.SetActive(false);
         _bowStringConstraint.constraintActive = false;
         _resetBowStringConstraint.constraintActive = true;
-        _animator.SetLayerWeight(_arrowMotionLayerIndex, 0f);
-        _animator.SetLayerWeight(_aimJumpLayerIndex, 0f);
+        _variable.Animator.SetLayerWeight(_arrowMotionLayerIndex, 0f);
+        _variable.Animator.SetLayerWeight(_aimJumpLayerIndex, 0f);
+    }
+
+    public void InjectVariable(PlayerVariable variable)
+    {
+        _variable = variable;
     }
 }

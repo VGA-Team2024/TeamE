@@ -44,12 +44,18 @@ public class PlayerHealthCalculator : MonoBehaviour
     {
         _currentHealth.Value -= damage;
     }
-
-    public void FallDamage(float maxHeight, float landingHeight)
+    /// <summary>
+    /// 落下ダメージの計算
+    /// </summary>
+    /// <param name="maxHeight">滞空時の最高点</param>
+    /// <param name="landingHeight">着地した高さ</param>
+    /// <returns>ダメージを受けたかどうか</returns>
+    public bool FallDamage(float maxHeight, float landingHeight)
     {
-        if (maxHeight <= landingHeight) return;
+        if (maxHeight <= landingHeight) return false;
         var fallDistance = maxHeight - landingHeight;
-        if (fallDistance <= _fallHeightThreshold) return;
+        if (fallDistance <= _fallHeightThreshold) return false;
         TakeDamage(fallDistance * _fallDamageMultiplier);
+        return true;
     }
 }

@@ -1,18 +1,17 @@
 using System;
-using R3;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-public class PlayerAttackController : MonoBehaviour
+public class PlayerAttackController : MonoBehaviour, IHasPlayerVariable
 {
-    private static readonly int AttackHash = Animator.StringToHash("Attack");
-    private static readonly int StabHash = Animator.StringToHash("Stab");
-    [SerializeField] private float _attackTime = 1.1f;
+    [SerializeField] private float _slashTime = 1.1f;
     [SerializeField] private float _stabTime = 2.2f;
+    [SerializeField] private float _slashSETime = 0.434124f;
+    [SerializeField] private float _stabSETime = 1.33753f;
     [SerializeField] private GameObject _attackObject;
     [SerializeField] private GameObject _stabObject;
-    private bool _isAttack;
-    public bool IsAttack => _isAttack;
-
+    private PlayerVariable _variable;
     private void Awake()
     {
         _attackObject?.SetActive(false);
@@ -21,27 +20,45 @@ public class PlayerAttackController : MonoBehaviour
 
     public void Attack(bool isClimb, Animator animator)
     {
-        if (_isAttack) return;
-        _isAttack = true;
+        if (_variable.IsAttack) return;
+        _variable.IsAttack = true;
         if (isClimb)
         {
-            _stabObject?.SetActive(true);
-            animator.SetTrigger(StabHash);
-            Observable.Timer(TimeSpan.FromSeconds(_stabTime)).Subscribe(_=>
-            {
-                _stabObject?.SetActive(false);
-                _isAttack = false;
-            }).AddTo(this);
+            StabAnimation(animator, destroyCancellationToken).Forget();
+            InsertSE("CueSheet_SE", "SE_player_sword_pierce", _stabSETime, destroyCancellationToken).Forget();
         }
         else
         {
-            _attackObject?.SetActive(true);
-            animator.SetTrigger(AttackHash);
-            Observable.Timer(TimeSpan.FromSeconds(_attackTime)).Subscribe(_=>
-            {
-                _attackObject?.SetActive(false);
-                _isAttack = false;
-            }).AddTo(this);
+            SlashAnimation(animator, destroyCancellationToken).Forget();
+            InsertSE("CueSheet_SE", "SE_player_sword_put", _slashSETime, destroyCancellationToken).Forget();
         }
+    }
+
+    async UniTaskVoid InsertSE(string sheet, string name,float time,  CancellationToken ct)
+    {
+        await UniTask.Delay(TimeSpan.FromSeconds(time), cancellationToken: ct);
+        CRIAudioManager.SE.Play(sheet, name);
+    }
+    async UniTaskVoid StabAnimation(Animator animator, CancellationToken ct)
+    {
+        _stabObject?.SetActive(true);
+        animator.SetTrigger(AnimHashUtil.Stab);
+        await UniTask.Delay(TimeSpan.FromSeconds(_stabTime), cancellationToken: ct);
+        _stabObject?.SetActive(false);
+        _variable.IsAttack = false;
+    }
+
+    async UniTaskVoid SlashAnimation(Animator animator, CancellationToken ct)
+    {
+        _attackObject?.SetActive(true);
+        animator.SetTrigger(AnimHashUtil.Attack);
+        await UniTask.Delay(TimeSpan.FromSeconds(_slashTime), cancellationToken: ct);
+        _attackObject?.SetActive(false);
+        _variable.IsAttack = false;
+    }
+
+    public void InjectVariable(PlayerVariable variable)
+    {
+        _variable = variable;
     }
 }
