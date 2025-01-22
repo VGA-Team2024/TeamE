@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 
 /// <summary>敵を制御するクラス</summary>
 public class EnemyController : MonoBehaviour
@@ -7,7 +6,7 @@ public class EnemyController : MonoBehaviour
     /// <summary>
     /// プレイヤーを制御するクラス
     /// </summary>
-    [SerializeField] private PlayerDummy player;
+    [SerializeField] private Transform player;
     
     /// <summary>
     /// 敵のデータを管理するクラス
@@ -60,9 +59,16 @@ public class EnemyController : MonoBehaviour
 
     private bool _isDown;
     private bool _isAttacking;
+    private bool _isActive;
     
     Animator _animator;
-    
+
+    public void Activate()
+    {
+        if (_isActive) return;
+        _animator.enabled = true;
+        _isActive = true;
+    }
     //-------------------------------------------------------------------------------
     // 初期化
     //-------------------------------------------------------------------------------
@@ -86,6 +92,7 @@ public class EnemyController : MonoBehaviour
     private void GetAllNecessaryComponents()
     {
         _animator = GetComponent<Animator>();
+        _animator.enabled = false;
     }
 
     /// <summary>
@@ -524,7 +531,7 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
-        if (!_isDown && !_isAttacking) _rootNode.Execute();
+        if (!_isDown && !_isAttacking && _isActive) _rootNode.Execute();
     }
     
     //-------------------------------------------------------------------------------
