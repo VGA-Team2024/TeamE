@@ -17,4 +17,19 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Debug/PostProcessingScene.unity
+    guid: 38ddffc3a0c4df349ac0066743128d82
+  - enabled: 1
+    path: Assets/Scenes/Design/TomizawaTaiju.unity
+    guid: b40277d162751d5488daa6ffddf06e3f
+  - enabled: 1
+    path: Assets/Scenes/Design/YamamotoKanta.unity
+    guid: 691a109fa2136f746aa16ce320da22e6
+  - enabled: 1
+    path: Assets/Scenes/Sample/3DSoundSample.unity
+    guid: a174e69cd80e78248945d3373b6e48f0
+  - enabled: 1
+    path: Assets/Scenes/System/IngameDebug.unity
+    guid: f344c073eba28c247a464cfb6b57ff22
   m_configObjects: {}
