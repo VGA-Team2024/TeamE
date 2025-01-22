@@ -6,7 +6,7 @@ public class OptionPresenter : MonoBehaviour
 {
     [SerializeField] private CriControlPresenter _criControlPresenter;
     [SerializeField] private OptionView _optionView;
-    private OptionModel _optionModel;
+    [SerializeField] private OptionModel _optionModel;
 
     private void Start()
     {
