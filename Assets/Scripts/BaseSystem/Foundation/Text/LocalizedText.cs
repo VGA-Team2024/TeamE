@@ -55,5 +55,15 @@ public class LocalizedText : MonoBehaviour
 
         _text.text = text;
     }
+
+    public string GetKeyName()
+    {
+        return _textKey;
+    }
+
+    public void SetComponent(TextMeshProUGUI text)
+    {
+        _text = text;
+    }
 #endif
 }

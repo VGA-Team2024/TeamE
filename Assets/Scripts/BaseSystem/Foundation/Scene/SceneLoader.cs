@@ -146,7 +146,7 @@ public class SceneLoader
 
         if(current == null)
         {
-            Debug.LogError(currentSceneName + "のシーンはありません");
+            Debug.LogWarning(currentSceneName + "のシーンはありません");
             return false;
         }
 
@@ -171,14 +171,14 @@ public class SceneLoader
         }
         if (baseScene == null)
         {
-            Debug.LogError(current.Name + "の再生に必要なシーンがありません");
+            Debug.LogWarning(current.Name + "の再生に必要なシーンがありません");
             return false;
         }
 
         SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(baseScene.AssetPath);
         if (sceneAsset == null)
         {
-            Debug.LogError(baseScene.Name + "というシーンアセットは存在しません");
+            Debug.LogWarning(baseScene.Name + "というシーンアセットは存在しません");
             return false;
         }
 

@@ -1,29 +1,24 @@
 using System.Globalization;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class CriVolumeControl : MonoBehaviour
 {
-    [SerializeField] private Text _volumeText;
+    [SerializeField] private TextMeshProUGUI _volumeText;
     [SerializeField] private Slider _volumeSlider;
-    [SerializeField] private InputField _volumeInputField;
+    [SerializeField] private TMP_InputField _volumeInputField;
     [SerializeField] private SoundType _soundType;
-
-    private CRIAudioManager _criAudioManager;
+    public SoundType SoundType => _soundType;
     private float _currentValue;
 
-    private void Awake()
-    {
-        // CRIAudioManager のインスタンスを取得
-        _criAudioManager = CRIAudioManager.Instance;
-    }
-
-    public void Initialize(string label, float initialValue, SoundType soundType,
+    /// <summary>
+    /// 初期化メソッド
+    /// </summary>
+    public void Initialize(string label, float initialValue,
         UnityAction<float> onSliderChanged, UnityAction<string> onInputChanged)
     {
-        _soundType = soundType;
-
         // UI要素の初期化
         _volumeText.text = label;
         _volumeSlider.minValue = 0;
@@ -31,7 +26,9 @@ public class CriVolumeControl : MonoBehaviour
         _volumeSlider.value = initialValue * 100;
         _volumeSlider.onValueChanged.AddListener(onSliderChanged);
         _volumeSlider.onValueChanged.AddListener(OnSliderChanged);
-        _volumeInputField.text = (initialValue * 100).ToString(CultureInfo.CurrentCulture);
+
+        // 初期値を整数として設定
+        _volumeInputField.text = Mathf.FloorToInt(initialValue * 100).ToString(CultureInfo.CurrentCulture);
         _volumeInputField.onEndEdit.AddListener(onInputChanged);
         _volumeInputField.onEndEdit.AddListener(OnInputChanged);
 
@@ -39,17 +36,20 @@ public class CriVolumeControl : MonoBehaviour
         _currentValue = initialValue;
     }
 
+    /// <summary>
+    /// スライダー変更時のローカル処理
+    /// </summary>
     private void OnSliderChanged(float value)
     {
         _currentValue = value / 100;
 
-        // CRIAudioManager に音量を反映
-        _criAudioManager?.SetVolume(_soundType, _currentValue);
-
-        // 入力フィールドの更新
-        _volumeInputField.text = value.ToString(CultureInfo.CurrentCulture);
+        // 入力フィールドの値を整数として更新
+        _volumeInputField.text = Mathf.FloorToInt(value).ToString(CultureInfo.CurrentCulture);
     }
 
+    /// <summary>
+    /// 入力フィールド変更時のローカル処理
+    /// </summary>
     private void OnInputChanged(string value)
     {
         if (float.TryParse(value, out float result))
@@ -57,10 +57,7 @@ public class CriVolumeControl : MonoBehaviour
             _currentValue = result / 100;
 
             // スライダーの値を更新
-            _volumeSlider.value = result;
-
-            // CRIAudioManager に音量を反映
-            _criAudioManager?.SetVolume(_soundType, _currentValue);
+            _volumeSlider.value = Mathf.FloorToInt(result);
         }
         else
         {
@@ -71,7 +68,7 @@ public class CriVolumeControl : MonoBehaviour
     private void OnDestroy()
     {
         // イベントリスナーの解除
-        _volumeSlider.onValueChanged.RemoveListener(OnSliderChanged);
-        _volumeInputField.onEndEdit.RemoveListener(OnInputChanged);
+        _volumeSlider.onValueChanged.RemoveAllListeners();
+        _volumeInputField.onEndEdit.RemoveAllListeners();
     }
 }

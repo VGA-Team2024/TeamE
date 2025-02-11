@@ -54,7 +54,7 @@ public class AudioButtonControl : MonoBehaviour
         // サウンドを再生 (プレイヤーにループ設定を適用)
         var player = GetPlayer();
         if (player == null) return;
-        player.SetLoop(_isLoop);
+        // player.SetLoop(_isLoop);
         player.Play(_cueSheet, _cueName);
     }
 
@@ -64,7 +64,7 @@ public class AudioButtonControl : MonoBehaviour
     public void Pause()
     {
         var player = GetPlayer();
-        player?.Pause();
+        // player?.Pause();
     }
 
     /// <summary>
@@ -73,7 +73,7 @@ public class AudioButtonControl : MonoBehaviour
     public void Resume()
     {
         var player = GetPlayer();
-        player?.Resume();
+        //  player?.Resume();
     }
 
     /// <summary>

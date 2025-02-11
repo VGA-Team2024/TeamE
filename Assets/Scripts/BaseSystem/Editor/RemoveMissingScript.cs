@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 public static class MissingScriptRemover
@@ -13,3 +14,4 @@ public static class MissingScriptRemover
         Debug.Log($"{missingCount} 個のmissingScriptを取り除きました");
     }
 }
+#endif

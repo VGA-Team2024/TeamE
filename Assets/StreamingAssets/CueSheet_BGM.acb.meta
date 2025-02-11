@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: c3c3c5149336e7a40a40cb7bd142fce7
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: d286586ba24ad438aac133d47a3e12b0, type: 3}
+  implementation:
+    rid: 1000
+  awb: {instanceID: 0}
+  assetInfo:
+    awb: {fileID: -6750239444755058063, guid: 5aa07f881ce7d3044ba998ef8ae92a32, type: 3}
+  references:
+    version: 2
+    RefIds:
+    - rid: 1000
+      type: {class: CriSerializedBytesAssetImplCreator, ns: CriWare.Assets, asm: CriMw.CriWare.Assets.Editor}
+      data: 
