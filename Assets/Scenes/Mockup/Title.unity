@@ -1709,7 +1709,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _fadePanel: {fileID: 934409693}
-  _fadeTime: 0.5
+  _fadeTime: 1.5
   _waitTime: 0
 --- !u!114 &1788112789
 MonoBehaviour:
