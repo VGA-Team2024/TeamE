@@ -1037,6 +1037,8 @@ MonoBehaviour:
     _containerIndex: 0
   - _sceneName: Temple_Animation
     _containerIndex: 1
+  - _sceneName: InGame_Animation
+    _containerIndex: 0
   - _sceneName: Temple_Animation
     _containerIndex: 2
 --- !u!4 &1294542869
