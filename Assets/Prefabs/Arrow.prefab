@@ -236,9 +236,9 @@ MonoBehaviour:
     type: 3}
   _rigidBody: {fileID: 5638602970560729628}
   _trail: {fileID: 6035472783052326511}
-  _gravity: 0.98
+  _gravity: 0
   _destroyTime: 5
-  _moveSpeed: 20
+  _moveSpeed: 40
 --- !u!1001 &4465262074513208591
 PrefabInstance:
   m_ObjectHideFlags: 0
