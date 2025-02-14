@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -9,11 +10,24 @@ public class TextController : MonoBehaviour
     [SerializeField] private List<string> _data;
     private int _currentIndex = 0;
 
+    [SerializeField] private bool _disableAutoWrapping = true;
+
+    public void Awake()
+    {
+        // 自動改行を無効化
+        if (_disableAutoWrapping)
+        {
+            _text.enableWordWrapping = false;
+        }
+    }
+
     public void DisplayText()
     {
         if (_currentIndex < _data.Count)
         {
-            _text.text = _data[_currentIndex];
+            string formattedText = _data[_currentIndex].Replace("/n", "\n");
+
+            _text.text = formattedText;
             _currentIndex++;
         }
     }
