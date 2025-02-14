@@ -13,11 +13,12 @@ public class EndingCall : MonoBehaviour
         _endingOne.SetActive(false);
         _endingTwo.SetActive(false);
     }
+    [ContextMenu("エンディング1")]
     public void EndingOne()
     {
         _endingOne.SetActive(true);
     }
-
+    [ContextMenu("エンディング2")]
     public void EndingTwo()
     {
         _endingTwo.SetActive(true);

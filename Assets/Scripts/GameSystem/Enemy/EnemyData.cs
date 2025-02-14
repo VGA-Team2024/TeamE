@@ -7,6 +7,9 @@ using UnityEngine.Serialization;
 [CreateAssetMenu(fileName = "EnemyData", menuName = "ScriptableObjects/CreateEnemyData")]
 public class EnemyData : ScriptableObject
 {
+    [Header("放浪し始めるプレイヤーとの距離")] public float wanderDistance = 20f;
+
+    [Header("放浪する最大距離")] public float wanderMaxDistance = 20f;
     //-------------------------------------------------------------------------------
     // 前足の攻撃範囲のデータ
     //-------------------------------------------------------------------------------

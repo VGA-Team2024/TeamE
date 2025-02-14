@@ -13,10 +13,10 @@ public class EnemyAttacker : MonoBehaviour
     [Header("与えるダメージ"), SerializeField] private float damage;
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.TryGetComponent(out PlayerHealthCalculator playerHealth))
         {
             // プレイヤーにダメージを与える処理
-            Debug.Log($"{damage} ダメージ");
+            playerHealth.TakeDamage(damage);
         }
     }
 

@@ -1,73 +1,56 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 /// <summary>敵を制御するクラス</summary>
 public class EnemyController : MonoBehaviour
 {
-    /// <summary>
-    /// プレイヤーを制御するクラス
-    /// </summary>
-    [SerializeField] private Transform player;
+    [SerializeField, InspectorVariantName("プレイヤーのTransform")] private Transform player;
+    [SerializeField, InspectorVariantName("敵のデータ")] private EnemyData data;
+    [SerializeField] private NavMeshAgent agent;
     
-    /// <summary>
-    /// 敵のデータを管理するクラス
-    /// </summary>
-    [SerializeField] private EnemyData data;
-
+    [SerializeField, InspectorVariantName("右前脚の攻撃範囲の中心")] private Transform rightFrontAttackPosition;
+    [SerializeField, InspectorVariantName("左前脚の攻撃範囲の中心")] private Transform leftFrontAttackPosition;
+    [SerializeField, InspectorVariantName("胴体の攻撃範囲の中心")] private Transform centerAttackPosition;
+    [SerializeField, InspectorVariantName("右後脚の攻撃範囲の位置")] private Transform rightBackAttackPosition;
+    [SerializeField, InspectorVariantName("左後脚の攻撃範囲の位置")] private Transform leftBackAttackPosition;
+    [SerializeField, InspectorVariantName("胴体の攻撃コライダー")] private EnemyAttacker centerAttackCollider;
+    
+    [Header("後脚の攻撃コライダー")]
+    [SerializeField] private EnemyAttacker rightBackAttackCollider1;
+    [SerializeField] private EnemyAttacker rightBackAttackCollider2;
+    [SerializeField] private EnemyAttacker leftBackAttackCollider1;
+    [SerializeField] private EnemyAttacker leftBackAttackCollider2;
+    
+    [Header("前脚の攻撃コライダー")]
+    [SerializeField] private EnemyAttacker rightFrontAttackCollider1;
+    [SerializeField] private EnemyAttacker rightFrontAttackCollider2;
+    [SerializeField] private EnemyAttacker leftFrontAttackCollider1;
+    [SerializeField] private EnemyAttacker leftFrontAttackCollider2;
+    
+    private bool _isDown;
+    private bool _isDying;  //  瀕死かどうか
+    private bool _isAttacking;
+    private bool _isActive;
+    
+    private Animator _animator;
     /// <summary>
     /// BehaviourTreeのRootノード
     /// </summary>
     private readonly EnemyNodes.SelectorNode _rootNode = new EnemyNodes.SelectorNode();
-    
-    [Header("右前脚の攻撃範囲の中心")] 
-    [SerializeField] private Transform rightFrontAttackPosition;
-    
-    [Header("左前脚の攻撃範囲の中心")] 
-    [SerializeField] private Transform leftFrontAttackPosition;
-    
-    [Header("胴体の攻撃範囲の中心")] 
-    [SerializeField] private Transform centerAttackPosition;
-    
-    [Header("右後脚の攻撃範囲の位置")] 
-    [SerializeField] private Transform rightBackAttackPosition;
-    
-    [Header("左後脚の攻撃範囲の位置")] 
-    [SerializeField] private Transform leftBackAttackPosition;
-    
-    [Header("後脚の攻撃コライダー")]
-
-    [SerializeField] private EnemyAttacker rightBackAttackCollider1;
-    
-    [SerializeField] private EnemyAttacker rightBackAttackCollider2;
-    
-    [SerializeField] private EnemyAttacker leftBackAttackCollider1;
-    
-    [SerializeField] private EnemyAttacker leftBackAttackCollider2;
-    
-    [Header("前脚の攻撃コライダー")]
-
-    [SerializeField] private EnemyAttacker rightFrontAttackCollider1;
-    
-    [SerializeField] private EnemyAttacker rightFrontAttackCollider2;
-
-    [SerializeField] private EnemyAttacker leftFrontAttackCollider1;
-    
-    [SerializeField] private EnemyAttacker leftFrontAttackCollider2;
-
-    [Header("胴体の攻撃コライダー")] 
-    
-    [SerializeField] private EnemyAttacker centerAttackCollider;
-
-    private bool _isDown;
-    private bool _isAttacking;
-    private bool _isActive;
-    
-    Animator _animator;
 
     public void Activate()
     {
         if (_isActive) return;
         _animator.enabled = true;
         _isActive = true;
+    }
+    /// <summary>
+    /// 瀕死状態にする
+    /// </summary>
+    public void SetDying()
+    {
+        _isDying = true;
+        _animator.SetBool("IsDying", true);
     }
     //-------------------------------------------------------------------------------
     // 初期化
@@ -105,8 +88,32 @@ public class EnemyController : MonoBehaviour
         _rootNode.Add(SetUpCenterAttackSequence());
         _rootNode.Add(SetUpRightBackAttackSequence());
         _rootNode.Add(SetUpLeftBackAttackSequence());
-        _rootNode.Add(SetUpRotateSequence());
+        //_rootNode.Add(SetUpRotateSequence());
         _rootNode.Add(SetUpChaseSequence());
+        _rootNode.Add(new EnemyNodes.ActionNode(Wander));
+    }
+    bool wanderStarted = false;
+    private EnemyNodes.NodeStatus Wander()
+    {
+        if (!wanderStarted)
+        {
+            var randomPos = Random.insideUnitCircle * data.wanderMaxDistance;
+            agent.SetDestination(transform.position + new Vector3(randomPos.x, 0, randomPos.y));
+            wanderStarted = true;
+        }
+
+        if (!agent.hasPath)
+        {
+            wanderStarted = false;
+            return EnemyNodes.NodeStatus.Success;
+        }
+        
+        if (agent.remainingDistance <= agent.stoppingDistance)
+        {
+            wanderStarted = false;
+            return EnemyNodes.NodeStatus.Success;
+        }
+        return EnemyNodes.NodeStatus.Running;
     }
     
     //-------------------------------------------------------------------------------
@@ -178,10 +185,17 @@ public class EnemyController : MonoBehaviour
     {
         var chaseSeq = new EnemyNodes.SequenceNode();
         chaseSeq.Add(new EnemyNodes.ConditionNode(ShouldChasePlayer));
+        chaseSeq.Add(new EnemyNodes.ConditionNode(CheckDistance));
         chaseSeq.Add(new EnemyNodes.ActionNode(Chase));
         return chaseSeq;
     }
-    
+
+    private bool CheckDistance()
+    {
+        Vector2 playerPos = new Vector2(player.position.x, player.position.z);
+        Vector2 enemyPos = new Vector2(transform.position.x, transform.position.z);
+        return (playerPos - enemyPos).magnitude > data.wanderDistance;
+    }
     //-------------------------------------------------------------------------------
     // 追跡シーケンスに関連する処理
     //-------------------------------------------------------------------------------
@@ -199,16 +213,17 @@ public class EnemyController : MonoBehaviour
 
         return true;
     }
-    
     /// <summary>
     /// プレイヤーを追跡する
     /// </summary>
     private EnemyNodes.NodeStatus Chase()
     {
-        var target = Quaternion.LookRotation(GetFixedDirectionToPlayer());
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, target, data.rotateSpeed * Time.deltaTime);
-        transform.Translate(Time.deltaTime * data.moveSpeed * GetFixedDirectionToPlayer(), Space.World);
-        return EnemyNodes.NodeStatus.Running;
+        agent.SetDestination(player.transform.position);
+        return EnemyNodes.NodeStatus.Success;
+        // var target = Quaternion.LookRotation(GetFixedDirectionToPlayer());
+        // transform.rotation = Quaternion.RotateTowards(transform.rotation, target, data.rotateSpeed * Time.deltaTime);
+        // transform.Translate(Time.deltaTime * data.moveSpeed * GetFixedDirectionToPlayer(), Space.World);
+        // return EnemyNodes.NodeStatus.Running;
     }
     
     //-------------------------------------------------------------------------------
@@ -531,7 +546,14 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
-        if (!_isDown && !_isAttacking && _isActive) _rootNode.Execute();
+        if (!_isDown && !_isAttacking && _isActive && !_isDying)
+        {
+            _rootNode.Execute();
+        }
+        else
+        {
+            agent.SetDestination(transform.position);
+        }
     }
     
     //-------------------------------------------------------------------------------
