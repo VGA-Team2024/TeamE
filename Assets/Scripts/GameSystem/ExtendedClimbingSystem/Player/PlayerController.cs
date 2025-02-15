@@ -80,9 +80,9 @@ public class PlayerController : MonoBehaviour
             _isGround.Value = Physics.SphereCast(_variable.Rigidbody.position + new Vector3(0f, _groundCheckRayCastOffsetY, 0f),
                 _variable.CapsuleCollider.radius, Vector3.down, out var hitGround,
                 _groundCheckRayCastLength - _variable.CapsuleCollider.radius, _variable.GroundLayer);
-            _isGround.Value = !hitGround.collider.isTrigger;
             if (_isGround.Value)
             {
+                _isGround.Value = !hitGround.collider.isTrigger;
                 _variable.GroundNormal = hitGround.normal;
                 _variable.CanWalk = Vector3.Angle(hitGround.normal, Vector3.up) < _variable.WallAngle;
                 if(!_variable.IsKnockBack) _variable.PlayerRoot.SetParent(hitGround.collider.transform);
