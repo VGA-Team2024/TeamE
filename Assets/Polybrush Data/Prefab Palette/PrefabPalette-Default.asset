@@ -237,7 +237,7 @@ MonoBehaviour:
   - gameObject: {fileID: 3513519379114454384, guid: 6dda2f10b3135974cb054535df12ecd2,
       type: 3}
     settings:
-      m_Strength: 86.4
+      m_Strength: 32.613445
       m_RotationRangeMin: {x: 0, y: 0, z: 0}
       m_RotationRangeMax: {x: 0, y: 0, z: 0}
       m_ScaleRangeMin: {x: 1, y: 1, z: 1}
@@ -251,3 +251,20 @@ MonoBehaviour:
       m_YScaleBool: 0
       m_ZScaleBool: 0
     name: prefab_grass_03_3
+  - gameObject: {fileID: 6817610328861097818, guid: c4f3b4b6fb17f024d892790aad26f841,
+      type: 3}
+    settings:
+      m_Strength: 64.22689
+      m_RotationRangeMin: {x: 0, y: 0, z: 0}
+      m_RotationRangeMax: {x: 78.88415, y: 360, z: 49.265244}
+      m_ScaleRangeMin: {x: 1, y: 1, z: 1}
+      m_ScaleRangeMax: {x: 1, y: 1, z: 1}
+      m_UniformScale: {x: 1, y: 1}
+      m_UniformBool: 0
+      m_XRotationBool: 0
+      m_YRotationBool: 0
+      m_ZRotationBool: 1
+      m_XScaleBool: 0
+      m_YScaleBool: 0
+      m_ZScaleBool: 0
+    name: Leaf

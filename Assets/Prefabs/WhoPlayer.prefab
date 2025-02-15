@@ -1833,7 +1833,7 @@ Transform:
   m_GameObject: {fileID: 2414364361174311658}
   serializedVersion: 2
   m_LocalRotation: {x: -0.16433237, y: 0.09195352, z: 0.6192264, w: 0.7622979}
-  m_LocalPosition: {x: -0.68163234, y: 0.0698331, z: 0.17426276}
+  m_LocalPosition: {x: -0.6816324, y: 0.069829345, z: 0.17426305}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2613,7 +2613,7 @@ Transform:
   m_GameObject: {fileID: 3363048478678624141}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7277449, y: -0.0045442614, z: -0.68580854, w: 0.0057820445}
-  m_LocalPosition: {x: -0.97297174, y: 0.0007162094, z: -0.17142655}
+  m_LocalPosition: {x: -0.97297174, y: 0.0007171631, z: -0.17142662}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4697,7 +4697,7 @@ Transform:
   m_GameObject: {fileID: 6534162706400192300}
   serializedVersion: 2
   m_LocalRotation: {x: 0.42631716, y: 0.3641874, z: 0.56039697, w: 0.6095708}
-  m_LocalPosition: {x: -1.4136561, y: -0.08598614, z: -0.120205425}
+  m_LocalPosition: {x: -1.4136561, y: -0.085989, z: -0.12020521}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6309,7 +6309,7 @@ MonoBehaviour:
     _playerEventReceiver: {fileID: 8177813029043797573}
     _ragdollController: {fileID: 6704381612793307085}
   _climbHoppingLimit: 0.3
-  _vineMat: {fileID: 2100000, guid: b348098112c0e894db32fdae34a078bb, type: 2}
+  _vineMat: {fileID: 2100000, guid: a4306a29bb0ea00469ea7e6ca8dfef2b, type: 2}
   _rascalSkinnedMesh: {fileID: 0}
   _playerClimbRayLength: 1
   _playerClimbThreshold: 0.8

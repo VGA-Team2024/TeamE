@@ -1,4 +1,6 @@
-﻿namespace GameSystem.Title
+﻿using UnityEngine.SceneManagement;
+
+namespace GameSystem.Title
 {
     public class TitleModel
     {
@@ -14,7 +16,11 @@
 
         public void StartButton()
         {
-            _fadeSceneTransition.CollCoroutine();
+            _fadeSceneTransition.FadeSceneTransition(()=>
+            {
+                TimelinePlayer.TimelineType = TimelineType.Opening;
+                SceneManager.LoadScene("Timeline");
+            }).Forget();
             GameEventRecorder.GameStart();
         }
 

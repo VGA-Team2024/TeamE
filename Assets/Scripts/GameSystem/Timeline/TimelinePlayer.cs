@@ -34,6 +34,7 @@ public class TimelinePlayer: MonoBehaviour
 
     private async UniTaskVoid PlayOpening()
     {
+        CRIAudioManager.BGM.Play("CueSheet_BGM", "BGM_opening");
         foreach (var director in _opening)
         {
             director.Play();
@@ -44,6 +45,7 @@ public class TimelinePlayer: MonoBehaviour
 
     private async UniTaskVoid PlayKillEnding()
     {
+        CRIAudioManager.BGM.Play("CueSheet_BGM", "BGM_ending");
         _killEnding.gameObject.SetActive(true);
         await UniTask.Yield(destroyCancellationToken);
         _killEnding.Play();
@@ -51,6 +53,7 @@ public class TimelinePlayer: MonoBehaviour
 
     private async UniTaskVoid PlayReleaseEnding()
     {
+        CRIAudioManager.BGM.Play("CueSheet_BGM", "BGM_ending");
         _releaseEnding.gameObject.SetActive(true);
         await UniTask.Yield(destroyCancellationToken);
         _releaseEnding.Play();

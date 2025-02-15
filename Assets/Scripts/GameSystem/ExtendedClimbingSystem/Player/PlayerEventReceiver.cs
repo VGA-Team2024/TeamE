@@ -12,11 +12,11 @@ public class PlayerEventReceiver : MonoBehaviour
     [SerializeField] float _climbSoundThreshold = -0.03f;
     private Task _landingTask;
     private Task _footStepTask;
-    private readonly string FootSound = "SE_player_footsound_1";
+    private readonly string FootSound = "SE_player_footsound_random";
     private readonly string CueSheetSE = "CueSheet_SE";
     private readonly string Falling = "SE_player_falling";
     private readonly string Landing = "SE_player_landing";
-    private readonly string Climb = "SE_player_climb_1";
+    private readonly string Climb = "SE_player_climb_random";
     private Animator _animator;
     private ReactiveProperty<bool> _footSoundRP = new();
     private readonly ReactiveProperty<bool> _climbSoundRP = new();

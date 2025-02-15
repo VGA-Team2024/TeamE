@@ -1,18 +1,7 @@
 fileFormatVersion: 2
-guid: e045e5eef0ae95444979a75d8756db0f
-ScriptedImporter:
-  internalIDToNameTable: []
+guid: 7f48b113c2d1d324fb5d45a6bd0dd53e
+DefaultImporter:
   externalObjects: {}
-  serializedVersion: 2
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-  script: {fileID: 11500000, guid: 503c02039ceed4218bb78fdac1d6a536, type: 3}
-  implementation:
-    rid: 1000
-  references:
-    version: 2
-    RefIds:
-    - rid: 1000
-      type: {class: CriStreamingFolderAssetImplCreator, ns: CriWare.Assets, asm: CriMw.CriWare.Assets.Editor}
-      data: 

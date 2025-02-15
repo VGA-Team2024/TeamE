@@ -19,7 +19,7 @@ public class EnemyEffectHandler : MonoBehaviour
     
     public void OnDown()
     {
-        CRIAudioManager.SE.Play(SECueSheetName, DownCueName, volume: 3f);
+        CRIAudioManager.SE.Play(SECueSheetName, DownCueName);
     }
 
     public void OnShout(ShoutType shout)
@@ -27,13 +27,13 @@ public class EnemyEffectHandler : MonoBehaviour
         switch (shout)
         {
             case ShoutType.Shout1:
-                CRIAudioManager.SE.Play(VOICECueSheetName, Shout1CueName, volume: 50f);
+                CRIAudioManager.SE.Play(VOICECueSheetName, Shout1CueName);
                 break;
             case ShoutType.Shout2:
-                CRIAudioManager.SE.Play(VOICECueSheetName, Shout2CueName, volume: 50f);
+                CRIAudioManager.SE.Play(VOICECueSheetName, Shout2CueName);
                 break;
             case ShoutType.Shout3:
-                CRIAudioManager.SE.Play(VOICECueSheetName, Shout3CueName, volume: 50f);
+                CRIAudioManager.SE.Play(VOICECueSheetName, Shout3CueName);
                 break;
         }
     }

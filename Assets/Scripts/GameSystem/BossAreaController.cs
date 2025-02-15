@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class BossAreaController : MonoBehaviour
@@ -12,6 +13,11 @@ public class BossAreaController : MonoBehaviour
     private void Awake()
     {
         _player = FindObjectOfType<PlayerController>();
+    }
+
+    private void Start()
+    {
+        CRIAudioManager.BGM.Play("CueSheet_BGM", "BGM_wind");
     }
 
     private void OnTriggerEnter(Collider other)

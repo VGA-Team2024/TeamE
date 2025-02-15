@@ -80,6 +80,7 @@ public class PlayerController : MonoBehaviour
             _isGround.Value = Physics.SphereCast(_variable.Rigidbody.position + new Vector3(0f, _groundCheckRayCastOffsetY, 0f),
                 _variable.CapsuleCollider.radius, Vector3.down, out var hitGround,
                 _groundCheckRayCastLength - _variable.CapsuleCollider.radius, _variable.GroundLayer);
+            _isGround.Value = !hitGround.collider.isTrigger;
             if (_isGround.Value)
             {
                 _variable.GroundNormal = hitGround.normal;
@@ -238,14 +239,14 @@ public class PlayerController : MonoBehaviour
             _isAiming = true;
             _bowObject.SetActive(true);
             _variable.CameraController.ChangeMode(CameraMode.Aim);
-            _bowPullSoundPlayer = CRIAudioManager.SE.Play("CueSheet_SE", "SE_player_bow_pull");
-            _bowPullSoundPlayer.SetVolume(0.1f);
+            // _bowPullSoundPlayer = CRIAudioManager.SE.Play("CueSheet_SE", "SE_player_bow_pull");
+            // _bowPullSoundPlayer.SetVolume(0.1f);
         }
 
         if (context.canceled)
         {
-            _bowPullSoundPlayer?.Stop();
-            _bowPullSoundPlayer?.SetVolume(1f);
+            // _bowPullSoundPlayer?.Stop();
+            // _bowPullSoundPlayer?.SetVolume(1f);
             AimStop();
             if (_variable.IsArrowCharging)
             {
