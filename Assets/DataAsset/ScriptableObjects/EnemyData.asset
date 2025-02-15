@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42d76a27469714f479c856d4027ff587, type: 3}
   m_Name: EnemyData
   m_EditorClassIdentifier: 
+  wanderDistance: 14
+  wanderMaxDistance: 20
   frontAttackWidth: 20
   frontAttackHeight: 6
   frontAttackDepth: 10
@@ -23,11 +25,12 @@ MonoBehaviour:
   backAttackDepth: 15
   rotateSpeed: 1.25
   rotateThreshold: 7.5
-  moveSpeed: 5
+  moveSpeed: 2.5
   attackWaitTime: 1
-  recoveryTime: 30
+  recoveryTime: 15
   rightFrontAttackTrigger: RightFrontAttack
   leftFrontAttackTrigger: LeftFrontAttack
+  centerAttackTrigger: CenterAttack
   rightBackAttackTrigger: RightBackAttack
   leftBackAttackTrigger: LeftBackAttack
   rightDownFlag: IsDownRight

@@ -71,10 +71,10 @@ public class PlayerInputProvider : SingletonMonoBehavior<PlayerInputProvider>
     }
     void OnPause(InputAction.CallbackContext context)
     {
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
-        SceneManager.LoadScene("Title");
-        _gameInputs.Dispose();
-        Destroy(gameObject);
+        // Cursor.visible = true;
+        // Cursor.lockState = CursorLockMode.None;
+        // SceneManager.LoadScene("Title");
+        // _gameInputs.Dispose();
+        // Destroy(gameObject);
     }
 }

@@ -54,8 +54,8 @@ public class PlayerController : MonoBehaviour
             .SelectMany(_ => Observable.Timer(TimeSpan.FromSeconds(0.2f)).TakeUntil(_hasParent.Where(flag => flag)))
             .Subscribe(_ =>
             {
-                _variable.PlayerRoot.parent = null;
-                SetLossyScale(_variable.PlayerRoot);
+                _variable.PlayerRoot.SetParent(null);
+                _variable.PlayerRoot.localScale = Vector3.one;
             }) //  元の親に戻す
             .AddTo(this);
         _isGround.Where(flag => !flag).Subscribe(_ => _highestPoint = _variable.PlayerRoot.position.y).AddTo(this);
@@ -82,10 +82,11 @@ public class PlayerController : MonoBehaviour
                 _groundCheckRayCastLength - _variable.CapsuleCollider.radius, _variable.GroundLayer);
             if (_isGround.Value)
             {
+                _isGround.Value = !hitGround.collider.isTrigger;
                 _variable.GroundNormal = hitGround.normal;
                 _variable.CanWalk = Vector3.Angle(hitGround.normal, Vector3.up) < _variable.WallAngle;
-                //_playerMoveController.transform.parent = hitGround.collider.transform;
-                //SetLossyScale(_playerMoveController.transform);
+                if(!_variable.IsKnockBack) _variable.PlayerRoot.SetParent(hitGround.collider.transform);
+                //SetLossyScale(_variable.PlayerRoot);
                 _hasParent.Value = true;
             }
             else
@@ -133,7 +134,11 @@ public class PlayerController : MonoBehaviour
             _variable.WallLayer) && (PlayerInputProvider.Instance.Grab || _variable.IsAttack) && !_isClimbHopping;
         if (_isClimbable.Value)
         {
-            if (hitWall.collider is MeshCollider)
+            if (hitWall.transform.CompareTag("ClimbableWall"))
+            {
+                _isClimbable.Value = true;
+            }
+            else if (hitWall.collider is MeshCollider)
             {
                 var mat = GetMaterial(hitWall.collider);
                 if (mat != null)
@@ -146,16 +151,18 @@ public class PlayerController : MonoBehaviour
                     _isClimbable.Value = false;
                 }
             }
-
-            _isClimbable.Value = hitWall.transform.CompareTag("ClimbableWall");
+            else
+            {
+                _isClimbable.Value = false;
+            }
         }
 
         if (_isClimbable.Value)
         {
             _currentNormal = hitWall.normal;
             _currentClosestPoint = hitWall.point;
-            //_playerMoveController.transform.parent = hitWall.collider.transform;
-            //SetLossyScale(_playerMoveController.transform);
+            if(!_variable.IsKnockBack) _variable.PlayerRoot.SetParent(hitWall.collider.transform);
+            //SetLossyScale(_variable.PlayerRoot);
             _hasParent.Value = true;
         }
         else
@@ -182,7 +189,7 @@ public class PlayerController : MonoBehaviour
             _variable.MoveController.MovePlayer(_currentMoveInput, _isAiming);
         }
 
-        //_prevPos = _playerMoveController.transform.position;
+        _prevPos = _variable.PlayerRoot.transform.position;
     }
 #if UNITY_EDITOR
     private void OnDrawGizmos()
@@ -232,14 +239,14 @@ public class PlayerController : MonoBehaviour
             _isAiming = true;
             _bowObject.SetActive(true);
             _variable.CameraController.ChangeMode(CameraMode.Aim);
-            _bowPullSoundPlayer = CRIAudioManager.SE.Play("CueSheet_SE", "SE_player_bow_pull");
-            _bowPullSoundPlayer.SetVolume(0.1f);
+            // _bowPullSoundPlayer = CRIAudioManager.SE.Play("CueSheet_SE", "SE_player_bow_pull");
+            // _bowPullSoundPlayer.SetVolume(0.1f);
         }
 
         if (context.canceled)
         {
-            _bowPullSoundPlayer?.Stop();
-            _bowPullSoundPlayer?.SetVolume(1f);
+            // _bowPullSoundPlayer?.Stop();
+            // _bowPullSoundPlayer?.SetVolume(1f);
             AimStop();
             if (_variable.IsArrowCharging)
             {
@@ -273,7 +280,6 @@ public class PlayerController : MonoBehaviour
                 return skinfo.skinnedMesh.sharedMaterials[boneMesh.skinnedMeshMaterialIndex];
         return null;
     }
-
     private void SetLossyScale(Transform target)
     {
         if (target.parent)

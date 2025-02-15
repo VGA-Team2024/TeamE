@@ -100,6 +100,8 @@ public class RagdollController : MonoBehaviour, IHasPlayerVariable
     [ContextMenu("有効化")]
     public void Active()
     {
+        _variable.PlayerRoot.SetParent(null);
+        _variable.PlayerRoot.localScale = Vector3.one;
         IsActive = true;
         Observable.Timer(TimeSpan.FromSeconds(1.5f)).Subscribe(_ => IsActive = false).AddTo(this);
     }

@@ -22,34 +22,64 @@ public class EnemyNodes
 
     public class SequenceNode : BaseNode
     {
+        private int _activeChild = 0;
         private List<BaseNode> _nodes = new List<BaseNode>();
         public void Add(BaseNode node) => _nodes.Add(node);
         public override NodeStatus Execute()
         {
-            foreach (var node in _nodes)
+            var childState = _nodes[_activeChild].Execute();
+            switch (childState)
             {
-                var status = node.Execute();
-                if (status == NodeStatus.Failure) return NodeStatus.Failure;
-                else if (status == NodeStatus.Running) return NodeStatus.Running;
+                case NodeStatus.Success:
+                    _activeChild++;
+                    if (_activeChild == _nodes.Count)
+                    {
+                        _activeChild = 0;
+                        return NodeStatus.Success;
+                    }
+                    else
+                    {
+                        return NodeStatus.Running;
+                    }
+                case NodeStatus.Failure:
+                    _activeChild = 0;
+                    return NodeStatus.Failure;
+                case NodeStatus.Running:
+                    return NodeStatus.Running;
             }
-            return NodeStatus.Success;
+            throw new Exception("想定していない状態が返されました。");
         }
     }
 
     public class SelectorNode : BaseNode
     {
+        private int _activeChild = 0;
         private List<BaseNode> _nodes = new List<BaseNode>();
         public void Add(BaseNode node) => _nodes.Add(node);
 
         public override NodeStatus Execute()
         {
-            foreach (var node in _nodes)
+            var childState = _nodes[_activeChild].Execute();
+            switch (childState)
             {
-                var status = node.Execute();
-                if (status == NodeStatus.Success) return NodeStatus.Success;
-                else if (status == NodeStatus.Running) return NodeStatus.Running;
+                case NodeStatus.Success:
+                    _activeChild = 0;
+                    return NodeStatus.Success;
+                case NodeStatus.Failure:
+                    _activeChild++;
+                    if (_activeChild == _nodes.Count)
+                    {
+                        _activeChild = 0;
+                        return NodeStatus.Failure;
+                    }
+                    else
+                    {
+                        return NodeStatus.Running;
+                    }
+                case NodeStatus.Running:
+                    return NodeStatus.Running;
             }
-            return NodeStatus.Failure;
+            throw new Exception("想定していない状態が返されました。");
         }
     }
 }

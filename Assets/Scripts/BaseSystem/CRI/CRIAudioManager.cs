@@ -221,7 +221,7 @@ public class CRIAudioManager
         /// <param name="cueName">キューネーム名</param>
         /// <param name="delay">遅延時間</param>
         /// <returns>メソッドチェーン用に自分自身を返す</returns>
-        public virtual SoundPlayer Play(string cueSheet, string cueName, float delay = 0.0f)
+        public virtual SoundPlayer Play(string cueSheet, string cueName, float delay = 0.0f, float volume = 1.0f)
         {
             //準備待ちの時は準備終わり次第再生
             if (!_instance._isReady)
@@ -245,6 +245,7 @@ public class CRIAudioManager
             CueInfo info = _instance._soundDic[cueSheet].GetCueInfo(cueName);
             _atomExPlayer.SetCue(_instance._soundDic[cueSheet].GetAcb(), info.id);
             _atomExPlayer.SetPreDelayTime(delay);
+            _atomExPlayer.SetVolume(volume);
             _playbackMemory = _atomExPlayer.Start();    //最後に再生したものを記録
             return this;
         }
@@ -356,7 +357,7 @@ public class CRIAudioManager
                 _atomExPlayer3D.SetPanType(CriAtomEx.PanType.Pos3d);
                 _atomExPlayer3D.Set3dSource(_source);
                 _atomExPlayer3D.UpdateAll();
-                //_atomExPlayer3D.Set3dListener(_instance._listener.3d as CriAtomEx3dListener);
+                _atomExPlayer3D.Set3dListener(_instance._seplayer.Listener);
                 return _atomExPlayer3D.Start();
             }
 
@@ -368,7 +369,7 @@ public class CRIAudioManager
 
         CriAtomEx3dListener _lintener;
         Sound3D[] _sound3Ds = new Sound3D[AtomSourceBuffer];
-
+        public CriAtomEx3dListener Listener => _lintener;
         public SEPlayerWith3D() : base(SoundType.SE)
         {
         }

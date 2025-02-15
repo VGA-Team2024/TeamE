@@ -11,8 +11,9 @@ public static class AnimHashUtil
     public static readonly int ClimbJump = Animator.StringToHash("ClimbJump");
     public static readonly int FallDistance = Animator.StringToHash("FallDistance");
     public static readonly int IsClimb = Animator.StringToHash("IsClimb");
-    public static readonly int Attack = Animator.StringToHash("Attack");
-    public static readonly int Stab = Animator.StringToHash("Stab");
     public static readonly int Charge = Animator.StringToHash("ArrowCharge");
     public static readonly int Release = Animator.StringToHash("ArrowRelease");
+    public static readonly int Slash = Animator.StringToHash("Slash");
+    public static readonly int WallStab = Animator.StringToHash("WallStab");
+    public static readonly int GroundStab = Animator.StringToHash("GroundStab");
 }

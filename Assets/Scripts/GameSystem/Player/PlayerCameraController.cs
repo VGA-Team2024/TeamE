@@ -1,4 +1,5 @@
 using Cinemachine;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 public enum CameraMode
 {
@@ -35,12 +36,23 @@ public class PlayerCameraController : MonoBehaviour, IHasPlayerVariable
         _defaultTargetPosition = _cameraLookAtTarget.localPosition;
         _transposer = _virtualCamera.GetCinemachineComponent<CinemachineTransposer>();
     }
+
+    private void Update()
+    {
+        if (CRIAudioManager.SE.Listener != null)
+        {
+            var cameraPos = _virtualCamera.transform.position;
+            CRIAudioManager.SE.Listener.SetPosition(cameraPos.x, cameraPos.y, cameraPos.z);
+            CRIAudioManager.SE.Listener.Update();
+        }
+    }
+
     private void FixedUpdate()
     {
         _currentInput = PlayerInputProvider.Instance.LookValue;
         
         _rotationX += _inverseX ? -1 : 1 * _currentInput.x * _xSensibility;
-        _rotationY += _inverseY ? -1 : 1 * -_currentInput.y * _ySensibility;
+        _rotationY += _inverseY ? -1 : 1 * _currentInput.y * _ySensibility;
         _rotationY = Mathf.Clamp(_rotationY, -_maxUpAngle, -_minDownAngle);
         var playerPosition = _variable.PlayerRoot.position;
         if (_currentCameraMode == CameraMode.KnockBack)
@@ -75,6 +87,11 @@ public class PlayerCameraController : MonoBehaviour, IHasPlayerVariable
                 _reticuleImage.SetActive(false);
                 break;
         }
+    }
+
+    public async UniTaskVoid ViewFinishPoints()
+    {
+        
     }
 
     public void InjectVariable(PlayerVariable variable)

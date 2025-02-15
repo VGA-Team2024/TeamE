@@ -69,7 +69,7 @@ Material:
     - _warpy: 0
     - _warpyuv: 6
     m_Colors:
-    - _color: {r: 0.82808024, g: 0.82808024, b: 0.82808024, a: 0}
+    - _color: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &3306459799695399832
 MonoBehaviour:

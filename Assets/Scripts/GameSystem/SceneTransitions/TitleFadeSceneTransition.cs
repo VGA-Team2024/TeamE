@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,13 +19,7 @@ public class TitleFadeSceneTransition : MonoBehaviour
         _fadePanelImage.color = _startColor;
         _fadePanelImage.enabled = false;
     }
-
-    public void CollCoroutine()
-    {
-        StartCoroutine(FadeSceneTransition());
-    }
-
-    IEnumerator FadeSceneTransition()
+    public async UniTaskVoid FadeSceneTransition(Action callback)
     {
         if (_fadeTime != 0f)
         {
@@ -35,11 +30,12 @@ public class TitleFadeSceneTransition : MonoBehaviour
                 deltaTime += Time.deltaTime;
                 var a = Mathf.Clamp01(deltaTime / _fadeTime);
                 _fadePanelImage.color = new Color(0f, 0f, 0f, a);
-                yield return null;
+                await UniTask.Yield(destroyCancellationToken);
             }
             _fadePanelImage.color = _endColor;
         }//フェード時間が０の場合フェードせずにそのまま遷移
-        yield return new WaitForSeconds(_waitTime);
-        TimelineManager.Instance.Play().Forget();
+
+        await UniTask.WaitForSeconds(_waitTime, cancellationToken: destroyCancellationToken);
+        callback?.Invoke();
     }
 }
