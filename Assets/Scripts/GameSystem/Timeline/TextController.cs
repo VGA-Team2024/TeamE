@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -7,7 +5,7 @@ using UnityEngine;
 public class TextController : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _text;
-    [SerializeField] private List<string> _data;
+    [SerializeField, TextArea] private List<string> _data;
     private int _currentIndex = 0;
 
     [SerializeField] private bool _disableAutoWrapping = true;

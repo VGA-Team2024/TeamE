@@ -25,7 +25,7 @@ MonoBehaviour:
     m_Start: 0.5833333333333334
     m_ClipIn: 0
     m_Asset: {fileID: -3156757082300554645}
-    m_Duration: 7.633333333333327
+    m_Duration: 14.099999999999943
     m_TimeScale: 1
     m_ParentTrack: {fileID: -7045450655995856317}
     m_EaseInDuration: 0
@@ -89,7 +89,7 @@ MonoBehaviour:
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: 0
     m_PreExtrapolationTime: 0
-    m_DisplayName: SE_player_footsound
+    m_DisplayName: SE_player_footsound_full
   m_Markers:
     m_Objects: []
   m_AisacControls: 
@@ -119,9 +119,9 @@ MonoBehaviour:
     volume: 1
     pitch: 0
     AISACValue: 0
-  clipDuration: 0
+  clipDuration: 2.7100625
   cueSheet: CueSheet_SE
-  cueName: SE_player_footsound
+  cueName: SE_player_footsound_full
 --- !u!114 &-2405024409982161141
 MonoBehaviour:
   m_ObjectHideFlags: 1

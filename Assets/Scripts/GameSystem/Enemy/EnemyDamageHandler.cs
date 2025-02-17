@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class EnemyDamageHandler : MonoBehaviour
@@ -24,15 +23,15 @@ public class EnemyDamageHandler : MonoBehaviour
 
         _killPoint.OnDamage += () =>
         {
-            TimelinePlayer.TimelineType = TimelineType.KillEnding;
-            SceneManager.LoadScene("Timeline");
             _releasePoint.Locked = true;
+            TimelinePlayer.TimelineType = TimelineType.KillEnding;
+            FadeSceneManager.Instance.FadeLoadScene("Timeline", 1f).Forget();
         };
         _releasePoint.OnDamage += () =>
         {
-            TimelinePlayer.TimelineType = TimelineType.ReleaseEnding;
-            SceneManager.LoadScene("Timeline");
             _killPoint.Locked = true;
+            TimelinePlayer.TimelineType = TimelineType.ReleaseEnding;
+            FadeSceneManager.Instance.FadeLoadScene("Timeline", 1f).Forget();
         };
     }
 

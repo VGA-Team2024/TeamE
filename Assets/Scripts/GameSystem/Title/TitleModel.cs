@@ -1,27 +1,19 @@
-﻿using UnityEngine.SceneManagement;
-
+﻿
 namespace GameSystem.Title
 {
     public class TitleModel
     {
-        private TitleFadeSceneTransition _fadeSceneTransition;
-
-        public TitleModel(TitleFadeSceneTransition fadeSceneTransition)
+        public TitleModel()
         {
-            _fadeSceneTransition = fadeSceneTransition;
-            
             CRIAudioManager.Initialize();
             CRIAudioManager.BGM.Play("CueSheet_BGM", "BGM_title"); 
         }
 
         public void StartButton()
         {
-            _fadeSceneTransition.FadeSceneTransition(()=>
-            {
-                TimelinePlayer.TimelineType = TimelineType.Opening;
-                SceneManager.LoadScene("Timeline");
-            }).Forget();
+            TimelinePlayer.TimelineType = TimelineType.Opening;
             GameEventRecorder.GameStart();
+            FadeSceneManager.Instance.FadeLoadScene("Timeline", 0.25f).Forget();
         }
 
         public void OptionButton()

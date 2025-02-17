@@ -6,12 +6,11 @@ namespace GameSystem.Title
     {
         [SerializeField] private TitleView _titleView;
         [SerializeField] private OptionPresenter _optionPresenter;
-        [SerializeField] private TitleFadeSceneTransition _fadeSceneTransition;
         private TitleModel _titleModel;
 
         private void Start()
         {
-            _titleModel = new TitleModel(_fadeSceneTransition);
+            _titleModel = new TitleModel();
             
             
 
@@ -31,7 +30,6 @@ namespace GameSystem.Title
             if (_optionPresenter != null)
             {
                 _optionPresenter.OpenOptionPanel();
-                Debug.Log("Open Option Panel");
             }
         }
     }

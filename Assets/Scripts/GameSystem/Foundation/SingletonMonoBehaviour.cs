@@ -1,23 +1,19 @@
 using UnityEngine;
 
-public class SingletonMonoBehavior< T > : MonoBehaviour where T : SingletonMonoBehavior<T>
+public class SingletonMonoBehavior<T> : MonoBehaviour where T : Component
 {
     public static T Instance { get; private set; }
-    protected virtual void Awake()
+    void Awake()
     {
-        if (Instance != this && Instance != null)
+        if (Instance && Instance != this)
         {
-            Debug.LogError($"シングルトンの{this.gameObject}が複数生成されました。");
-            Destroy(this.gameObject);
+            Debug.LogWarning($"シングルトンの{this.gameObject}が複数生成されました。");
+            Destroy(gameObject);
+            return;
         }
         Instance = this as T;
+        DontDestroyOnLoad(gameObject);
+        OnAwake();
     }
-
-
-    protected virtual void OnDestroy()
-    {
-        Debug.Log($"{this}を破棄しました");
-        Instance = null;
-    }
-
+    protected virtual void OnAwake(){}
 }

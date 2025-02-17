@@ -9,8 +9,9 @@ public class PlayerAttackController : MonoBehaviour, IHasPlayerVariable
     [SerializeField] private float _stabTime = 2.2f;
     [SerializeField] private float _slashSETime = 0.434124f;
     [SerializeField] private float _stabSETime = 1.33753f;
-    [SerializeField] private GameObject _attackObject;
-    [SerializeField] private GameObject _stabObject;
+    [SerializeField] private GameObject _slashObject;
+    [SerializeField] private GameObject _wallStabObject;
+    [SerializeField] private GameObject _groundStabObject;
     private PlayerVariable _variable;
     private readonly string CueSheetName = "CueSheet_SE";
     private readonly string SwordPierceCueName = "SE_player_sword_pierce";
@@ -19,8 +20,8 @@ public class PlayerAttackController : MonoBehaviour, IHasPlayerVariable
     public EnemyDamagePointHandler DamagePointHandler { get; set; }
     private void Awake()
     {
-        _attackObject?.SetActive(false);
-        _stabObject?.SetActive(false);
+        _slashObject?.SetActive(false);
+        _wallStabObject?.SetActive(false);
     }
 
     public void Attack(bool isClimb, Animator animator)
@@ -56,17 +57,17 @@ public class PlayerAttackController : MonoBehaviour, IHasPlayerVariable
         switch (type)
         {
             case AttackType.Slash:
-                visualObject = _attackObject;
+                visualObject = _slashObject;
                 stateHash = AnimHashUtil.Slash;
                 waitTime = _slashTime;
                 break;
             case AttackType.WallStab:
-                visualObject = _stabObject;
+                visualObject = _wallStabObject;
                 stateHash = AnimHashUtil.WallStab;
                 waitTime = _stabTime;
                 break;
             case AttackType.GroundStab:
-                visualObject = _stabObject;
+                visualObject = _groundStabObject;
                 stateHash = AnimHashUtil.GroundStab;
                 waitTime = _stabTime;
                 break;
