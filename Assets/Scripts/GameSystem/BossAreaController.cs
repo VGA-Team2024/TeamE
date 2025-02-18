@@ -1,8 +1,8 @@
-using System;
 using UnityEngine;
 
 public class BossAreaController : MonoBehaviour
 {
+    [SerializeField] private BoxCollider _areaCloseCollider;
     [SerializeField] private EnemyController _enemyController;
     [SerializeField, InspectorVariantName("ボスエリアの地面の高さ")] private float _bossAreaGroundHeight = 48f;
     [SerializeField, InspectorVariantName("地面をすり抜けた際の復帰用のレイキャストの長さ")] private float _returnGroundRaycastLength = 10f;
@@ -12,6 +12,7 @@ public class BossAreaController : MonoBehaviour
 
     private void Awake()
     {
+        _areaCloseCollider.enabled = false;
         _player = FindObjectOfType<PlayerController>();
     }
 
@@ -25,6 +26,7 @@ public class BossAreaController : MonoBehaviour
         if(_isEntered) return;
         if (other.CompareTag("Player"))
         {
+            _areaCloseCollider.enabled = true;
             _isEntered = true;
             _enemyController.Activate();
             CRIAudioManager.BGM.Play("CueSheet_BGM", "BGM_boss");

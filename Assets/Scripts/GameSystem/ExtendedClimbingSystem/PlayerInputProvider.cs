@@ -1,7 +1,6 @@
 using R3;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 
 public class PlayerInputProvider : SingletonMonoBehavior<PlayerInputProvider>
 {
@@ -18,10 +17,9 @@ public class PlayerInputProvider : SingletonMonoBehavior<PlayerInputProvider>
     public Subject<InputAction.CallbackContext> AimSubject => _aimSubject;
     public Subject<Unit> AttackSubject => _attackSubject;
     public bool Grab => _grab;
-
-    protected override void Awake()
+    public InputAction PauseAction { get; private set; }
+    protected override void OnAwake()
     {
-        base.Awake();
         _gameInputs = new GameInputs();
         _gameInputs.Player.Look.performed += OnLook;
         _gameInputs.Player.Look.canceled += OnLook;
@@ -33,7 +31,7 @@ public class PlayerInputProvider : SingletonMonoBehavior<PlayerInputProvider>
         _gameInputs.Player.Attack.started += OnAttack;
         _gameInputs.Player.Grab.started += OnGrab;
         _gameInputs.Player.Grab.canceled += OnGrab;
-        _gameInputs.Player.Pause.started += OnPause;
+        PauseAction = _gameInputs.Player.Pause;
         _gameInputs.Enable();
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -68,13 +66,5 @@ public class PlayerInputProvider : SingletonMonoBehavior<PlayerInputProvider>
     void OnGrab(InputAction.CallbackContext context)
     {
         _grab = context.started;
-    }
-    void OnPause(InputAction.CallbackContext context)
-    {
-        // Cursor.visible = true;
-        // Cursor.lockState = CursorLockMode.None;
-        // SceneManager.LoadScene("Title");
-        // _gameInputs.Dispose();
-        // Destroy(gameObject);
     }
 }

@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class TargetHItGoTitle : MonoBehaviour
 {
-   [SerializeField] GoTitleSceneTransition _goTitleSceneTransition;
+   [SerializeField] SceneTransition _sceneTransition;
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Bullet"))
         {
-            _goTitleSceneTransition.GoTitle();
+            _sceneTransition.LoadTitle();
         }
     }
 }

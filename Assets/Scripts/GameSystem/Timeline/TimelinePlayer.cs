@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Playables;
-using UnityEngine.SceneManagement;
 
 public enum TimelineType
 {
@@ -40,12 +39,12 @@ public class TimelinePlayer: MonoBehaviour
             director.Play();
             await UniTask.WaitUntil(()=>director.time >= director.duration);
         }
-        SceneManager.LoadScene("Temple");
+        FadeSceneManager.Instance.FadeLoadScene("Temple", 0.25f).Forget();
     }
 
     private async UniTaskVoid PlayKillEnding()
     {
-        CRIAudioManager.BGM.Play("CueSheet_BGM", "BGM_ending");
+        CRIAudioManager.BGM.Stop();
         _killEnding.gameObject.SetActive(true);
         await UniTask.Yield(destroyCancellationToken);
         _killEnding.Play();
@@ -53,7 +52,7 @@ public class TimelinePlayer: MonoBehaviour
 
     private async UniTaskVoid PlayReleaseEnding()
     {
-        CRIAudioManager.BGM.Play("CueSheet_BGM", "BGM_ending");
+        CRIAudioManager.BGM.Stop();
         _releaseEnding.gameObject.SetActive(true);
         await UniTask.Yield(destroyCancellationToken);
         _releaseEnding.Play();

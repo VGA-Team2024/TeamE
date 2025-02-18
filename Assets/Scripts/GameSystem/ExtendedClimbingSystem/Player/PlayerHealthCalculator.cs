@@ -1,6 +1,5 @@
 using R3;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerHealthCalculator : MonoBehaviour
 {
@@ -25,7 +24,9 @@ public class PlayerHealthCalculator : MonoBehaviour
             if (health < 0f)
             {
                 _currentHealth.Value = 0f;
-                SceneManager.LoadScene("GameOver");
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+                FadeSceneManager.Instance.FadeLoadScene("GameOver", 0.4f).Forget();
                 return;
             }
             _playerHealthIndicator.SetRatio(health /_maxHealth);
